@@ -76,5 +76,4 @@ public class AuthService {
             throw new InvalidCredentialsException("Credênciais inválidas!");
         }
     }
-
 }
