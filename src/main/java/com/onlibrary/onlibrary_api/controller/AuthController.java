@@ -36,13 +36,15 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO, HttpServletResponse response) {
         TokenDTO tokenDTO = authService.login(loginRequestDTO);
 
-        Cookie cookie = new Cookie("jwt", tokenDTO.getAccessToken());
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        cookie.setMaxAge(7 * 24 * 60 * 60);
+        ResponseCookie cookie = ResponseCookie.from("jwt", tokenDTO.getAccessToken())
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .sameSite("None")
+                .maxAge(7 * 24 * 60 * 60)
+                .build();
 
-        response.setHeader("Set-Cookie", "jwt=" + cookie + "; HttpOnly; Path=/; Max-Age=604800; SameSite=Lax");
+        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         return ResponseEntity.ok().body(new ResponseDTO<>(true, "Autenticação realizada com sucesso!", tokenDTO));
     }
 
