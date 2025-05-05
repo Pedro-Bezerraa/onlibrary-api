@@ -1,4 +1,4 @@
-package com.onlibrary.onlibrary_api.dto;
+package com.onlibrary.onlibrary_api.dto.usuario;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

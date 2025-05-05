@@ -35,6 +35,21 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler(EtapaInvalidaException.class)
+    public ResponseEntity<ErrorResponseDTO> handlerEtapaInvalida(EtapaInvalidaException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DadoObrigatorioException.class)
+    public ResponseEntity<ErrorResponseDTO> handlerDadoObrigatorio(DadoObrigatorioException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DadoInvalidoException.class)
+    public ResponseEntity<ErrorResponseDTO> handlerDadoInvalido(DadoInvalidoException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
     private ResponseEntity<ErrorResponseDTO> buildErrorResponse(String message, HttpStatus status) {
         ErrorResponseDTO response = new ErrorResponseDTO(
                 message,

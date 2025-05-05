@@ -1,4 +1,4 @@
-package com.onlibrary.onlibrary_api.dto;
+package com.onlibrary.onlibrary_api.dto.usuario;
 
 import com.onlibrary.onlibrary_api.model.ContaSituacao;
 import com.onlibrary.onlibrary_api.model.UsuarioRole;
