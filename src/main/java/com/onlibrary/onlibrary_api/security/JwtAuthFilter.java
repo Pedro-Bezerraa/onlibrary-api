@@ -1,3 +1,4 @@
+
 package com.onlibrary.onlibrary_api.security;
 
 import com.onlibrary.onlibrary_api.service.CustomUserDetailsService;
@@ -38,7 +39,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = null;
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
-                if ("access_token".equals(cookie.getName())) {
+                if ("jwt".equals(cookie.getName())) {
                     token = cookie.getValue();
                     break;
                 }

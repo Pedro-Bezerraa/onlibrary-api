@@ -4,6 +4,7 @@ import com.onlibrary.onlibrary_api.dto.*;
 import com.onlibrary.onlibrary_api.dto.usuario.*;
 import com.onlibrary.onlibrary_api.repository.UsuarioRepository;
 import com.onlibrary.onlibrary_api.service.AuthService;
+import com.onlibrary.onlibrary_api.service.JwtService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,10 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -23,10 +21,11 @@ public class AuthController {
 
     private final AuthService authService;
     private final UsuarioRepository usuarioRepository;
+    private  final JwtService jwtService;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUsuario(@Valid @RequestBody RegisterRequestDTO requestDTO) {
-       RegisterResponseDTO usuarioCriado = authService.registerUsuario(requestDTO);
+        RegisterResponseDTO usuarioCriado = authService.registerUsuario(requestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseDTO<>(true, "Usuário cadastrado com sucesso!", usuarioCriado));
     }
 
