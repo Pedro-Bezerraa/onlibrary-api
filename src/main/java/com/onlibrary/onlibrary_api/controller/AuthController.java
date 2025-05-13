@@ -50,4 +50,9 @@ public class AuthController {
         authService.validarEtapa(request.getEtapa(), request.getDados());
         return ResponseEntity.ok(new ResponseDTO<>(true, "Dados válidos", request.getDados()));
     }
+
+    @GetMapping("/ping")
+    public String ping() {
+        return "pong";
+    }
 }
