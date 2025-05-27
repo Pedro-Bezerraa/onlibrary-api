@@ -1,7 +1,6 @@
 package com.onlibrary.onlibrary_api.dto.usuario;
 
-import com.onlibrary.onlibrary_api.model.ContaSituacao;
-import com.onlibrary.onlibrary_api.model.UsuarioRole;
+import com.onlibrary.onlibrary_api.model.enums.ContaSituacao;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,5 +15,4 @@ public class RegisterResponseDTO {
     private String email;
     private String cpf;
     private ContaSituacao situacao;
-    private UsuarioRole role;
 }

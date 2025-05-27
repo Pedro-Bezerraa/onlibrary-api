@@ -5,9 +5,8 @@ import com.onlibrary.onlibrary_api.dto.usuario.RegisterRequestDTO;
 import com.onlibrary.onlibrary_api.dto.usuario.RegisterResponseDTO;
 import com.onlibrary.onlibrary_api.dto.usuario.TokenDTO;
 import com.onlibrary.onlibrary_api.exception.*;
-import com.onlibrary.onlibrary_api.model.ContaSituacao;
-import com.onlibrary.onlibrary_api.model.Usuario;
-import com.onlibrary.onlibrary_api.model.UsuarioRole;
+import com.onlibrary.onlibrary_api.model.entities.Usuario;
+import com.onlibrary.onlibrary_api.model.enums.ContaSituacao;
 import com.onlibrary.onlibrary_api.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -45,7 +44,6 @@ public class AuthService {
         novoUsuario.setCpf(requestDTO.getCpf());
         novoUsuario.setSenha(passwordEncoder.encode(requestDTO.getSenha()));
         novoUsuario.setSituacao(ContaSituacao.ATIVO);
-        novoUsuario.setRole(UsuarioRole.ROLE_USUARIO);
 
 
         Usuario usuarioSalvo = usuarioRepository.save(novoUsuario);
@@ -57,7 +55,6 @@ public class AuthService {
                 .email(usuarioSalvo.getEmail())
                 .cpf(usuarioSalvo.getCpf())
                 .situacao(usuarioSalvo.getSituacao())
-                .role(usuarioSalvo.getRole())
                 .build();
     }
 

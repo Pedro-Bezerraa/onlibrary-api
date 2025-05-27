@@ -1,17 +1,13 @@
 package com.onlibrary.onlibrary_api.repository;
 
-import com.onlibrary.onlibrary_api.model.Biblioteca;
-import com.onlibrary.onlibrary_api.model.UsuarioBiblioteca;
+import com.onlibrary.onlibrary_api.model.entities.UsuarioBiblioteca;
+import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.UUID;
 
-public interface UsuarioBibliotecaRepository extends JpaRepository<UsuarioBiblioteca, Long> {
-    @Query("""
-    SELECT ub.biblioteca FROM UsuarioBiblioteca ub
-    WHERE ub.usuario.id = :usuarioId AND ub.tipoUsuario IN ('ADMIN_MASTER', 'FUNCIONARIO')
-""")
-    List<Biblioteca> findBibliotecasDoUsuarioAdministradorOuFuncionario(@Param("usuarioId") Long usuarioId);
+public interface UsuarioBibliotecaRepository extends JpaRepository<UsuarioBiblioteca, UUID> {
+
+    List<UsuarioBiblioteca> findByUsuarioIdAndTipoUsuarioIn(UUID usuarioId, List<TipoUsuario> tipos);
 }

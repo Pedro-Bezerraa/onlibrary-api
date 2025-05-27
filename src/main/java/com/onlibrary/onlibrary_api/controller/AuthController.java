@@ -1,13 +1,13 @@
 package com.onlibrary.onlibrary_api.controller;
 
-import com.onlibrary.onlibrary_api.dto.*;
+import com.onlibrary.onlibrary_api.dto.ResponseDTO;
 import com.onlibrary.onlibrary_api.dto.usuario.*;
 import com.onlibrary.onlibrary_api.repository.UsuarioRepository;
 import com.onlibrary.onlibrary_api.service.AuthService;
 import com.onlibrary.onlibrary_api.service.JwtService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class AuthController {
 
-    private final AuthService authService;
-    private final UsuarioRepository usuarioRepository;
-    private  final JwtService jwtService;
+    private AuthService authService;
+    private UsuarioRepository usuarioRepository;
+    private JwtService jwtService;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUsuario(@Valid @RequestBody RegisterRequestDTO requestDTO) {

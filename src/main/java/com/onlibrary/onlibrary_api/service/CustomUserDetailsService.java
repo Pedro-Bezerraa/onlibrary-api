@@ -1,6 +1,6 @@
 package com.onlibrary.onlibrary_api.service;
 
-import com.onlibrary.onlibrary_api.model.Usuario;
+import com.onlibrary.onlibrary_api.model.entities.Usuario;
 import com.onlibrary.onlibrary_api.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -34,7 +34,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     private Collection<? extends GrantedAuthority> getAuthority(Usuario usuario) {
-        GrantedAuthority authority = new SimpleGrantedAuthority(usuario.getRole().name());
-        return List.of(authority);
+        return List.of(new SimpleGrantedAuthority("USER"));
     }
+
 }

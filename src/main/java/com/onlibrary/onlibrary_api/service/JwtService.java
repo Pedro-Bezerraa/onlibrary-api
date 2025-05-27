@@ -1,6 +1,6 @@
 package com.onlibrary.onlibrary_api.service;
 
-import com.onlibrary.onlibrary_api.model.Usuario;
+import com.onlibrary.onlibrary_api.model.entities.Usuario;
 import com.onlibrary.onlibrary_api.repository.UsuarioRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -13,10 +13,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -43,7 +45,7 @@ public class JwtService {
         Date expiryDate = new Date(now.getTime() + expiration);
 
         Map<String, Object> claims = new HashMap<>(customClaims);
-        claims.put("id", usuario.getId());
+        claims.put("id", usuario.getId().toString());
 
         log.info("Token gerado para usuário com ID: {}", usuario.getId());
         return Jwts.builder()
@@ -58,14 +60,18 @@ public class JwtService {
                 .compact();
     }
 
-    public Long extractUserId(String token) {
+    public UUID extractIdForUser(String token) {
         Claims claims = extractAllClaims(token);
         Object idClaim = claims.get("id");
-        if (idClaim instanceof Integer) {
-            return ((Integer) idClaim).longValue();
-        } else if (idClaim instanceof Long) {
-            return (Long) idClaim;
+        if (idClaim instanceof String) {
+            try {
+                return UUID.fromString((String) idClaim);
+            } catch (IllegalArgumentException e) {
+                log.error("ID no token não é um UUID válido: {}", idClaim);
+                throw new RuntimeException("ID no token inválido", e);
+            }
         } else {
+            log.error("ID no token não é uma string: {}", idClaim);
             return null;
         }
     }

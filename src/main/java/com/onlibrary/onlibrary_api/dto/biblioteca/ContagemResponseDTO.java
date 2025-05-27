@@ -1,0 +1,7 @@
+package com.onlibrary.onlibrary_api.dto.biblioteca;
+
+public record ContagemResponseDTO(
+        Long quatidade,
+        boolean aviso
+) {
+}
