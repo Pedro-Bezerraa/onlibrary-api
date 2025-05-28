@@ -8,6 +8,7 @@ import com.onlibrary.onlibrary_api.service.JwtService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -16,12 +17,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthController {
 
-    private AuthService authService;
-    private UsuarioRepository usuarioRepository;
-    private JwtService jwtService;
+    private final AuthService authService;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUsuario(@Valid @RequestBody RegisterRequestDTO requestDTO) {
@@ -33,15 +32,15 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO, HttpServletResponse response) {
         TokenDTO tokenDTO = authService.login(loginRequestDTO);
 
-        ResponseCookie cookie = ResponseCookie.from("jwt", tokenDTO.getAccessToken())
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .sameSite("None")
-                .maxAge(7 * 24 * 60 * 60)
-                .build();
-
-        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+//        ResponseCookie cookie = ResponseCookie.from("jwt", tokenDTO.getAccessToken())
+//                .httpOnly(true)
+//                .secure(false)
+//                .path("/")
+//                .sameSite("None")
+//                .maxAge(7 * 24 * 60 * 60)
+//                .build();
+//
+//        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         return ResponseEntity.ok().body(new ResponseDTO<>(true, "Autenticação realizada com sucesso!", tokenDTO));
     }
 

@@ -35,8 +35,10 @@ public class UsuarioBiblioteca {
     private PerfilUsuario perfilUsuario;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_usuario")
     private TipoUsuario tipoUsuario;
 
+    @Column(name = "numero_matricula")
     private String numeroMatricula;
     private String cpf;
 

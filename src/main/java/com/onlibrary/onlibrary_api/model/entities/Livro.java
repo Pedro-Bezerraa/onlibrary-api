@@ -30,6 +30,7 @@ public class Livro {
 
     @Column(name = "ano_lancamento", nullable = false)
     private Integer anoLancamento;
+    private String capa;
 
     @OneToMany(mappedBy = "livro")
     private List<LivroAutor> autores;

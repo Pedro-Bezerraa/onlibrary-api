@@ -52,4 +52,8 @@ public class Reserva {
 
     @OneToMany(mappedBy = "reserva")
     private List<ReservaExemplar> exemplares;
+
+    @OneToMany(mappedBy = "reserva")
+    private List<Emprestimo> emprestimos;
+
 }

@@ -1,6 +1,6 @@
 package com.onlibrary.onlibrary_api.model.enums;
 
-public enum TipoUsuario {
-    ADMIN,
-    COMUM
+public enum TipoReserva {
+    ONLINE,
+    FISICO
 }

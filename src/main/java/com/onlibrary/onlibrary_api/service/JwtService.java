@@ -3,7 +3,6 @@ package com.onlibrary.onlibrary_api.service;
 import com.onlibrary.onlibrary_api.model.entities.Usuario;
 import com.onlibrary.onlibrary_api.repository.UsuarioRepository;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -19,6 +18,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import static io.jsonwebtoken.Jwts.builder;
 
 @Service
 @Slf4j
@@ -48,7 +49,7 @@ public class JwtService {
         claims.put("id", usuario.getId().toString());
 
         log.info("Token gerado para usuário com ID: {}", usuario.getId());
-        return Jwts.builder()
+        return builder()
                 .header()
                 .add("typ", "JWT")
                 .and()
@@ -82,21 +83,21 @@ public class JwtService {
     }
 
     public String extractUsername(String token) {
-        Claims claims = extractAllClaims(token);
-        return claims != null ? claims.getSubject() : null;
+        try {
+            return extractAllClaims(token).getSubject();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private Claims extractAllClaims(String token) {
-        try {
-            return Jwts.parser()
-                    .verifyWith(getSignInKey())
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
-        } catch (JwtException | IllegalArgumentException e) {
-            throw new RuntimeException("Token inválido", e);
-        }
+        return Jwts.parser()
+                .verifyWith(getSignInKey())  // ✔️ Verifica a assinatura
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
+
 
     private SecretKey getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);

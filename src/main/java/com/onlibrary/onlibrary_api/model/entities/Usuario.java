@@ -1,5 +1,6 @@
 package com.onlibrary.onlibrary_api.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.onlibrary.onlibrary_api.model.enums.ContaSituacao;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -23,15 +24,22 @@ public class Usuario {
 
     private String nome;
     private String sobrenome;
+
+    @Column(unique = true)
     private String email;
+
+    @Column(unique = true)
     private String cpf;
     private String senha;
 
     @Enumerated(EnumType.STRING)
     private ContaSituacao situacao;
+
+    @Column(unique = true)
     private String username;
 
     @OneToMany(mappedBy = "usuario")
+    @JsonIgnore
     private List<Notificacao> notificacoes;
 
     @OneToMany(mappedBy = "usuario")

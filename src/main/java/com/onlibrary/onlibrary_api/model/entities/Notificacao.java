@@ -20,15 +20,18 @@ public class Notificacao {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @Column(name = "data_emissao")
     private LocalDate dataEmissao;
     private String titulo;
     private String conteudo;
-    private Boolean marcadoLido;
-    private String tipo;
 
     @ManyToOne
     @JoinColumn(name = "fk_id_usuario")
     private Usuario usuario;
+
+    @Column(name = "marcado_lido")
+    private Boolean marcadoLido;
+    private String tipo;
 
     @ManyToOne
     @JoinColumn(name = "fk_id_biblioteca")

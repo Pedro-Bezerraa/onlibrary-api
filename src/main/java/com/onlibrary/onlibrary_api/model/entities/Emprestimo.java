@@ -1,5 +1,7 @@
 package com.onlibrary.onlibrary_api.model.entities;
 
+import com.onlibrary.onlibrary_api.model.enums.SituacaoEmprestimo;
+import com.onlibrary.onlibrary_api.model.enums.SituacaoMulta;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,7 +41,12 @@ public class Emprestimo {
     @Column(name = "data_devolucao")
     private LocalDate dataDevolucao;
 
-    private String situacao;
+    @Enumerated(EnumType.STRING)
+    private SituacaoEmprestimo situacao;
+
+    @ManyToOne
+    @JoinColumn(name = "fk_id_reserva")
+    private Reserva reserva;
 
     @OneToMany(mappedBy = "emprestimo")
     private List<EmprestimoExemplar> exemplares;

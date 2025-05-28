@@ -1,5 +1,6 @@
 package com.onlibrary.onlibrary_api.model.entities;
 
+import com.onlibrary.onlibrary_api.model.enums.SituacaoExemplar;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +25,7 @@ public class Exemplar {
     @JoinColumn(name = "fk_id_livro")
     private Livro livro;
 
+    @Column(name = "numero_tombo")
     private String numeroTombo;
     private Boolean disponivel;
     private String estante;
@@ -33,6 +35,9 @@ public class Exemplar {
     @ManyToOne
     @JoinColumn(name = "fk_id_biblioteca")
     private Biblioteca biblioteca;
+
+    @Enumerated(EnumType.STRING)
+    private SituacaoExemplar situacao;
 
     @OneToMany(mappedBy = "exemplar")
     private List<EmprestimoExemplar> emprestimos;

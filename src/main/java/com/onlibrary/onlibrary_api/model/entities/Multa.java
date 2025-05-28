@@ -1,5 +1,6 @@
 package com.onlibrary.onlibrary_api.model.entities;
 
+import com.onlibrary.onlibrary_api.model.enums.SituacaoMulta;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,9 +34,15 @@ public class Multa {
     private Usuario bibliotecario;
 
     private Integer valor;
+
+    @Column(name = "data_emissao")
     private LocalDate dataEmissao;
+
+    @Column(name = "data_vencimento")
     private LocalDate dataVencimento;
-    private String situacao;
+
+    @Enumerated(EnumType.STRING)
+    private SituacaoMulta situacao;
     private String motivo;
 
     @ManyToOne

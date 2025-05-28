@@ -25,8 +25,14 @@ public class PerfilUsuario {
     private Biblioteca biblioteca;
 
     private String nome;
+
+    @Column(name = "multa_padrao")
     private Integer multaPadrao;
+
+    @Column(name = "prazo_devolucao_padrao")
     private Integer prazoDevolucaoPadrao;
+
+    @Column(name = "prazo_multa_padrao")
     private Integer prazoMultaPadrao;
 
     @OneToMany(mappedBy = "perfilUsuario")
