@@ -1,0 +1,15 @@
+package com.onlibrary.onlibrary_api.dto;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.UUID;
+
+public record PerfilUsuarioRequestDTO(
+
+        @JsonProperty("fk_id_biblioteca") UUID bibliotecaId,
+        String nome,
+        @JsonProperty("multa_padrao") Integer multaPadrao,
+        @JsonProperty("prazo_devolucao_padrao") Integer prazoDevolucaoPadrao,
+        @JsonProperty("prazo_multa_padrao") Integer prazoMultaPadrao
+) {
+}

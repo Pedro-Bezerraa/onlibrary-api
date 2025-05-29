@@ -32,15 +32,15 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO, HttpServletResponse response) {
         TokenDTO tokenDTO = authService.login(loginRequestDTO);
 
-//        ResponseCookie cookie = ResponseCookie.from("jwt", tokenDTO.getAccessToken())
-//                .httpOnly(true)
-//                .secure(false)
-//                .path("/")
-//                .sameSite("None")
-//                .maxAge(7 * 24 * 60 * 60)
-//                .build();
-//
-//        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        ResponseCookie cookie = ResponseCookie.from("jwt", tokenDTO.getAccessToken())
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .sameSite("None")
+                .maxAge(7 * 24 * 60 * 60)
+                .build();
+
+        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         return ResponseEntity.ok().body(new ResponseDTO<>(true, "Autenticação realizada com sucesso!", tokenDTO));
     }
 

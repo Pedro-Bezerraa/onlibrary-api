@@ -21,9 +21,7 @@ public class ExemplarController {
     private final ExemplarService exemplarService;
 
     @PutMapping("/atualizar-exemplar/{id}")
-    public ResponseEntity<?> atualizarExemplar(
-            @PathVariable UUID id,
-            @RequestBody ExemplarRequestDTO dto) {
+    public ResponseEntity<?> atualizarExemplar(@PathVariable UUID id, @RequestBody ExemplarRequestDTO dto) {
 
         try {
             exemplarService.atualizarExemlar(id, dto);
