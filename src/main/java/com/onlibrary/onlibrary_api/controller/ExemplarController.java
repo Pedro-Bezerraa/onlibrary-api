@@ -1,8 +1,8 @@
 package com.onlibrary.onlibrary_api.controller;
 
-import com.onlibrary.onlibrary_api.dto.biblioteca.ExemplarRequestDTO;
-import com.onlibrary.onlibrary_api.repository.ExemplarRepository;
-import com.onlibrary.onlibrary_api.service.BibliotecaService;
+import com.onlibrary.onlibrary_api.dto.AttExemplarRequestDTO;
+import com.onlibrary.onlibrary_api.dto.ExemplarRequestDTO;
+import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.service.ExemplarService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,18 @@ import java.util.UUID;
 public class ExemplarController {
     private final ExemplarService exemplarService;
 
+    @PostMapping("/criar-exemplar")
+    public ResponseEntity<?> criarExemplar(@RequestBody ExemplarRequestDTO dto) {
+        try {
+            exemplarService.criarExemplar(dto);
+            return ResponseEntity.ok("Exemplar criado com sucesso");
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
     @PutMapping("/atualizar-exemplar/{id}")
-    public ResponseEntity<?> atualizarExemplar(@PathVariable UUID id, @RequestBody ExemplarRequestDTO dto) {
+    public ResponseEntity<?> atualizarExemplar(@PathVariable UUID id, @RequestBody AttExemplarRequestDTO dto) {
 
         try {
             exemplarService.atualizarExemlar(id, dto);

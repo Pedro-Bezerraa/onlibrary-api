@@ -22,10 +22,6 @@ public class Multa {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "fk_id_emprestimo")
-    private Emprestimo emprestimo;
-
-    @ManyToOne
     @JoinColumn(name = "fk_id_usuario")
     private Usuario usuario;
 
