@@ -39,6 +39,6 @@ public class VwBibliotecaReservaExemplar {
     @Column(name = "quantidade")
     private Long quantidade;
 
-    @Column(name = "quantidade_disponivel")
-    private Long quantidadeDisponivel;
+//    @Column(name = "quantidade_disponivel")
+//    private Long quantidadeDisponivel;
 }

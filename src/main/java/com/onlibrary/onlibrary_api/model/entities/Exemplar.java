@@ -27,7 +27,6 @@ public class Exemplar {
 
     @Column(name = "numero_tombo")
     private String numeroTombo;
-    private Boolean disponivel;
     private String estante;
     private String prateleira;
     private String setor;

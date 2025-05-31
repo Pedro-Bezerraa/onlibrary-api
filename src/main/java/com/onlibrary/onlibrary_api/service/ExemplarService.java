@@ -41,7 +41,6 @@ public class ExemplarService {
         exemplar.setBiblioteca(biblioteca);
         exemplar.setLivro(livro);
         exemplar.setNumeroTombo(dto.numeroTombo());
-        exemplar.setDisponivel(dto.disponivel());
         exemplar.setSetor(dto.setor());
         exemplar.setPrateleira(dto.prateleira());
         exemplar.setEstante(dto.estante());

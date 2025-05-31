@@ -70,8 +70,7 @@ public class BibliotecaService {
         UUID usuarioId = jwtService.extractIdForUser(token);
 
         List<UsuarioBiblioteca> vinculos = usuarioBibliotecaRepository
-                .findByUsuarioIdAndTipoUsuarioIn(usuarioId,
-                        List.of(TipoUsuario.ADMIN, TipoUsuario.ADMIN));
+                .findByUsuarioIdAndTipoUsuario(usuarioId, TipoUsuario.ADMIN);
 
         return vinculos.stream()
                 .map(ub -> new CreateBibliotecaResponseDTO(

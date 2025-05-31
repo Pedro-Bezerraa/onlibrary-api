@@ -29,9 +29,6 @@ public class VwTableExemplar {
     @Column(name = "Setor")
     private String setor;
 
-    @Column(name = "Disponibilidade")
-    private String disponibilidade;
-
     @Id
     private UUID id;
 

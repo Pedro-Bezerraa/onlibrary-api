@@ -3,6 +3,7 @@ package com.onlibrary.onlibrary_api.service;
 import com.onlibrary.onlibrary_api.dto.biblioteca.EmprestimoRequestDTO;
 import com.onlibrary.onlibrary_api.model.entities.*;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoEmprestimo;
+import com.onlibrary.onlibrary_api.model.enums.SituacaoExemplar;
 import com.onlibrary.onlibrary_api.repository.EmprestimoRepository;
 import com.onlibrary.onlibrary_api.repository.ExemplarRepository;
 import com.onlibrary.onlibrary_api.repository.ReservaExemplarRepository;
@@ -55,7 +56,7 @@ public class EmprestimoService {
             for (EmprestimoExemplar ee : emprestimo.getExemplares()) {
                 Exemplar exemplar = ee.getExemplar();
 
-                exemplar.setDisponivel(true);
+                exemplar.setSituacao(SituacaoExemplar.DISPONIVEL);
                 exemplarRepository.save(exemplar);
 
                 List<Reserva> reservasPendentes = reservaRepository

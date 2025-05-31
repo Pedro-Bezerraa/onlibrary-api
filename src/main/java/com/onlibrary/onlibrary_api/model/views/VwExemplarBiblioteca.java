@@ -29,9 +29,6 @@ public class VwExemplarBiblioteca {
     @Column(name = "setor")
     private String setor;
 
-    @Column(name = "disponivel")
-    private Boolean disponivel;
-
     @Id
     @Column(name = "id")
     private UUID id;
