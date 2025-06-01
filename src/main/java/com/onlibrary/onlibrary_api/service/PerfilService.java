@@ -24,9 +24,9 @@ public class PerfilService {
             throw new InvalidCredentialsException("Valores negativos não são válidos");
         }
 
-        boolean nomeExiste = perfilUsuarioRepository.existsByNome(dto.nome());
+        boolean nomeExiste = perfilUsuarioRepository.existsByNomeAndBibliotecaId(dto.nome(), dto.bibliotecaId());
         if (nomeExiste) {
-            throw new InvalidCredentialsException("Já existe um perfil com esse nome");
+            throw new InvalidCredentialsException("Já existe um perfil com esse nome nessa biblioteca");
         }
 
         PerfilUsuario perfil = new PerfilUsuario();
@@ -49,9 +49,13 @@ public class PerfilService {
             throw new InvalidCredentialsException("Valores negativos não são válidos");
         }
 
-        boolean nomeExiste = perfilUsuarioRepository.existsByNome(dto.nome());
+        boolean nomeExiste = perfilUsuarioRepository.existsByNomeAndBibliotecaIdAndIdNot(
+                dto.nome(),
+                perfilNovo.getBiblioteca().getId(),
+                id
+        );
         if (nomeExiste) {
-            throw new InvalidCredentialsException("Já existe um perfil com esse nome");
+            throw new InvalidCredentialsException("Já existe um perfil com esse nome nessa biblioteca");
         }
 
         perfilNovo.setNome(dto.nome());

@@ -6,5 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
 public interface PerfilUsuarioRepository extends JpaRepository<PerfilUsuario, UUID> {
-    boolean existsByNome(String nome);
+    boolean existsByNomeAndBibliotecaId(String nome, UUID bibliotecaId);
+
+    boolean existsByNomeAndBibliotecaIdAndIdNot(String nome, UUID bibliotecaId, UUID id);
 }
