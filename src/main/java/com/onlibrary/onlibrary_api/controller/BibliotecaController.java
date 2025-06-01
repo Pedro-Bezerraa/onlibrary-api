@@ -1,14 +1,14 @@
 package com.onlibrary.onlibrary_api.controller;
 
+import com.onlibrary.onlibrary_api.dto.biblioteca.ContagemResponseDTO;
+import com.onlibrary.onlibrary_api.dto.biblioteca.BibliotecaRequestDTO;
+import com.onlibrary.onlibrary_api.dto.biblioteca.BibliotecaResponseDTO;
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
-import com.onlibrary.onlibrary_api.dto.biblioteca.*;
 import com.onlibrary.onlibrary_api.service.BibliotecaService;
 import com.onlibrary.onlibrary_api.service.JwtService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,7 +29,7 @@ public class BibliotecaController {
 
     @PostMapping("/criar-biblioteca")
     public ResponseEntity<?> criarBiblioteca(
-            @RequestBody @Valid CreateBibliotecaDTO dto,
+            @RequestBody @Valid BibliotecaRequestDTO dto,
             HttpServletRequest request
     ) {
         String token = recuperarToken(request);
@@ -56,7 +56,7 @@ public class BibliotecaController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido");
         }
 
-        List<CreateBibliotecaResponseDTO> bibliotecas = bibliotecaService.listarBibliotecasAdminOuFuncionario(token);
+        List<BibliotecaResponseDTO> bibliotecas = bibliotecaService.listarBibliotecasAdminOuFuncionario(token);
         return ResponseEntity.ok(new ResponseDTO<>(true, "Bibliotecas encontradas", bibliotecas));
     }
 

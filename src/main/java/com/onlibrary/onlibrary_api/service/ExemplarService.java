@@ -1,7 +1,7 @@
 package com.onlibrary.onlibrary_api.service;
 
-import com.onlibrary.onlibrary_api.dto.AttExemplarRequestDTO;
-import com.onlibrary.onlibrary_api.dto.ExemplarRequestDTO;
+import com.onlibrary.onlibrary_api.dto.exemplar.AttExemplarRequestDTO;
+import com.onlibrary.onlibrary_api.dto.exemplar.ExemplarRequestDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.*;

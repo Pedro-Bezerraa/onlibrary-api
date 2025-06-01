@@ -10,6 +10,7 @@ import com.onlibrary.onlibrary_api.model.enums.ContaSituacao;
 import com.onlibrary.onlibrary_api.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthService {
 
     private final UsuarioRepository usuarioRepository;
@@ -31,39 +32,32 @@ public class AuthService {
 
     @Transactional
     public RegisterResponseDTO registerUsuario(RegisterRequestDTO requestDTO) {
-        if (usuarioRepository.existsByUsername(requestDTO.getUsername()) || usuarioRepository.existsByEmail(requestDTO.getEmail())) {
+        if (usuarioRepository.existsByUsername(requestDTO.username()) || usuarioRepository.existsByEmail(requestDTO.email())) {
             throw new ConflictException("Nome de usuário ou Email já em uso");
         }
 
         Usuario novoUsuario = new Usuario();
 
-        novoUsuario.setNome(requestDTO.getNome());
-        novoUsuario.setSobrenome(requestDTO.getSobrenome());
-        novoUsuario.setUsername(requestDTO.getUsername());
-        novoUsuario.setEmail(requestDTO.getEmail());
-        novoUsuario.setCpf(requestDTO.getCpf());
-        novoUsuario.setSenha(passwordEncoder.encode(requestDTO.getSenha()));
+        novoUsuario.setNome(requestDTO.nome());
+        novoUsuario.setSobrenome(requestDTO.sobrenome());
+        novoUsuario.setUsername(requestDTO.username());
+        novoUsuario.setEmail(requestDTO.email());
+        novoUsuario.setCpf(requestDTO.cpf());
+        novoUsuario.setSenha(passwordEncoder.encode(requestDTO.senha()));
         novoUsuario.setSituacao(ContaSituacao.ATIVO);
 
 
         Usuario usuarioSalvo = usuarioRepository.save(novoUsuario);
 
-        return RegisterResponseDTO.builder()
-                .nome(usuarioSalvo.getNome())
-                .sobrenome(usuarioSalvo.getSobrenome())
-                .username(usuarioSalvo.getUsername())
-                .email(usuarioSalvo.getEmail())
-                .cpf(usuarioSalvo.getCpf())
-                .situacao(usuarioSalvo.getSituacao())
-                .build();
+        return new RegisterResponseDTO(novoUsuario.getNome(), novoUsuario.getSobrenome(), novoUsuario.getUsername(), novoUsuario.getEmail(), novoUsuario.getCpf(), novoUsuario.getSituacao());
     }
 
     public TokenDTO login(LoginRequestDTO loginRequestDTO) {
         try {
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            loginRequestDTO.getLogin(),
-                            loginRequestDTO.getSenha()
+                            loginRequestDTO.login(),
+                            loginRequestDTO.senha()
                     )
             );
             SecurityContextHolder.getContext().setAuthentication(auth);

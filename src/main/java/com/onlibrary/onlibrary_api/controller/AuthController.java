@@ -2,12 +2,9 @@ package com.onlibrary.onlibrary_api.controller;
 
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
 import com.onlibrary.onlibrary_api.dto.usuario.*;
-import com.onlibrary.onlibrary_api.repository.UsuarioRepository;
 import com.onlibrary.onlibrary_api.service.AuthService;
-import com.onlibrary.onlibrary_api.service.JwtService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -32,7 +29,7 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO, HttpServletResponse response) {
         TokenDTO tokenDTO = authService.login(loginRequestDTO);
 
-        ResponseCookie cookie = ResponseCookie.from("jwt", tokenDTO.getAccessToken())
+        ResponseCookie cookie = ResponseCookie.from("jwt", tokenDTO.accessToken())
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
@@ -46,8 +43,8 @@ public class AuthController {
 
     @PostMapping("/validar-etapa")
     public ResponseEntity<?> validarEtapa(@RequestBody EtapaCadastroRequestDTO request) {
-        authService.validarEtapa(request.getEtapa(), request.getDados());
-        return ResponseEntity.ok(new ResponseDTO<>(true, "Dados válidos", request.getDados()));
+        authService.validarEtapa(request.etapa(), request.dados());
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Dados válidos", request.dados()));
     }
 
     @GetMapping("/ping")

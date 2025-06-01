@@ -1,7 +1,7 @@
 package com.onlibrary.onlibrary_api.controller;
 
-import com.onlibrary.onlibrary_api.dto.AttUsuarioBibliotecaDTO;
-import com.onlibrary.onlibrary_api.dto.UsuarioBibliotecaRequestDTO;
+import com.onlibrary.onlibrary_api.dto.usuarioBiblioteca.AttUsuarioBibliotecaRequestDTO;
+import com.onlibrary.onlibrary_api.dto.usuarioBiblioteca.UsuarioBibliotecaRequestDTO;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.service.UsuarioBibliotecaService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class UsuarioBibliotecaController {
     }
 
     @PutMapping("/atualizar-usuarioBiblioteca/{id}")
-    public ResponseEntity<?> atualizarUsuarioBiblioteca(@PathVariable UUID id, @RequestBody AttUsuarioBibliotecaDTO dto) {
+    public ResponseEntity<?> atualizarUsuarioBiblioteca(@PathVariable UUID id, @RequestBody AttUsuarioBibliotecaRequestDTO dto) {
         try {
             usuarioBibliotecaService.atualizarUsuarioBiblioteca(dto, id);
             return ResponseEntity.ok("relação usuario a biblioteca atualizado");

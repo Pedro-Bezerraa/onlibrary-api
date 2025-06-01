@@ -1,6 +1,6 @@
 package com.onlibrary.onlibrary_api.dto.biblioteca;
 
-public record CreateBibliotecaDTO(
+public record BibliotecaRequestDTO(
         String nome,
         String telefone,
         String rua,

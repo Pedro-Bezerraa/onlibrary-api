@@ -1,8 +1,8 @@
 package com.onlibrary.onlibrary_api.service;
 
 import com.onlibrary.onlibrary_api.dto.biblioteca.ContagemResponseDTO;
-import com.onlibrary.onlibrary_api.dto.biblioteca.CreateBibliotecaDTO;
-import com.onlibrary.onlibrary_api.dto.biblioteca.CreateBibliotecaResponseDTO;
+import com.onlibrary.onlibrary_api.dto.biblioteca.BibliotecaRequestDTO;
+import com.onlibrary.onlibrary_api.dto.biblioteca.BibliotecaResponseDTO;
 import com.onlibrary.onlibrary_api.model.entities.Biblioteca;
 import com.onlibrary.onlibrary_api.model.entities.PerfilUsuario;
 import com.onlibrary.onlibrary_api.model.entities.Usuario;
@@ -27,7 +27,7 @@ public class BibliotecaService {
     private final UsuarioRepository usuarioRepository;
     private final BibliotecaLivroRepository bibliotecaLivroRepository;
 
-    public UUID criarBiblioteca(CreateBibliotecaDTO dto, UUID idUsuarioCriador) {
+    public UUID criarBiblioteca(BibliotecaRequestDTO dto, UUID idUsuarioCriador) {
         Biblioteca biblioteca = new Biblioteca();
         biblioteca.setNome(dto.nome());
         biblioteca.setTelefone(dto.telefone());
@@ -41,7 +41,7 @@ public class BibliotecaService {
         biblioteca = bibliotecaRepository.save(biblioteca);
 
         PerfilUsuario perfil = new PerfilUsuario();
-        perfil.setNome("bibliotecario");
+        perfil.setNome("Bibliotecario");
         perfil.setMultaPadrao(0);
         perfil.setPrazoDevolucaoPadrao(0);
         perfil.setPrazoMultaPadrao(0);
@@ -66,14 +66,14 @@ public class BibliotecaService {
         return biblioteca.getId();
     }
 
-    public List<CreateBibliotecaResponseDTO> listarBibliotecasAdminOuFuncionario(String token) {
+    public List<BibliotecaResponseDTO> listarBibliotecasAdminOuFuncionario(String token) {
         UUID usuarioId = jwtService.extractIdForUser(token);
 
         List<UsuarioBiblioteca> vinculos = usuarioBibliotecaRepository
                 .findByUsuarioIdAndTipoUsuario(usuarioId, TipoUsuario.ADMIN);
 
         return vinculos.stream()
-                .map(ub -> new CreateBibliotecaResponseDTO(
+                .map(ub -> new BibliotecaResponseDTO(
                         ub.getBiblioteca().getId(),
                         ub.getBiblioteca().getNome(),
                         ub.getBiblioteca().getTelefone(),

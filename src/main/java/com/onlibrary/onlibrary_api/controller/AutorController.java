@@ -1,20 +1,14 @@
 package com.onlibrary.onlibrary_api.controller;
 
-import com.onlibrary.onlibrary_api.dto.AutorRequestDTO;
-import com.onlibrary.onlibrary_api.dto.FunctionDTO;
+import com.onlibrary.onlibrary_api.dto.autor.AutorRequestDTO;
 import com.onlibrary.onlibrary_api.exception.InvalidCredentialsException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.service.AutorService;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController

@@ -1,8 +1,7 @@
 package com.onlibrary.onlibrary_api.service;
 
-import com.onlibrary.onlibrary_api.dto.AttPerfilUsuarioRequestDTO;
-import com.onlibrary.onlibrary_api.dto.AttUsuarioBibliotecaDTO;
-import com.onlibrary.onlibrary_api.dto.UsuarioBibliotecaRequestDTO;
+import com.onlibrary.onlibrary_api.dto.usuarioBiblioteca.AttUsuarioBibliotecaRequestDTO;
+import com.onlibrary.onlibrary_api.dto.usuarioBiblioteca.UsuarioBibliotecaRequestDTO;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Biblioteca;
 import com.onlibrary.onlibrary_api.model.entities.PerfilUsuario;
@@ -73,7 +72,7 @@ public class UsuarioBibliotecaService {
         usuarioBibliotecaRepository.save(usuarioBiblioteca);
     }
 
-    public void atualizarUsuarioBiblioteca(AttUsuarioBibliotecaDTO dto, UUID id) {
+    public void atualizarUsuarioBiblioteca(AttUsuarioBibliotecaRequestDTO dto, UUID id) {
         UsuarioBiblioteca usuarioBiblioteca = usuarioBibliotecaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("UsuárioBiblioteca não encontrado"));
 

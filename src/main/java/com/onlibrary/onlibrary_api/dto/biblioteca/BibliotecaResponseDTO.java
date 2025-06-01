@@ -2,7 +2,7 @@ package com.onlibrary.onlibrary_api.dto.biblioteca;
 
 import java.util.UUID;
 
-public record CreateBibliotecaResponseDTO(
+public record BibliotecaResponseDTO(
         UUID id,
         String nome,
         String telefone,

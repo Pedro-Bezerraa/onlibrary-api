@@ -27,8 +27,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, UUID> {
             @Param("situacao") String situacao,
             @Param("livro") Livro livro);
 
-    @Query("SELECT r FROM Reserva r WHERE r.livro = :livro AND r.situacao = :situacao AND r.quantidadePendente > 0 ORDER BY r.dataEmissao ASC")
-    List<Reserva> findReservasPendentesByLivro(
-            @Param("livro") Livro livro,
-            @Param("situacao") String situacao);
+    @Query("SELECT r FROM Reserva r WHERE r.livro.id = :livroId AND r.situacao = 'PENDENTE' ORDER BY r.dataEmissao ASC")
+    List<Reserva> findReservasPendentesPorLivro(@Param("livroId") UUID livroId);
 }

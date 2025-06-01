@@ -1,7 +1,7 @@
 package com.onlibrary.onlibrary_api.controller;
 
-import com.onlibrary.onlibrary_api.dto.AttPerfilUsuarioRequestDTO;
-import com.onlibrary.onlibrary_api.dto.PerfilUsuarioRequestDTO;
+import com.onlibrary.onlibrary_api.dto.perfilUsuario.AttPerfilUsuarioRequestDTO;
+import com.onlibrary.onlibrary_api.dto.perfilUsuario.PerfilUsuarioRequestDTO;
 import com.onlibrary.onlibrary_api.exception.InvalidCredentialsException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.service.PerfilService;

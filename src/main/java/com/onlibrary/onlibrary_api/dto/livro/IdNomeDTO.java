@@ -1,4 +1,4 @@
-package com.onlibrary.onlibrary_api.dto.biblioteca;
+package com.onlibrary.onlibrary_api.dto.livro;
 
 import java.util.UUID;
 
