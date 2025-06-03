@@ -1,23 +1,31 @@
 package com.onlibrary.onlibrary_api.service;
 
-import com.onlibrary.onlibrary_api.repository.AutorRepository;
-import com.onlibrary.onlibrary_api.repository.CategoriaRepository;
-import com.onlibrary.onlibrary_api.repository.EditoraRepository;
-import com.onlibrary.onlibrary_api.repository.GeneroRepository;
+import com.onlibrary.onlibrary_api.dto.livro.LivroRequestDTO;
+import com.onlibrary.onlibrary_api.dto.livro.LivroResponseDTO;
+import com.onlibrary.onlibrary_api.exception.ConflictException;
+import com.onlibrary.onlibrary_api.model.entities.Livro;
+import com.onlibrary.onlibrary_api.repository.*;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class LivroService {
-    private GeneroRepository generoRepository;
-    private EditoraRepository editoraRepository;
-    private CategoriaRepository categoriaRepository;
-    private AutorRepository autorRepository;
+    private final LivroRepository livroRepository;
 
-//    public List<AutorDTO> listarAutores() {
-//        return autorRepository.findAll().stream()
-//                .map(autor -> new AutorDTO(autor.getId(), autor.getNome()))
-//                .toList();
+//    public LivroResponseDTO criarLivro(LivroRequestDTO dto) {
+//        boolean tituloExiste = livroRepository.existsByTitulo(dto.titulo());
+//        boolean isbnExiste = livroRepository.existsByIsbn(dto.isbn());
+//        if (tituloExiste || isbnExiste) {
+//            throw new ConflictException("Título de livro já existente.");
+//        }
+//
+//        Livro livro = new Livro();
+//
+//        livro.setTitulo(dto.titulo());
+//        livro.setDescricao(dto.descricao());
+//        livro.setAnoLancamento(dto.anoLancamento());
+////        livro.setCapa();
 //    }
 }

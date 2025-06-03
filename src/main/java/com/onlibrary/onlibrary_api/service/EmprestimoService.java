@@ -37,6 +37,7 @@ public class EmprestimoService {
         UsuarioBiblioteca usuarioBiblioteca = usuarioBibliotecaRepository.findById(dto.usuarioBibliotecaId())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário da biblioteca não encontrado!"));
 
+
         if (usuarioBiblioteca.getSituacao() == ContaSituacao.BLOQUEADO) {
             throw new BusinessException("Usuário está bloqueado!");
         }

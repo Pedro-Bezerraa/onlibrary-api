@@ -1,6 +1,7 @@
 package com.onlibrary.onlibrary_api.dto.exemplar;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.onlibrary.onlibrary_api.model.enums.SituacaoExemplar;
 
 import java.util.UUID;
 
@@ -11,6 +12,6 @@ public record ExemplarRequestDTO(
         String estante,
         String prateleira,
         String setor,
-        String situacao
+        SituacaoExemplar situacao
 ) {
 }

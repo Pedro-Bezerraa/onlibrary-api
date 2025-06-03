@@ -1,4 +1,16 @@
 package com.onlibrary.onlibrary_api.dto.livro;
 
-public record LivroRequestDTO() {
+import java.util.List;
+import java.util.UUID;
+
+public record LivroRequestDTO(
+        String isbn,
+        String titulo,
+        String descricao,
+        Integer anoLancamento,
+        List<UUID> autores,
+        List<UUID> categorias,
+        List<UUID> generos,
+        List<UUID> editoras
+) {
 }

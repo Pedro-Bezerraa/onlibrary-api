@@ -9,5 +9,6 @@ import java.util.UUID;
 
 public interface UsuarioBibliotecaRepository extends JpaRepository<UsuarioBiblioteca, UUID> {
 
-    List<UsuarioBiblioteca> findByUsuarioIdAndTipoUsuario(UUID usuarioId, TipoUsuario tipos);
+    List<UsuarioBiblioteca> findByUsuarioIdAndTipoUsuarioIn(UUID usuarioId, List<TipoUsuario> tipos);
+
 }

@@ -1,6 +1,7 @@
 package com.onlibrary.onlibrary_api.model.enums;
 
-import com.onlibrary.onlibrary_api.exception.BusinessException;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum SituacaoExemplar {
     DISPONIVEL,
@@ -8,11 +9,13 @@ public enum SituacaoExemplar {
     RESERVADO,
     EMPRESTADO;
 
-    public static SituacaoExemplar fromString(String value) {
-        try {
-            return SituacaoExemplar.valueOf(value.trim().toUpperCase());
-        } catch (IllegalArgumentException | NullPointerException e) {
-            throw new BusinessException("Situação inválida. Use DISPONIVEL ou INDISPONIVEL.");
-        }
+    @JsonValue
+    public String toLower() {
+        return name().toLowerCase();
+    }
+
+    @JsonCreator
+    public static SituacaoExemplar from(String value) {
+        return SituacaoExemplar.valueOf(value.toUpperCase());
     }
 }

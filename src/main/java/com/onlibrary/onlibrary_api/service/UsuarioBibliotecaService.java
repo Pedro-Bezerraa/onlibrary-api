@@ -40,7 +40,6 @@ public class UsuarioBibliotecaService {
         PerfilUsuario perfilUsuario = perfilUsuarioRepository.findById(dto.perfilUsuarioId())
                 .orElseThrow(() -> new ResourceNotFoundException("Perfil não encontrado."));
 
-        TipoUsuario tipoUsuario = TipoUsuario.fromString(dto.tipoUsuario());
 
         if (!usuario.getCpf().equals(dto.cpf())) {
             throw new BusinessException("O CPF informado não corresponde ao CPF do usuário.");
@@ -48,19 +47,19 @@ public class UsuarioBibliotecaService {
 
         String nomePerfil = perfilUsuario.getNome().toLowerCase();
 
-        if (tipoUsuario == TipoUsuario.COMUM && nomePerfil.equals("bibliotecario")) {
+        if (dto.tipoUsuario() == TipoUsuario.COMUM && nomePerfil.equalsIgnoreCase("bibliotecario")) {
             throw new BusinessException("Usuários do tipo COMUM não podem ter o perfil de BIBLIOTECARIO.");
         }
 
-        if (tipoUsuario == TipoUsuario.ADMIN && !nomePerfil.equals("bibliotecario")) {
+        if (dto.tipoUsuario() == TipoUsuario.ADMIN && !nomePerfil.equalsIgnoreCase("bibliotecario")) {
             throw new BusinessException("Usuários do tipo ADMIN só podem ter o perfil de BIBLIOTECARIO.");
         }
 
-        if (nomePerfil.equals("bibliotecario") && tipoUsuario != TipoUsuario.ADMIN) {
+        if (nomePerfil.equalsIgnoreCase("bibliotecario") && dto.tipoUsuario() != TipoUsuario.ADMIN) {
             throw new BusinessException("Perfis de BIBLIOTECARIO devem ser do tipo ADMIN.");
         }
 
-        if (nomePerfil.equals("outro") && tipoUsuario != TipoUsuario.COMUM) {
+        if (nomePerfil.equalsIgnoreCase("outro") && dto.tipoUsuario() != TipoUsuario.COMUM) {
             throw new BusinessException("Perfis de OUTRO devem ser do tipo COMUM.");
         }
 
@@ -68,7 +67,7 @@ public class UsuarioBibliotecaService {
         usuarioBiblioteca.setBiblioteca(biblioteca);
         usuarioBiblioteca.setUsuario(usuario);
         usuarioBiblioteca.setPerfilUsuario(perfilUsuario);
-        usuarioBiblioteca.setTipoUsuario(tipoUsuario);
+        usuarioBiblioteca.setTipoUsuario(dto.tipoUsuario());
         usuarioBiblioteca.setNumeroMatricula(dto.numeroMatricula());
         usuarioBiblioteca.setCpf(dto.cpf());
         usuarioBiblioteca.setSituacao(ContaSituacao.ATIVO);
@@ -96,26 +95,22 @@ public class UsuarioBibliotecaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Perfil não encontrado."));
 
         String nomePerfil = perfilUsuario.getNome().toLowerCase();
-        TipoUsuario tipoUsuario = TipoUsuario.fromString(dto.tipoUsuario());
 
-        if (tipoUsuario == TipoUsuario.COMUM && nomePerfil.equals("bibliotecario")) {
+        if (dto.tipoUsuario() == TipoUsuario.COMUM && nomePerfil.equalsIgnoreCase("bibliotecario")) {
             throw new BusinessException("Usuários do tipo COMUM não podem ter o perfil de BIBLIOTECARIO.");
         }
 
-        if (tipoUsuario == TipoUsuario.ADMIN && nomePerfil.equals("outro")) {
+        if (dto.tipoUsuario() == TipoUsuario.ADMIN && nomePerfil.equalsIgnoreCase("outro")) {
             throw new BusinessException("Usuários do tipo ADMIN não podem ter o perfil de OUTRO.");
         }
 
-        if (nomePerfil.equals("bibliotecario") && tipoUsuario != TipoUsuario.ADMIN) {
+        if (nomePerfil.equalsIgnoreCase("bibliotecario") && dto.tipoUsuario() != TipoUsuario.ADMIN) {
             throw new BusinessException("Perfis de BIBLIOTECARIO devem ser do tipo ADMIN.");
         }
 
-        if (nomePerfil.equals("outro") && tipoUsuario != TipoUsuario.COMUM) {
-            throw new BusinessException("Perfis de OUTRO devem ser do tipo COMUM.");
-        }
 
         usuarioBiblioteca.setPerfilUsuario(perfilUsuario);
-        usuarioBiblioteca.setTipoUsuario(tipoUsuario);
+        usuarioBiblioteca.setTipoUsuario(dto.tipoUsuario());
         usuarioBiblioteca.setNumeroMatricula(dto.numeroMatricula());
 
         usuarioBibliotecaRepository.save(usuarioBiblioteca);

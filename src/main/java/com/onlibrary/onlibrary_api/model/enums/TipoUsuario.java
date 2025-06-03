@@ -1,16 +1,20 @@
 package com.onlibrary.onlibrary_api.model.enums;
 
-import com.onlibrary.onlibrary_api.exception.BusinessException;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum TipoUsuario {
     ADMIN,
+    ADMIN_MASTER,
     COMUM;
 
-    public static TipoUsuario fromString(String value) {
-        try {
-            return TipoUsuario.valueOf(value.trim().toUpperCase());
-        } catch (IllegalArgumentException | NullPointerException e) {
-            throw new BusinessException("Situação inválida. Use ADMIN ou COMUM.");
-        }
+    @JsonValue
+    public String toLower() {
+        return name().toLowerCase();
+    }
+
+    @JsonCreator
+    public static TipoUsuario from(String value) {
+        return TipoUsuario.valueOf(value.toUpperCase());
     }
 }

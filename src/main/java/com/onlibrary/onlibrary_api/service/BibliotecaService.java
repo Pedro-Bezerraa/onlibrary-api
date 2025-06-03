@@ -57,7 +57,7 @@ public class BibliotecaService {
         usuarioBiblioteca.setBiblioteca(biblioteca);
         usuarioBiblioteca.setUsuario(usuario);
         usuarioBiblioteca.setPerfilUsuario(perfil);
-        usuarioBiblioteca.setTipoUsuario(TipoUsuario.ADMIN);
+        usuarioBiblioteca.setTipoUsuario(TipoUsuario.ADMIN_MASTER);
         usuarioBiblioteca.setNumeroMatricula("");
         usuarioBiblioteca.setCpf(usuario.getCpf());
         usuarioBiblioteca.setSituacao(ContaSituacao.ATIVO);
@@ -71,8 +71,10 @@ public class BibliotecaService {
     public List<BibliotecaResponseDTO> listarBibliotecasAdminOuFuncionario(String token) {
         UUID usuarioId = jwtService.extractIdForUser(token);
 
+        List<TipoUsuario> tiposPermitidos = List.of(TipoUsuario.ADMIN, TipoUsuario.ADMIN_MASTER);
+
         List<UsuarioBiblioteca> vinculos = usuarioBibliotecaRepository
-                .findByUsuarioIdAndTipoUsuario(usuarioId, TipoUsuario.ADMIN);
+                .findByUsuarioIdAndTipoUsuarioIn(usuarioId, tiposPermitidos);
 
         return vinculos.stream()
                 .map(ub -> new BibliotecaResponseDTO(

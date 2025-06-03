@@ -8,13 +8,11 @@ import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.*;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoExemplar;
 import com.onlibrary.onlibrary_api.repository.*;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -36,7 +34,6 @@ public class ExemplarService {
         Livro livro = livroRepository.findById(dto.livroId())
                 .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado"));
 
-        // Verifica se já existe associação Biblioteca-Livro, se não existir cria
         boolean existeBibliotecaLivro = bibliotecaLivroRepository
                 .existsByBibliotecaIdAndLivroId(dto.bibliotecaId(), dto.livroId());
 
@@ -54,7 +51,7 @@ public class ExemplarService {
         exemplar.setSetor(dto.setor());
         exemplar.setPrateleira(dto.prateleira());
         exemplar.setEstante(dto.estante());
-        exemplar.setSituacao(SituacaoExemplar.fromString(dto.situacao()));
+        exemplar.setSituacao(SituacaoExemplar.DISPONIVEL);
 
         exemplarRepository.save(exemplar);
 
@@ -87,7 +84,7 @@ public class ExemplarService {
         exemplar.setEstante(dto.estante());
         exemplar.setPrateleira(dto.prateleira());
         exemplar.setSetor(dto.setor());
-        exemplar.setSituacao(SituacaoExemplar.fromString(dto.situacao()));
+        exemplar.setSituacao(dto.situacao());
 
         exemplarRepository.save(exemplar);
 
