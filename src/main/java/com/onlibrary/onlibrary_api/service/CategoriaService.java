@@ -1,6 +1,7 @@
 package com.onlibrary.onlibrary_api.service;
 
 import com.onlibrary.onlibrary_api.dto.categoria.CategoriaRequestDTO;
+import com.onlibrary.onlibrary_api.exception.ConflictException;
 import com.onlibrary.onlibrary_api.exception.InvalidCredentialsException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Categoria;
@@ -18,7 +19,7 @@ public class CategoriaService {
     public void criarCategoria(CategoriaRequestDTO dto) {
         boolean nomeExiste = categoriaRepository.existsByNome(dto.nome());
         if (nomeExiste) {
-            throw new InvalidCredentialsException("Já existe uma Categoria com esse nome");
+            throw new ConflictException("Já existe uma Categoria com esse nome");
         }
 
         Categoria categoria = new Categoria();
@@ -30,17 +31,15 @@ public class CategoriaService {
 
     public void atualizarCategoria(UUID id, CategoriaRequestDTO dto) {
         Categoria categoria = categoriaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada"));
 
         boolean nomeExiste = categoriaRepository.existsByNome(dto.nome());
         if (nomeExiste) {
-            throw new InvalidCredentialsException("Já existe uma categoria com esse nome");
+            throw new ConflictException("Já existe uma categoria com esse nome");
         }
 
-        Categoria categoriaAtualizado = new Categoria();
+        categoria.setNome(dto.nome());
 
-        categoriaAtualizado.setNome(dto.nome());
-
-        categoriaRepository.save(categoriaAtualizado);
+        categoriaRepository.save(categoria);
     }
 }

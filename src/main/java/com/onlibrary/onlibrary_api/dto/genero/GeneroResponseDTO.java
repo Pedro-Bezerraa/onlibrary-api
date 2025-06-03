@@ -1,4 +1,9 @@
 package com.onlibrary.onlibrary_api.dto.genero;
 
-public record GeneroResponseDTO() {
-}
+import java.util.UUID;
+
+public record GeneroResponseDTO(
+        UUID id,
+        String nome
+) { }
+

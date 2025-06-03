@@ -1,5 +1,6 @@
 package com.onlibrary.onlibrary_api.controller;
 
+import com.onlibrary.onlibrary_api.dto.ResponseDTO;
 import com.onlibrary.onlibrary_api.dto.editora.EditoraRequestDTO;
 import com.onlibrary.onlibrary_api.exception.InvalidCredentialsException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
@@ -18,22 +19,16 @@ public class EditoraController {
     private final EditoraService editoraService;
 
     @PostMapping("/criar-editora")
-    public ResponseEntity<?> criarEditora(@RequestBody EditoraRequestDTO dto) {
-        try {
-            editoraService.criarEditora(dto);
-            return ResponseEntity.ok("Editora criado com sucesso");
-        } catch (InvalidCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity<ResponseDTO<Void>> criarEditora(@RequestBody EditoraRequestDTO dto) {
+        editoraService.criarEditora(dto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ResponseDTO<>(true, "Editora criada com sucesso", null));
     }
+
 
     @PutMapping("/atualizar-editora/{id}")
     public ResponseEntity<?> atualizarEditora(@PathVariable UUID id, @RequestBody EditoraRequestDTO dto) {
-        try {
-            editoraService.atualizar(id, dto);
-            return ResponseEntity.ok("Categoria atualizado com sucesso");
-        } catch (InvalidCredentialsException | ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        editoraService.atualizar(id, dto);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Editora atualizada com sucesso!", null));
     }
 }

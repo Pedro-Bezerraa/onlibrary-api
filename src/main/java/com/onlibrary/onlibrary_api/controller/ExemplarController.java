@@ -1,7 +1,9 @@
 package com.onlibrary.onlibrary_api.controller;
 
+import com.onlibrary.onlibrary_api.dto.ResponseDTO;
 import com.onlibrary.onlibrary_api.dto.exemplar.AttExemplarRequestDTO;
 import com.onlibrary.onlibrary_api.dto.exemplar.ExemplarRequestDTO;
+import com.onlibrary.onlibrary_api.dto.exemplar.ExemplarResponseDTO;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.service.ExemplarService;
 import jakarta.persistence.EntityNotFoundException;
@@ -22,27 +24,16 @@ public class ExemplarController {
 
     @PostMapping("/criar-exemplar")
     public ResponseEntity<?> criarExemplar(@RequestBody ExemplarRequestDTO dto) {
-        try {
-            exemplarService.criarExemplar(dto);
-            return ResponseEntity.ok("Exemplar criado com sucesso");
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        ExemplarResponseDTO exemplar = exemplarService.criarExemplar(dto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ResponseDTO<>(true, "Exemplar criado com sucesso!", exemplar));
     }
+
 
     @PutMapping("/atualizar-exemplar/{id}")
     public ResponseEntity<?> atualizarExemplar(@PathVariable UUID id, @RequestBody AttExemplarRequestDTO dto) {
-
-        try {
-            exemplarService.atualizarExemlar(id, dto);
-            return ResponseEntity.ok("Exemplar atualizado com sucesso.");
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        } catch (Exception e) {
-            log.error("Erro ao atualizar exemplar", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao atualizar exemplar.");
-        }
+        ExemplarResponseDTO exemplarAtualizado = exemplarService.atualizarExemplar(id, dto);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Exemplar atualizado com sucesso!", exemplarAtualizado));
     }
+
 }

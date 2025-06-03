@@ -12,10 +12,8 @@ import java.time.LocalDateTime;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<String> handleBusinessException(BusinessException ex) {
-        return ResponseEntity
-                .badRequest()
-                .body(ex.getMessage());
+    public ResponseEntity<ErrorResponseDTO> handleBusinessException(BusinessException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)

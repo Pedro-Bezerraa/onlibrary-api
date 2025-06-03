@@ -1,8 +1,9 @@
 package com.onlibrary.onlibrary_api.service;
 
-import com.onlibrary.onlibrary_api.dto.biblioteca.ContagemResponseDTO;
 import com.onlibrary.onlibrary_api.dto.biblioteca.BibliotecaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.biblioteca.BibliotecaResponseDTO;
+import com.onlibrary.onlibrary_api.dto.biblioteca.ContagemResponseDTO;
+import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Biblioteca;
 import com.onlibrary.onlibrary_api.model.entities.PerfilUsuario;
 import com.onlibrary.onlibrary_api.model.entities.Usuario;
@@ -50,13 +51,13 @@ public class BibliotecaService {
         perfil = perfilUsuarioRepository.save(perfil);
 
         Usuario usuario = usuarioRepository.findById(idUsuarioCriador)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
         UsuarioBiblioteca usuarioBiblioteca = new UsuarioBiblioteca();
         usuarioBiblioteca.setBiblioteca(biblioteca);
         usuarioBiblioteca.setUsuario(usuario);
         usuarioBiblioteca.setPerfilUsuario(perfil);
-        usuarioBiblioteca.setTipoUsuario((TipoUsuario.ADMIN));
+        usuarioBiblioteca.setTipoUsuario(TipoUsuario.ADMIN);
         usuarioBiblioteca.setNumeroMatricula("");
         usuarioBiblioteca.setCpf(usuario.getCpf());
         usuarioBiblioteca.setSituacao(ContaSituacao.ATIVO);
@@ -65,6 +66,7 @@ public class BibliotecaService {
 
         return biblioteca.getId();
     }
+
 
     public List<BibliotecaResponseDTO> listarBibliotecasAdminOuFuncionario(String token) {
         UUID usuarioId = jwtService.extractIdForUser(token);

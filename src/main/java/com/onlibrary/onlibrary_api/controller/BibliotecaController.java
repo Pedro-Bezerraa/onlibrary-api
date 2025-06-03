@@ -4,6 +4,7 @@ import com.onlibrary.onlibrary_api.dto.biblioteca.ContagemResponseDTO;
 import com.onlibrary.onlibrary_api.dto.biblioteca.BibliotecaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.biblioteca.BibliotecaResponseDTO;
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
+import com.onlibrary.onlibrary_api.exception.AuthenticationException;
 import com.onlibrary.onlibrary_api.service.BibliotecaService;
 import com.onlibrary.onlibrary_api.service.JwtService;
 import jakarta.servlet.http.Cookie;
@@ -28,37 +29,36 @@ public class BibliotecaController {
     private final JwtService jwtService;
 
     @PostMapping("/criar-biblioteca")
-    public ResponseEntity<?> criarBiblioteca(
+    public ResponseEntity<ResponseDTO<Map<String, UUID>>> criarBiblioteca(
             @RequestBody @Valid BibliotecaRequestDTO dto,
             HttpServletRequest request
     ) {
         String token = recuperarToken(request);
 
         if (token == null || token.isBlank()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token ausente");
+            throw new AuthenticationException("Token ausente ou inválido");
         }
 
         UUID idUsuario = jwtService.extractIdForUser(token);
-
         UUID idBiblioteca = bibliotecaService.criarBiblioteca(dto, idUsuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("idBiblioteca", idBiblioteca));
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ResponseDTO<>(true, "Biblioteca criada com sucesso", Map.of("idBiblioteca", idBiblioteca)));
     }
 
     @GetMapping("/minhas-bibliotecas")
-    public ResponseEntity<?> listarMinhasBibliotecas(HttpServletRequest request) {
+    public ResponseEntity<ResponseDTO<List<BibliotecaResponseDTO>>> listarMinhasBibliotecas(HttpServletRequest request) {
         String token = recuperarToken(request);
-        if (token == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token ausente");
-        }
 
-        UUID usuarioId = jwtService.extractIdForUser(token);
-        if (usuarioId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido");
+        if (token == null || token.isBlank()) {
+            throw new AuthenticationException("Token ausente ou inválido");
         }
 
         List<BibliotecaResponseDTO> bibliotecas = bibliotecaService.listarBibliotecasAdminOuFuncionario(token);
-        return ResponseEntity.ok(new ResponseDTO<>(true, "Bibliotecas encontradas", bibliotecas));
+
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Bibliotecas recuperadas com sucesso", bibliotecas));
     }
+
 
     @GetMapping("/contagem/{type}/{id}")
     public ResponseEntity<ContagemResponseDTO> contarPorBibliotecas(

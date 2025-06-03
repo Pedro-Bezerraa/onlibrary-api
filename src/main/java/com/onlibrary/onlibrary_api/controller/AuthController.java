@@ -12,6 +12,8 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -42,10 +44,11 @@ public class AuthController {
     }
 
     @PostMapping("/validar-etapa")
-    public ResponseEntity<?> validarEtapa(@RequestBody EtapaCadastroRequestDTO request) {
+    public ResponseEntity<ResponseDTO<Map<String, String>>> validarEtapa(@RequestBody EtapaCadastroRequestDTO request) {
         authService.validarEtapa(request.etapa(), request.dados());
         return ResponseEntity.ok(new ResponseDTO<>(true, "Dados válidos", request.dados()));
     }
+
 
     @GetMapping("/ping")
     public String ping() {

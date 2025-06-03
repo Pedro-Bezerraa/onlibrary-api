@@ -1,5 +1,6 @@
 package com.onlibrary.onlibrary_api.controller;
 
+import com.onlibrary.onlibrary_api.dto.ResponseDTO;
 import com.onlibrary.onlibrary_api.dto.categoria.CategoriaRequestDTO;
 import com.onlibrary.onlibrary_api.exception.InvalidCredentialsException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
@@ -18,22 +19,17 @@ public class CategoriaController {
     private final CategoriaService categoriaService;
 
     @PostMapping("/criar-categoria")
-    public ResponseEntity<?> criarCategoria(@RequestBody CategoriaRequestDTO dto) {
-        try {
-            categoriaService.criarCategoria(dto);
-            return ResponseEntity.ok("Categoria criada com sucesso");
-        } catch (InvalidCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity<ResponseDTO<Void>> criarCategoria(@RequestBody CategoriaRequestDTO dto) {
+        categoriaService.criarCategoria(dto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ResponseDTO<>(true, "Categoria criada com sucesso", null));
     }
 
+
     @PutMapping("/atualizar-categoria/{id}")
-    public ResponseEntity<?> atualizarCategoria(@PathVariable UUID id, @RequestBody CategoriaRequestDTO dto) {
-        try {
-            categoriaService.atualizarCategoria(id, dto);
-            return ResponseEntity.ok("Categoria atualizado com sucesso");
-        } catch (InvalidCredentialsException | ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity<ResponseDTO<Void>> atualizarCategoria(@PathVariable UUID id, @RequestBody CategoriaRequestDTO dto) {
+        categoriaService.atualizarCategoria(id, dto);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Categoria atualizada com sucesso", null));
     }
+
 }

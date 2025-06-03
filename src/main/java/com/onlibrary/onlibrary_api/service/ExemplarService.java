@@ -2,6 +2,7 @@ package com.onlibrary.onlibrary_api.service;
 
 import com.onlibrary.onlibrary_api.dto.exemplar.AttExemplarRequestDTO;
 import com.onlibrary.onlibrary_api.dto.exemplar.ExemplarRequestDTO;
+import com.onlibrary.onlibrary_api.dto.exemplar.ExemplarResponseDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.*;
@@ -26,7 +27,8 @@ public class ExemplarService {
     private final ReservaRepository reservaRepository;
     private final BibliotecaLivroRepository bibliotecaLivroRepository;
 
-    public void criarExemplar(ExemplarRequestDTO dto) {
+    @Transactional
+    public ExemplarResponseDTO criarExemplar(ExemplarRequestDTO dto) {
 
         Biblioteca biblioteca = bibliotecaRepository.findById(dto.bibliotecaId())
                 .orElseThrow(() -> new ResourceNotFoundException("Biblioteca não encontrada"));
@@ -34,10 +36,18 @@ public class ExemplarService {
         Livro livro = livroRepository.findById(dto.livroId())
                 .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado"));
 
-        boolean existe = bibliotecaLivroRepository.existsByBibliotecaIdAndLivroId(
-                dto.bibliotecaId(), dto.livroId());
-        Exemplar exemplar = new Exemplar();
+        // Verifica se já existe associação Biblioteca-Livro, se não existir cria
+        boolean existeBibliotecaLivro = bibliotecaLivroRepository
+                .existsByBibliotecaIdAndLivroId(dto.bibliotecaId(), dto.livroId());
 
+        if (!existeBibliotecaLivro) {
+            BibliotecaLivro bibliotecaLivro = new BibliotecaLivro();
+            bibliotecaLivro.setBiblioteca(biblioteca);
+            bibliotecaLivro.setLivro(livro);
+            bibliotecaLivroRepository.save(bibliotecaLivro);
+        }
+
+        Exemplar exemplar = new Exemplar();
         exemplar.setBiblioteca(biblioteca);
         exemplar.setLivro(livro);
         exemplar.setNumeroTombo(dto.numeroTombo());
@@ -48,29 +58,29 @@ public class ExemplarService {
 
         exemplarRepository.save(exemplar);
 
-        BibliotecaLivro bibliotecaLivro = new BibliotecaLivro();
-
-        bibliotecaLivro.setBiblioteca(bibliotecaRepository.findById(dto.bibliotecaId())
-                .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado")));
-        bibliotecaLivro.setLivro(livroRepository.findById(dto.livroId())
-                .orElseThrow(() -> new ResourceNotFoundException("Biblioteca não encontrada")));
-
-        bibliotecaLivroRepository.save(bibliotecaLivro);
+        return new ExemplarResponseDTO(
+                exemplar.getId(),
+                exemplar.getNumeroTombo(),
+                exemplar.getSetor(),
+                exemplar.getPrateleira(),
+                exemplar.getEstante(),
+                exemplar.getSituacao(),
+                exemplar.getLivro().getId(),
+                exemplar.getBiblioteca().getId()
+        );
     }
 
-
-
     @Transactional
-    public void atualizarExemlar(UUID id, AttExemplarRequestDTO dto) {
+    public ExemplarResponseDTO atualizarExemplar(UUID id, AttExemplarRequestDTO dto) {
         Exemplar exemplar = exemplarRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Exemplar não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Exemplar não encontrado."));
 
         if (exemplar.getSituacao() != SituacaoExemplar.DISPONIVEL) {
             throw new BusinessException("Exemplar não está disponível para alteração.");
         }
 
         Livro livro = livroRepository.findById(dto.livroId())
-                        .orElseThrow(() -> new ResourceNotFoundException(("Livro não encontrado")));
+                .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado."));
 
         exemplar.setLivro(livro);
         exemplar.setNumeroTombo(dto.numeroTombo());
@@ -81,23 +91,29 @@ public class ExemplarService {
 
         exemplarRepository.save(exemplar);
 
-        Optional<Reserva> reservaOpt = reservaRepository
-                .findFirstBySituacaoAndLivroOrderByDataEmissaoAsc("PENDENTE", exemplar.getLivro());
+        reservaRepository.findFirstBySituacaoAndLivroOrderByDataEmissaoAsc("PENDENTE", livro)
+                .ifPresent(reserva -> {
+                    ReservaExemplar reservaExemplar = ReservaExemplar.builder()
+                            .exemplar(exemplar)
+                            .reserva(reserva)
+                            .build();
+                    reservaExemplarRepository.save(reservaExemplar);
 
-        if (reservaOpt.isPresent()) {
-            Reserva reserva = reservaOpt.get();
+                    if (reserva.getQuantidadePendente().compareTo(BigDecimal.ZERO) > 0) {
+                        reserva.setQuantidadePendente(reserva.getQuantidadePendente().subtract(BigDecimal.ONE));
+                        reservaRepository.save(reserva);
+                    }
+                });
 
-            ReservaExemplar reservaExemplar = ReservaExemplar.builder()
-                    .exemplar(exemplar)
-                    .reserva(reserva)
-                    .build();
-
-            reservaExemplarRepository.save(reservaExemplar);
-
-            if (reserva.getQuantidadePendente().compareTo(BigDecimal.ZERO) > 0) {
-                reserva.setQuantidadePendente(reserva.getQuantidadePendente().subtract(BigDecimal.ONE));
-                reservaRepository.save(reserva);
-            }
-        }
+        return new ExemplarResponseDTO(
+                exemplar.getId(),
+                exemplar.getNumeroTombo(),
+                exemplar.getSetor(),
+                exemplar.getPrateleira(),
+                exemplar.getEstante(),
+                exemplar.getSituacao(),
+                exemplar.getLivro().getId(),
+                exemplar.getBiblioteca().getId()
+        );
     }
 }

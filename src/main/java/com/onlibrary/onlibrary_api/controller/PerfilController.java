@@ -1,7 +1,9 @@
 package com.onlibrary.onlibrary_api.controller;
 
+import com.onlibrary.onlibrary_api.dto.ResponseDTO;
 import com.onlibrary.onlibrary_api.dto.perfilUsuario.AttPerfilUsuarioRequestDTO;
 import com.onlibrary.onlibrary_api.dto.perfilUsuario.PerfilUsuarioRequestDTO;
+import com.onlibrary.onlibrary_api.dto.perfilUsuario.PerfilUsuarioResponseDTO;
 import com.onlibrary.onlibrary_api.exception.InvalidCredentialsException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.service.PerfilService;
@@ -20,23 +22,17 @@ public class PerfilController {
 
     @PostMapping("/criar-perfil")
     public ResponseEntity<?> criarPerfil(@RequestBody PerfilUsuarioRequestDTO dto) {
-        try {
-            perfilService.criarPerfil(dto);
-            return ResponseEntity.ok("Perfil criado com sucesso");
-        } catch (InvalidCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        PerfilUsuarioResponseDTO perfil = perfilService.criarPerfil(dto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ResponseDTO<>(true, "Perfil criado com sucesso!", perfil));
     }
+
 
     @PutMapping("/atualizar-perfil/{id}")
     public ResponseEntity<?> atualizarPerfil(@RequestBody AttPerfilUsuarioRequestDTO dto, @PathVariable UUID id) {
-        try {
-            perfilService.atualizarPerfil(dto, id);
-            return ResponseEntity.ok("Perfil atualizado com sucesso");
-        } catch (InvalidCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        PerfilUsuarioResponseDTO perfilAtualizado = perfilService.atualizarPerfil(dto, id);
+        return ResponseEntity.ok(
+                new ResponseDTO<>(true, "Perfil atualizado com sucesso!", perfilAtualizado)
+        );
     }
 }

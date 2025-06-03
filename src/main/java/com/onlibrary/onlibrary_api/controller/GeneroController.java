@@ -1,6 +1,8 @@
 package com.onlibrary.onlibrary_api.controller;
 
+import com.onlibrary.onlibrary_api.dto.ResponseDTO;
 import com.onlibrary.onlibrary_api.dto.genero.GeneroRequestDTO;
+import com.onlibrary.onlibrary_api.dto.genero.GeneroResponseDTO;
 import com.onlibrary.onlibrary_api.exception.InvalidCredentialsException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.service.GeneroService;
@@ -19,21 +21,16 @@ public class GeneroController {
 
     @PostMapping("/criar-genero")
     public ResponseEntity<?> criarGenero(@RequestBody GeneroRequestDTO dto) {
-        try {
-            generoService.criarGenero(dto);
-            return ResponseEntity.ok("genero criado com sucesso");
-        } catch (InvalidCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        GeneroResponseDTO genero = generoService.criarGenero(dto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ResponseDTO<>(true, "Gênero criado com sucesso!", genero));
     }
+
 
     @PutMapping("/atualizar-genero/{id}")
     public ResponseEntity<?> atualizarGenero(@PathVariable UUID id, @RequestBody GeneroRequestDTO dto) {
-        try {
-            generoService.atualizarGenero(id, dto);
-            return ResponseEntity.ok("genero atualizado com sucesso");
-        } catch (InvalidCredentialsException | ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        GeneroResponseDTO generoAtualizado = generoService.atualizarGenero(id, dto);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Gênero atualizado com sucesso!", generoAtualizado));
     }
+
 }

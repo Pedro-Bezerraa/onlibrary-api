@@ -2,6 +2,8 @@ package com.onlibrary.onlibrary_api.service;
 
 import com.onlibrary.onlibrary_api.dto.emprestimo.AttEmprestimoRequestDTO;
 import com.onlibrary.onlibrary_api.dto.emprestimo.EmprestimoRequestDTO;
+import com.onlibrary.onlibrary_api.dto.emprestimo.EmprestimoResponseDTO;
+import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.*;
 import com.onlibrary.onlibrary_api.model.enums.ContaSituacao;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,19 +33,19 @@ public class EmprestimoService {
     private final EmprestimoExemplarRepository emprestimoExemplarRepository;
 
     @Transactional
-    public void criarEmprestimo(EmprestimoRequestDTO dto) {
+    public EmprestimoResponseDTO criarEmprestimo(EmprestimoRequestDTO dto) {
         UsuarioBiblioteca usuarioBiblioteca = usuarioBibliotecaRepository.findById(dto.usuarioBibliotecaId())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário da biblioteca não encontrado!"));
 
         if (usuarioBiblioteca.getSituacao() == ContaSituacao.BLOQUEADO) {
-            throw new IllegalArgumentException("Usuário está bloqueado!");
+            throw new BusinessException("Usuário está bloqueado!");
         }
 
         Usuario bibliotecario = usuarioRepository.findById(dto.bibliotecarioId())
                 .orElseThrow(() -> new ResourceNotFoundException("Bibliotecário não encontrado!"));
 
         if (bibliotecario.getSituacao() == ContaSituacao.BLOQUEADO) {
-            throw new IllegalArgumentException("Bibliotecário está bloqueado!");
+            throw new BusinessException("Bibliotecário está bloqueado!");
         }
 
         Biblioteca biblioteca = bibliotecaRepository.findById(dto.bibliotecaId())
@@ -51,15 +54,15 @@ public class EmprestimoService {
         List<Exemplar> exemplares = exemplarRepository.findAllById(dto.exemplares());
 
         if (exemplares.size() != dto.exemplares().size()) {
-            throw new IllegalArgumentException("Um ou mais exemplares não foram encontrados.");
+            throw new BusinessException("Um ou mais exemplares não foram encontrados.");
         }
 
         for (Exemplar exemplar : exemplares) {
             if (!exemplar.getBiblioteca().getId().equals(biblioteca.getId())) {
-                throw new IllegalArgumentException("O exemplar " + exemplar.getId() + " não pertence à biblioteca.");
+                throw new BusinessException("O exemplar " + exemplar.getId() + " não pertence à biblioteca.");
             }
             if (exemplar.getSituacao() == SituacaoExemplar.INDISPONIVEL) {
-                throw new IllegalArgumentException("O exemplar " + exemplar.getId() + " está indisponível.");
+                throw new BusinessException("O exemplar " + exemplar.getId() + " está indisponível.");
             }
         }
 
@@ -85,36 +88,64 @@ public class EmprestimoService {
         ).toList();
 
         emprestimoExemplarRepository.saveAll(emprestimoExemplares);
+
+        return new EmprestimoResponseDTO(
+                emprestimo.getId(),
+                emprestimo.getDataEmissao(),
+                emprestimo.getDataDevolucao(),
+                emprestimo.getSituacao(),
+                usuarioBiblioteca.getId(),
+                bibliotecario.getId(),
+                biblioteca.getId(),
+                exemplares.stream().map(Exemplar::getId).toList()
+        );
     }
 
+
     @Transactional
-    public void atualizarEmprestimo(UUID id, AttEmprestimoRequestDTO dto) {
+    public EmprestimoResponseDTO atualizarEmprestimo(UUID id, AttEmprestimoRequestDTO dto) {
         Emprestimo emprestimo = emprestimoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Emprestimo não encontrado!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Empréstimo não encontrado!"));
 
-        boolean finalizado = emprestimo.getSituacao() == SituacaoEmprestimo.CONCLUIDO ||
-                emprestimo.getSituacao() == SituacaoEmprestimo.CANCELADO;
+        boolean estaFinalizado = emprestimo.getSituacao() == SituacaoEmprestimo.CONCLUIDO
+                || emprestimo.getSituacao() == SituacaoEmprestimo.CANCELADO;
 
-        if (!finalizado) {
+        if (estaFinalizado) {
+            throw new BusinessException("Não é possível atualizar um empréstimo já finalizado.");
+        }
+
+        if (dto.dataDevolucao() != null) {
             emprestimo.setDataDevolucao(dto.dataDevolucao());
         }
 
-        emprestimo.setSituacao((dto.situacao()));
+        emprestimo.setSituacao(dto.situacao());
         emprestimoRepository.save(emprestimo);
 
         if (dto.situacao() == SituacaoEmprestimo.CONCLUIDO || dto.situacao() == SituacaoEmprestimo.CANCELADO) {
             liberarExemplares(emprestimo);
         }
+
+        return new EmprestimoResponseDTO(
+                emprestimo.getId(),
+                emprestimo.getDataEmissao(),
+                emprestimo.getDataDevolucao(),
+                emprestimo.getSituacao(),
+                emprestimo.getUsuarioBiblioteca().getId(),
+                emprestimo.getBibliotecario().getId(),
+                emprestimo.getBiblioteca().getId(),
+                emprestimo.getExemplares().stream().map(e -> e.getExemplar().getId()).toList()
+        );
     }
 
     private void liberarExemplares(Emprestimo emprestimo) {
         List<EmprestimoExemplar> emprestimoExemplares = emprestimo.getExemplares();
 
+        List<Exemplar> exemplaresAtualizados = new ArrayList<>();
+
         for (EmprestimoExemplar ee : emprestimoExemplares) {
             Exemplar exemplar = ee.getExemplar();
-
             exemplar.setSituacao(SituacaoExemplar.DISPONIVEL);
-            exemplarRepository.save(exemplar);
+            exemplaresAtualizados.add(exemplar);
 
             List<Reserva> reservasPendentes = reservaRepository
                     .findReservasPendentesPorLivro(exemplar.getLivro().getId());
@@ -137,5 +168,7 @@ public class EmprestimoService {
                 }
             }
         }
+
+        exemplarRepository.saveAll(exemplaresAtualizados);
     }
 }

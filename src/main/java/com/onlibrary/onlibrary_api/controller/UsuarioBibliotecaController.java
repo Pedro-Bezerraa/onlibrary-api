@@ -1,7 +1,9 @@
 package com.onlibrary.onlibrary_api.controller;
 
+import com.onlibrary.onlibrary_api.dto.ResponseDTO;
 import com.onlibrary.onlibrary_api.dto.usuarioBiblioteca.AttUsuarioBibliotecaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.usuarioBiblioteca.UsuarioBibliotecaRequestDTO;
+import com.onlibrary.onlibrary_api.dto.usuarioBiblioteca.UsuarioBibliotecaResponseDTO;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.service.UsuarioBibliotecaService;
 import lombok.RequiredArgsConstructor;
@@ -19,21 +21,16 @@ public class UsuarioBibliotecaController {
 
     @PostMapping("/criar-usuarioBiblioteca")
     public ResponseEntity<?> criarUsuarioBiblioteca(@RequestBody UsuarioBibliotecaRequestDTO dto) {
-        try {
-            usuarioBibliotecaService.criarUsuarioBiblioteca(dto);
-            return ResponseEntity.ok("relação usuario a biblioteca criado");
-        } catch (ResourceNotFoundException | IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        UsuarioBibliotecaResponseDTO usuarioBiblioteca = usuarioBibliotecaService.criarUsuarioBiblioteca(dto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ResponseDTO<>(true, "Relação usuário-biblioteca criada com sucesso!", usuarioBiblioteca));
     }
 
     @PutMapping("/atualizar-usuarioBiblioteca/{id}")
     public ResponseEntity<?> atualizarUsuarioBiblioteca(@PathVariable UUID id, @RequestBody AttUsuarioBibliotecaRequestDTO dto) {
-        try {
-            usuarioBibliotecaService.atualizarUsuarioBiblioteca(dto, id);
-            return ResponseEntity.ok("relação usuario a biblioteca atualizado");
-        } catch (ResourceNotFoundException | IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        UsuarioBibliotecaResponseDTO usuarioBiblioteca = usuarioBibliotecaService.atualizarUsuarioBiblioteca(dto, id);
+        return ResponseEntity.ok(
+                new ResponseDTO<>(true, "Relação usuário-biblioteca atualizada com sucesso!", usuarioBiblioteca)
+        );
     }
 }
