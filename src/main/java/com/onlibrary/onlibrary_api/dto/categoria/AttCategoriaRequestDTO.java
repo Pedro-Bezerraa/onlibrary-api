@@ -1,9 +1,6 @@
 package com.onlibrary.onlibrary_api.dto.categoria;
 
-import java.util.UUID;
-
-public record CategoriaResponseDTO(
-        UUID id,
+public record AttCategoriaRequestDTO(
         String nome
 ) {
 }

@@ -2,8 +2,9 @@ package com.onlibrary.onlibrary_api.dto.editora;
 
 import java.util.UUID;
 
-public record EditoraResponseDTO(
+public record AttEditoraResponseDTO(
         UUID id,
         String nome
 ) {
 }
+

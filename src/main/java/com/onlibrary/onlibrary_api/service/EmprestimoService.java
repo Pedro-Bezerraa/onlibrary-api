@@ -62,12 +62,12 @@ public class EmprestimoService {
             if (!exemplar.getBiblioteca().getId().equals(biblioteca.getId())) {
                 throw new BusinessException("O exemplar " + exemplar.getId() + " não pertence à biblioteca.");
             }
-            if (exemplar.getSituacao() == SituacaoExemplar.INDISPONIVEL) {
+            if (exemplar.getSituacao() == SituacaoExemplar.INDISPONIVEL || exemplar.getSituacao() == SituacaoExemplar.EMPRESTADO) {
                 throw new BusinessException("O exemplar " + exemplar.getId() + " está indisponível.");
             }
         }
 
-        exemplares.forEach(exemplar -> exemplar.setSituacao(SituacaoExemplar.INDISPONIVEL));
+        exemplares.forEach(exemplar -> exemplar.setSituacao(SituacaoExemplar.EMPRESTADO));
         exemplarRepository.saveAll(exemplares);
 
         Emprestimo emprestimo = Emprestimo.builder()

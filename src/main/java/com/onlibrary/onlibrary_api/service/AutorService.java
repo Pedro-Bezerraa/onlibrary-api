@@ -1,10 +1,15 @@
 package com.onlibrary.onlibrary_api.service;
 
+import com.onlibrary.onlibrary_api.dto.autor.AttAutorRequestDTO;
+import com.onlibrary.onlibrary_api.dto.autor.AttAutorResponseDTO;
 import com.onlibrary.onlibrary_api.dto.autor.AutorRequestDTO;
+import com.onlibrary.onlibrary_api.dto.autor.AutorResponseDTO;
+import com.onlibrary.onlibrary_api.exception.ConflictException;
 import com.onlibrary.onlibrary_api.exception.InvalidCredentialsException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Autor;
 import com.onlibrary.onlibrary_api.repository.AutorRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,32 +20,34 @@ import java.util.UUID;
 public class AutorService {
     private final AutorRepository autorRepository;
 
-    public void criarAutor(AutorRequestDTO dto) {
-        boolean nomeExiste = autorRepository.existsByNome(dto.nome());
-        if (nomeExiste) {
-            throw new InvalidCredentialsException("Já existe um autor com esse nome");
+    @Transactional
+    public AutorResponseDTO criarAutor(AutorRequestDTO dto) {
+        if (autorRepository.existsByNome(dto.nome())) {
+            throw new ConflictException("Já existe um autor com esse nome.");
         }
 
         Autor autor = new Autor();
+        autor.setNome(dto.nome());
+
+        autorRepository.save(autor);
+
+        return new AutorResponseDTO(autor.getId(), autor.getNome());
+    }
+
+    @Transactional
+    public AutorResponseDTO atualizarAutor(UUID id, AutorRequestDTO dto) {
+        Autor autor = autorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Autor não encontrado."));
+
+        boolean nomeExiste = autorRepository.existsByNome(dto.nome());
+        if (nomeExiste && !autor.getNome().equalsIgnoreCase(dto.nome())) {
+            throw new ConflictException("Já existe um autor com esse nome.");
+        }
 
         autor.setNome(dto.nome());
 
         autorRepository.save(autor);
-    }
 
-    public void atualizarAutor(UUID id, AutorRequestDTO dto) {
-        Autor autor = autorRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Autor não encontrado"));
-
-        boolean nomeExiste = autorRepository.existsByNome(dto.nome());
-        if (nomeExiste) {
-            throw new InvalidCredentialsException("Já existe um autor com esse nome");
-        }
-
-        Autor autorAtualizado = new Autor();
-
-        autorAtualizado.setNome(dto.nome());
-
-        autorRepository.save(autorAtualizado);
+        return new AutorResponseDTO(autor.getId(), autor.getNome());
     }
 }

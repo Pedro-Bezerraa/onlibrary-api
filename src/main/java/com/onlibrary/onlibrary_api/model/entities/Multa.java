@@ -29,6 +29,10 @@ public class Multa {
     @JoinColumn(name = "fk_id_bibliotecario")
     private Usuario bibliotecario;
 
+    @ManyToOne
+    @JoinColumn(name = "fk_id_emprestimo")
+    private Emprestimo emprestimo;
+
     private Integer valor;
 
     @Column(name = "data_emissao")
@@ -44,4 +48,8 @@ public class Multa {
     @ManyToOne
     @JoinColumn(name = "fk_id_biblioteca")
     private Biblioteca biblioteca;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean deletado = false;
 }

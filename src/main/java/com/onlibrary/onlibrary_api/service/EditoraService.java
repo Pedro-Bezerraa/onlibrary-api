@@ -1,6 +1,9 @@
 package com.onlibrary.onlibrary_api.service;
 
+import com.onlibrary.onlibrary_api.dto.editora.AttEditoraRequestDTO;
+import com.onlibrary.onlibrary_api.dto.editora.AttEditoraResponseDTO;
 import com.onlibrary.onlibrary_api.dto.editora.EditoraRequestDTO;
+import com.onlibrary.onlibrary_api.dto.editora.EditoraResponseDTO;
 import com.onlibrary.onlibrary_api.exception.ConflictException;
 import com.onlibrary.onlibrary_api.exception.InvalidCredentialsException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
@@ -16,7 +19,7 @@ import java.util.UUID;
 public class EditoraService {
     private final EditoraRepository editoraRepository;
 
-    public void criarEditora(EditoraRequestDTO dto) {
+    public EditoraResponseDTO criarEditora(EditoraRequestDTO dto) {
         boolean nomeExiste = editoraRepository.existsByNome(dto.nome());
         if (nomeExiste) {
             throw new ConflictException("Já existe uma editora com esse nome");
@@ -27,9 +30,11 @@ public class EditoraService {
         editora.setNome(dto.nome());
 
         editoraRepository.save(editora);
+
+        return new EditoraResponseDTO(editora.getId(), editora.getNome());
     }
 
-    public void atualizar(UUID id, EditoraRequestDTO dto) {
+    public AttEditoraResponseDTO atualizar(UUID id, AttEditoraRequestDTO dto) {
         Editora editora = editoraRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Editora não encontrada"));
 
@@ -41,5 +46,7 @@ public class EditoraService {
         editora.setNome(dto.nome());
 
         editoraRepository.save(editora);
+
+        return new AttEditoraResponseDTO(editora.getId(), editora.getNome());
     }
 }

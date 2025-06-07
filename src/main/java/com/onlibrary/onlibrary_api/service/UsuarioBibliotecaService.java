@@ -40,6 +40,11 @@ public class UsuarioBibliotecaService {
         PerfilUsuario perfilUsuario = perfilUsuarioRepository.findById(dto.perfilUsuarioId())
                 .orElseThrow(() -> new ResourceNotFoundException("Perfil não encontrado."));
 
+        boolean usuarioExiste = usuarioBibliotecaRepository.existsByUsuarioId(dto.usuarioId());
+
+        if (usuarioExiste) {
+            throw new BusinessException("Usuario já cadastrado na biblioteca");
+        }
 
         if (!usuario.getCpf().equals(dto.cpf())) {
             throw new BusinessException("O CPF informado não corresponde ao CPF do usuário.");
