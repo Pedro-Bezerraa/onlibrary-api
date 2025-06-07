@@ -39,8 +39,11 @@ public class ReservaService {
         Usuario usuario = usuarioRepository.findById(dto.usuarioId())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
-        Usuario bibliotecario = usuarioRepository.findById(dto.bibliotecarioId())
-                .orElseThrow(() -> new ResourceNotFoundException("Bibliotecário não encontrado"));
+        Usuario bibliotecario = null;
+        if (dto.bibliotecarioId() != null) {
+            bibliotecario = usuarioRepository.findById(dto.bibliotecarioId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Bibliotecário não encontrado"));
+        }
 
         Livro livro = livroRepository.findById(dto.livroId())
                 .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado"));
@@ -105,7 +108,6 @@ public class ReservaService {
                 reserva.getId(),
                 biblioteca.getId(),
                 usuario.getId(),
-                bibliotecario.getId(),
                 reserva.getDataEmissao(),
                 reserva.getDataRetirada(),
                 reserva.getSituacao(),
@@ -141,7 +143,6 @@ public class ReservaService {
                 reserva.getId(),
                 reserva.getBiblioteca().getId(),
                 reserva.getUsuario().getId(),
-                bibliotecario.getId(),
                 reserva.getDataEmissao(),
                 reserva.getDataRetirada(),
                 reserva.getSituacao(),

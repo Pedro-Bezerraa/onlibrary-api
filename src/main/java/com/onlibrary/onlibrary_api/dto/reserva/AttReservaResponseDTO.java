@@ -11,7 +11,6 @@ public record AttReservaResponseDTO(
         UUID reservaId,
         UUID bibliotecaId,
         UUID usuarioid,
-        UUID bibliotecarioId,
         LocalDate dataEmissao,
         LocalDate dataRetirada,
         SituacaoReserva situacaoReserva,

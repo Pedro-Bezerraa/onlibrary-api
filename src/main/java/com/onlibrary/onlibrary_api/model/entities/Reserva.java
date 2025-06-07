@@ -34,7 +34,7 @@ public class Reserva {
     private Usuario usuario;
 
     @ManyToOne
-    @JoinColumn(name = "fk_id_bibliotecario")
+    @JoinColumn(name = "fk_id_bibliotecario", nullable = true)
     private Usuario bibliotecario;
 
     private LocalDate dataEmissao;
