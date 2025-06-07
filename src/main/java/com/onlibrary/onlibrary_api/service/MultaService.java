@@ -64,8 +64,8 @@ public class MultaService {
         Multa multa = multaRepository.findById(multaId)
                 .orElseThrow(() -> new ResourceNotFoundException("Multa não encontrada."));
 
-        if (multa.getSituacao() == SituacaoMulta.CONCLUIDO) {
-            throw new BusinessException("Não é possível atualizar multa já concluida.");
+        if (multa.getSituacao() == SituacaoMulta.CONCLUIDO || multa.getSituacao() == SituacaoMulta.CANCELADO) {
+            throw new BusinessException("Não é possível atualizar multa já finalizada.");
         }
 
         multa.setMotivo(dto.motivo());

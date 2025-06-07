@@ -5,7 +5,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum SituacaoMulta {
     CONCLUIDO,
-    PENDENTE;
+    PENDENTE,
+    CANCELADO;
 
     @JsonValue
     public String toLower() {
