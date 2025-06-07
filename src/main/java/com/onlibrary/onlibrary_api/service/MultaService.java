@@ -4,6 +4,7 @@ import com.onlibrary.onlibrary_api.dto.multa.AttMultaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.multa.AttMultaResponseDTO;
 import com.onlibrary.onlibrary_api.dto.multa.MultaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.multa.MultaResponseDTO;
+import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.*;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoMulta;
@@ -62,6 +63,10 @@ public class MultaService {
     public AttMultaResponseDTO atualizarMulta(UUID multaId, AttMultaRequestDTO dto) {
         Multa multa = multaRepository.findById(multaId)
                 .orElseThrow(() -> new ResourceNotFoundException("Multa não encontrada."));
+
+        if (multa.getSituacao() == SituacaoMulta.CONCLUIDO) {
+            throw new BusinessException("Não é possível atualizar multa já concluida.");
+        }
 
         multa.setMotivo(dto.motivo());
 
