@@ -78,7 +78,7 @@ public class ReservaService {
                 .dataEmissao(LocalDate.now())
                 .dataRetirada(null)
                 .situacao(situacao)
-                .tipo(dto.tipoReserva())
+                .tipo(dto.tipo())
                 .quantidadeTotal(dto.quantidade())
                 .quantidadePendente(quantidadePendente)
                 .build();
