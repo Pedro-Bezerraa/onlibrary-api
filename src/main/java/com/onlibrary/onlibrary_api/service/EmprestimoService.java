@@ -9,6 +9,7 @@ import com.onlibrary.onlibrary_api.model.entities.*;
 import com.onlibrary.onlibrary_api.model.enums.ContaSituacao;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoEmprestimo;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoExemplar;
+import com.onlibrary.onlibrary_api.model.enums.SituacaoReserva;
 import com.onlibrary.onlibrary_api.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,6 @@ public class EmprestimoService {
         UsuarioBiblioteca usuarioBiblioteca = usuarioBibliotecaRepository.findById(dto.usuarioBibliotecaId())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário da biblioteca não encontrado!"));
 
-
         if (usuarioBiblioteca.getSituacao() == ContaSituacao.BLOQUEADO) {
             throw new BusinessException("Usuário está bloqueado!");
         }
@@ -64,6 +64,11 @@ public class EmprestimoService {
             }
             if (exemplar.getSituacao() == SituacaoExemplar.INDISPONIVEL || exemplar.getSituacao() == SituacaoExemplar.EMPRESTADO) {
                 throw new BusinessException("O exemplar " + exemplar.getId() + " está indisponível.");
+            }
+
+            if (reservaExemplarRepository.existsByExemplarAndReserva_Situacao(
+                    exemplar, SituacaoReserva.ATENDIDO_COMPLETAMENTE)) {
+                throw new BusinessException("O exemplar " + exemplar.getId() + " está reservado.");
             }
         }
 
@@ -102,7 +107,6 @@ public class EmprestimoService {
         );
     }
 
-
     @Transactional
     public EmprestimoResponseDTO atualizarEmprestimo(UUID id, AttEmprestimoRequestDTO dto) {
         Emprestimo emprestimo = emprestimoRepository.findById(id)
@@ -115,14 +119,18 @@ public class EmprestimoService {
             throw new BusinessException("Não é possível atualizar um empréstimo já finalizado.");
         }
 
-        if (dto.dataDevolucao() != null) {
-            emprestimo.setDataDevolucao(dto.dataDevolucao());
+        SituacaoEmprestimo novaSituacao = dto.situacao();
+        LocalDate novaDevolucao = dto.dataDevolucao();
+
+        if (novaDevolucao != null) {
+            emprestimo.setDataDevolucao(novaDevolucao);
         }
 
-        emprestimo.setSituacao(dto.situacao());
+        boolean mudouSituacao = emprestimo.getSituacao() != novaSituacao;
+        emprestimo.setSituacao(novaSituacao);
         emprestimoRepository.save(emprestimo);
 
-        if (dto.situacao() == SituacaoEmprestimo.CONCLUIDO || dto.situacao() == SituacaoEmprestimo.CANCELADO) {
+        if (mudouSituacao && (novaSituacao == SituacaoEmprestimo.CONCLUIDO || novaSituacao == SituacaoEmprestimo.CANCELADO)) {
             liberarExemplares(emprestimo);
         }
 
@@ -134,19 +142,19 @@ public class EmprestimoService {
                 emprestimo.getUsuarioBiblioteca().getId(),
                 emprestimo.getBibliotecario().getId(),
                 emprestimo.getBiblioteca().getId(),
-                emprestimo.getExemplares().stream().map(e -> e.getExemplar().getId()).toList()
+                emprestimo.getExemplares().stream()
+                        .map(ee -> ee.getExemplar().getId())
+                        .toList()
         );
     }
 
     private void liberarExemplares(Emprestimo emprestimo) {
         List<EmprestimoExemplar> emprestimoExemplares = emprestimo.getExemplares();
-
         List<Exemplar> exemplaresAtualizados = new ArrayList<>();
 
         for (EmprestimoExemplar ee : emprestimoExemplares) {
             Exemplar exemplar = ee.getExemplar();
-            exemplar.setSituacao(SituacaoExemplar.DISPONIVEL);
-            exemplaresAtualizados.add(exemplar);
+            boolean foiReservado = false;
 
             List<Reserva> reservasPendentes = reservaRepository
                     .findReservasPendentesPorLivro(exemplar.getLivro().getId());
@@ -165,9 +173,13 @@ public class EmprestimoService {
                     reserva.setQuantidadePendente(qntPendente.subtract(BigDecimal.ONE));
                     reservaRepository.save(reserva);
 
+                    foiReservado = true;
                     break;
                 }
             }
+
+            exemplar.setSituacao(foiReservado ? SituacaoExemplar.RESERVADO : SituacaoExemplar.DISPONIVEL);
+            exemplaresAtualizados.add(exemplar);
         }
 
         exemplarRepository.saveAll(exemplaresAtualizados);

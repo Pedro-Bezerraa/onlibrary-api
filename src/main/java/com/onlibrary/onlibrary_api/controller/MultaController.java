@@ -26,7 +26,7 @@ public class MultaController {
     ) {
         MultaResponseDTO multa = multaService.cadastrarMulta(dto);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ResponseDTO<>(true, "Multa dada com sucesso.", multa));
+                .body(new ResponseDTO<>(true, "Multa realizada com sucesso.", multa));
     }
 
     @PutMapping("/atualizar-multa/{multaId}")

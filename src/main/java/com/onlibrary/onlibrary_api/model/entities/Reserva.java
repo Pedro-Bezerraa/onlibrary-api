@@ -1,5 +1,7 @@
 package com.onlibrary.onlibrary_api.model.entities;
 
+import com.onlibrary.onlibrary_api.model.enums.SituacaoReserva;
+import com.onlibrary.onlibrary_api.model.enums.TipoReserva;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,8 +39,12 @@ public class Reserva {
 
     private LocalDate dataEmissao;
     private LocalDate dataRetirada;
-    private String situacao;
-    private String tipo;
+
+    @Enumerated(EnumType.STRING)
+    private SituacaoReserva situacao;
+
+    @Enumerated(EnumType.STRING)
+    private TipoReserva tipo;
 
     @Column(name = "quantidade_total")
     private BigDecimal quantidadeTotal;

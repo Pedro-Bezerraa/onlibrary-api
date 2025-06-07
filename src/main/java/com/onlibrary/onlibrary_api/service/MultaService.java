@@ -20,7 +20,6 @@ import java.util.UUID;
 public class MultaService {
     private final MultaRepository multaRepository;
     private final UsuarioRepository usuarioRepository;
-    private final PerfilUsuarioRepository perfilUsuarioRepository;
     private final UsuarioBibliotecaRepository usuarioBibliotecaRepository;
     private final BibliotecaRepository bibliotecaRepository;
 
