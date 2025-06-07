@@ -156,8 +156,11 @@ public class EmprestimoService {
             Exemplar exemplar = ee.getExemplar();
             boolean foiReservado = false;
 
-            List<Reserva> reservasPendentes = reservaRepository
-                    .findReservasPendentesPorLivro(exemplar.getLivro().getId());
+            List<Reserva> reservasPendentes =reservaRepository.findReservasPorLivroComSituacao(
+                    exemplar.getLivro().getId(),
+                    SituacaoReserva.ATENDIDO_COMPLETAMENTE
+            );
+
 
             for (Reserva reserva : reservasPendentes) {
                 BigDecimal qntPendente = reserva.getQuantidadePendente();

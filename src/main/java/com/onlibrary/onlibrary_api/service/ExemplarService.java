@@ -7,6 +7,7 @@ import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.*;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoExemplar;
+import com.onlibrary.onlibrary_api.model.enums.SituacaoReserva;
 import com.onlibrary.onlibrary_api.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -88,7 +89,7 @@ public class ExemplarService {
 
         exemplarRepository.save(exemplar);
 
-        reservaRepository.findFirstBySituacaoAndLivroOrderByDataEmissaoAsc("PENDENTE", livro)
+        reservaRepository.findFirstBySituacaoAndLivroOrderByDataEmissaoAsc(SituacaoReserva.PENDENTE, livro)
                 .ifPresent(reserva -> {
                     ReservaExemplar reservaExemplar = ReservaExemplar.builder()
                             .exemplar(exemplar)

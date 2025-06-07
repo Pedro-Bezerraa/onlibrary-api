@@ -19,9 +19,11 @@ public interface ReservaRepository extends JpaRepository<Reserva, UUID> {
             "WHERE r.situacao = :situacao AND e.exemplar.livro = :livro " +
             "ORDER BY r.dataEmissao ASC")
     Optional<Reserva> findFirstBySituacaoAndLivroOrderByDataEmissaoAsc(
-            @Param("situacao") String situacao,
+            @Param("situacao") SituacaoReserva situacao,
             @Param("livro") Livro livro);
 
-    @Query("SELECT r FROM Reserva r WHERE r.livro.id = :livroId AND r.situacao = 'PENDENTE' ORDER BY r.dataEmissao ASC")
-    List<Reserva> findReservasPendentesPorLivro(@Param("livroId") UUID livroId);
+
+    @Query("SELECT r FROM Reserva r WHERE r.livro.id = :livroId AND r.situacao = :situacao ORDER BY r.dataEmissao ASC")
+    List<Reserva> findReservasPorLivroComSituacao(@Param("livroId") UUID livroId, @Param("situacao") SituacaoReserva situacao);
+
 }
