@@ -50,4 +50,13 @@ public class Usuario {
 
     @OneToMany(mappedBy = "usuario")
     private List<Multa> multas;
+
+    public Usuario(UUID id, String nome, String email, String senha, String username) {
+        this.id = id;
+        this.nome = nome;
+        this.email = email;
+        this.senha = senha;
+        this.username = username;
+    }
+
 }

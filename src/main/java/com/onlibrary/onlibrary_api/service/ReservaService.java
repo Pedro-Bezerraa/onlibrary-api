@@ -53,7 +53,7 @@ public class ReservaService {
         }
 
         List<Exemplar> exemplaresDisponiveis = exemplarRepository
-                .findByLivroAndSituacao(livro, SituacaoExemplar.DISPONIVEL);
+                .findByLivroAndBibliotecaAndSituacao(livro, biblioteca, SituacaoExemplar.DISPONIVEL);
 
         if (exemplaresDisponiveis.isEmpty()) {
             throw new BusinessException("Nenhum exemplar disponível para reserva.");

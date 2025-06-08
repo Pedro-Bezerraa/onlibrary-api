@@ -1,13 +1,11 @@
 package com.onlibrary.onlibrary_api.service;
 
-import com.onlibrary.onlibrary_api.dto.usuario.LoginRequestDTO;
-import com.onlibrary.onlibrary_api.dto.usuario.RegisterRequestDTO;
-import com.onlibrary.onlibrary_api.dto.usuario.RegisterResponseDTO;
-import com.onlibrary.onlibrary_api.dto.usuario.TokenDTO;
+import com.onlibrary.onlibrary_api.dto.usuario.*;
 import com.onlibrary.onlibrary_api.exception.*;
 import com.onlibrary.onlibrary_api.model.entities.Usuario;
 import com.onlibrary.onlibrary_api.model.enums.ContaSituacao;
 import com.onlibrary.onlibrary_api.repository.UsuarioRepository;
+import com.onlibrary.onlibrary_api.security.UsuarioDetails;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -51,7 +49,7 @@ public class AuthService {
         return new RegisterResponseDTO(novoUsuario.getNome(), novoUsuario.getSobrenome(), novoUsuario.getUsername(), novoUsuario.getEmail(), novoUsuario.getCpf(), novoUsuario.getSituacao());
     }
 
-    public TokenDTO login(LoginRequestDTO loginRequestDTO) {
+    public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
         try {
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -59,9 +57,18 @@ public class AuthService {
                             loginRequestDTO.senha()
                     )
             );
+
             SecurityContextHolder.getContext().setAuthentication(auth);
             String accessToken = jwtService.generateAcessToken(auth);
-            return new TokenDTO(accessToken);
+
+            UsuarioDetails usuario = (UsuarioDetails) auth.getPrincipal();
+
+            return new LoginResponseDTO(
+                    accessToken,
+                    usuario.getId(),
+                    usuario.getUsername(),
+                    usuario.getEmail()
+            );
         } catch (BadCredentialsException e) {
             throw new InvalidCredentialsException("Credênciais inválidas!");
         }

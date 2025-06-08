@@ -29,9 +29,9 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO, HttpServletResponse response) {
-        TokenDTO tokenDTO = authService.login(loginRequestDTO);
+        LoginResponseDTO loginResponseDTO = authService.login(loginRequestDTO);
 
-        ResponseCookie cookie = ResponseCookie.from("jwt", tokenDTO.accessToken())
+        ResponseCookie cookie = ResponseCookie.from("jwt", loginResponseDTO.accessToken())
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
@@ -40,7 +40,7 @@ public class AuthController {
                 .build();
 
         response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-        return ResponseEntity.ok().body(new ResponseDTO<>(true, "Autenticação realizada com sucesso!", tokenDTO));
+        return ResponseEntity.ok().body(new ResponseDTO<>(true, "Autenticação realizada com sucesso!", loginResponseDTO));
     }
 
     @PostMapping("/validar-etapa")
