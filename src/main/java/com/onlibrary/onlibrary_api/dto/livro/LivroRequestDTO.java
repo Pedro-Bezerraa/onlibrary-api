@@ -1,5 +1,7 @@
 package com.onlibrary.onlibrary_api.dto.livro;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -7,7 +9,7 @@ public record LivroRequestDTO(
         String isbn,
         String titulo,
         String descricao,
-        Integer anoLancamento,
+        @JsonProperty("ano_lancamento") Integer anoLancamento,
         List<UUID> autores,
         List<UUID> categorias,
         List<UUID> generos,
