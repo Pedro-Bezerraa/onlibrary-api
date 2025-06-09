@@ -6,10 +6,7 @@ import com.onlibrary.onlibrary_api.dto.emprestimo.EmprestimoResponseDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.*;
-import com.onlibrary.onlibrary_api.model.enums.ContaSituacao;
-import com.onlibrary.onlibrary_api.model.enums.SituacaoEmprestimo;
-import com.onlibrary.onlibrary_api.model.enums.SituacaoExemplar;
-import com.onlibrary.onlibrary_api.model.enums.SituacaoReserva;
+import com.onlibrary.onlibrary_api.model.enums.*;
 import com.onlibrary.onlibrary_api.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +14,12 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class EmprestimoService {
+    private final NotificacaoService notificacaoService;
     private final EmprestimoRepository emprestimoRepository;
     private final ExemplarRepository exemplarRepository;
     private final ReservaRepository reservaRepository;
@@ -65,10 +61,26 @@ public class EmprestimoService {
             if (exemplar.getSituacao() == SituacaoExemplar.INDISPONIVEL || exemplar.getSituacao() == SituacaoExemplar.EMPRESTADO) {
                 throw new BusinessException("O exemplar " + exemplar.getId() + " está indisponível.");
             }
+        }
 
-            if (reservaExemplarRepository.existsByExemplarAndReserva_Situacao(
-                    exemplar, SituacaoReserva.ATENDIDO_COMPLETAMENTE)) {
-                throw new BusinessException("O exemplar " + exemplar.getId() + " está reservado.");
+        Optional<Reserva> reservaOptional = reservaRepository
+                .findByUsuarioAndSituacao(usuarioBiblioteca.getUsuario(), SituacaoReserva.ATENDIDO_COMPLETAMENTE);
+
+        Reserva reservaAssociada = null;
+
+        if (reservaOptional.isPresent()) {
+            Reserva reserva = reservaOptional.get();
+            List<UUID> idsReserva = reserva.getExemplares().stream()
+                    .map(re -> re.getExemplar().getId()).toList();
+
+            List<UUID> idsEmprestimo = exemplares.stream().map(Exemplar::getId).toList();
+
+            if (new HashSet<>(idsReserva).equals(new HashSet<>(idsEmprestimo))) {
+                reserva.setSituacao(SituacaoReserva.CONCLUIDO);
+                reservaRepository.save(reserva);
+                reservaAssociada = reserva;
+            } else {
+                throw new BusinessException("Há reservas pendentes com exemplares diferentes.");
             }
         }
 
@@ -82,6 +94,7 @@ public class EmprestimoService {
                 .situacao(SituacaoEmprestimo.PENDENTE)
                 .dataEmissao(LocalDate.now())
                 .dataDevolucao(LocalDate.now().plusDays(usuarioBiblioteca.getPerfilUsuario().getPrazoDevolucaoPadrao()))
+                .reserva(reservaAssociada)
                 .build();
 
         emprestimoRepository.save(emprestimo);
@@ -95,6 +108,17 @@ public class EmprestimoService {
 
         emprestimoExemplarRepository.saveAll(emprestimoExemplares);
 
+        String livroTitulo = exemplares.get(0).getLivro().getTitulo();
+        String titulo = "Empréstimo realizado com sucesso";
+        String conteudo = "Você retirou o livro '" + livroTitulo + "' na biblioteca '" + biblioteca.getNome() + "'.";
+
+        notificacaoService.notificarUsuario(
+                usuarioBiblioteca.getUsuario(),
+                titulo,
+                conteudo,
+                TipoUsuario.COMUM
+        );
+
         return new EmprestimoResponseDTO(
                 emprestimo.getId(),
                 emprestimo.getDataEmissao(),
@@ -106,6 +130,7 @@ public class EmprestimoService {
                 exemplares.stream().map(Exemplar::getId).toList()
         );
     }
+
 
     @Transactional
     public EmprestimoResponseDTO atualizarEmprestimo(UUID id, AttEmprestimoRequestDTO dto) {
@@ -151,31 +176,47 @@ public class EmprestimoService {
     private void liberarExemplares(Emprestimo emprestimo) {
         List<EmprestimoExemplar> emprestimoExemplares = emprestimo.getExemplares();
         List<Exemplar> exemplaresAtualizados = new ArrayList<>();
+        List<ReservaExemplar> reservaExemplaresCriados = new ArrayList<>();
+        List<Reserva> reservasAtualizadas = new ArrayList<>();
 
         for (EmprestimoExemplar ee : emprestimoExemplares) {
             Exemplar exemplar = ee.getExemplar();
             boolean foiReservado = false;
 
-            List<Reserva> reservasPendentes =reservaRepository.findReservasPorLivroComSituacao(
+            List<Reserva> reservasPendentes = reservaRepository.findReservasPorLivroEBibliotecaComSituacao(
                     exemplar.getLivro().getId(),
-                    SituacaoReserva.ATENDIDO_COMPLETAMENTE
+                    emprestimo.getBiblioteca().getId(),
+                    SituacaoReserva.PENDENTE
             );
 
-
             for (Reserva reserva : reservasPendentes) {
-                BigDecimal qntPendente = reserva.getQuantidadePendente();
+                BigDecimal qntPendente = Optional.ofNullable(reserva.getQuantidadePendente())
+                        .orElse(BigDecimal.ZERO);
 
                 if (qntPendente.compareTo(BigDecimal.ZERO) > 0) {
+                    // Vincular exemplar à reserva
                     ReservaExemplar reservaExemplar = ReservaExemplar.builder()
                             .exemplar(exemplar)
                             .reserva(reserva)
                             .build();
-
-                    reservaExemplarRepository.save(reservaExemplar);
+                    reservaExemplaresCriados.add(reservaExemplar);
 
                     reserva.setQuantidadePendente(qntPendente.subtract(BigDecimal.ONE));
-                    reservaRepository.save(reserva);
 
+                    if (reserva.getQuantidadePendente().compareTo(BigDecimal.ZERO) <= 0) {
+                        reserva.setSituacao(SituacaoReserva.ATENDIDO_COMPLETAMENTE);
+
+                        notificacaoService.notificarUsuario(
+                                reserva.getUsuario(),
+                                "Reserva pronta para retirada",
+                                "Sua reserva do livro '" + reserva.getLivro().getTitulo() +
+                                        "' na biblioteca '" + reserva.getBiblioteca().getNome() +
+                                        "' está disponível para retirada.",
+                                TipoUsuario.COMUM
+                        );
+                    }
+
+                    reservasAtualizadas.add(reserva);
                     foiReservado = true;
                     break;
                 }
@@ -186,5 +227,7 @@ public class EmprestimoService {
         }
 
         exemplarRepository.saveAll(exemplaresAtualizados);
+        reservaRepository.saveAll(reservasAtualizadas);
+        reservaExemplarRepository.saveAll(reservaExemplaresCriados);
     }
 }

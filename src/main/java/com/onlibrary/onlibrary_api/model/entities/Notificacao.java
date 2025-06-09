@@ -1,5 +1,6 @@
 package com.onlibrary.onlibrary_api.model.entities;
 
+import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,7 +32,9 @@ public class Notificacao {
 
     @Column(name = "marcado_lido")
     private Boolean marcadoLido;
-    private String tipo;
+
+    @Enumerated(EnumType.STRING)
+    private TipoUsuario tipo;
 
     @ManyToOne
     @JoinColumn(name = "fk_id_biblioteca")

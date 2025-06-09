@@ -112,11 +112,16 @@ public class UsuarioBibliotecaService {
         if (nomePerfil.equalsIgnoreCase("bibliotecario") && dto.tipoUsuario() != TipoUsuario.ADMIN) {
             throw new BusinessException("Perfis de BIBLIOTECARIO devem ser do tipo ADMIN.");
         }
+        ContaSituacao situacao = ContaSituacao.ATIVO;
 
+        if (dto.situacao() == ContaSituacao.BLOQUEADO) {
+            situacao = ContaSituacao.BLOQUEADO;
+        }
 
         usuarioBiblioteca.setPerfilUsuario(perfilUsuario);
         usuarioBiblioteca.setTipoUsuario(dto.tipoUsuario());
         usuarioBiblioteca.setNumeroMatricula(dto.numeroMatricula());
+        usuarioBiblioteca.setSituacao(situacao);
 
         usuarioBibliotecaRepository.save(usuarioBiblioteca);
 

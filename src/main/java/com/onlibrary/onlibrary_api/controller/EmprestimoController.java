@@ -26,7 +26,6 @@ public class EmprestimoController {
                 .body(new ResponseDTO<>(true, "Empréstimo realizado com sucesso!", emprestimo));
     }
 
-
     @PutMapping("/atualizar-emprestimo/{id}")
     public ResponseEntity<?> atualizarEmprestimo(
             @PathVariable UUID id,

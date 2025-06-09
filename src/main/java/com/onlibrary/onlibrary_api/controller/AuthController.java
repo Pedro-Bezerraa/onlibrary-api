@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -22,9 +23,16 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUsuario(@Valid @RequestBody RegisterRequestDTO requestDTO) {
-        RegisterResponseDTO usuarioCriado = authService.registerUsuario(requestDTO);
+    public ResponseEntity<?> registerUsuario(@Valid @RequestBody UsuarioRequestDTO requestDTO) {
+        UsuarioResponseDTO usuarioCriado = authService.registerUsuario(requestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseDTO<>(true, "Usuário cadastrado com sucesso!", usuarioCriado));
+    }
+
+    @PutMapping("/atualizar-usuario/{usuarioId}")
+    public ResponseEntity<?> atualizarUsuario(@PathVariable UUID usuarioId, @RequestBody AttUsuarioRequestDTO dto) {
+        AttUsuarioResponseDTO usuarioAtualizado = authService.atualizarUsuario(usuarioId, dto);
+        return ResponseEntity.ok()
+                .body(new ResponseDTO<>(true, "Usuario atualizado com sucesso.", usuarioAtualizado));
     }
 
     @PostMapping("/login")

@@ -1,9 +1,6 @@
 package com.onlibrary.onlibrary_api.repository;
 
-import com.onlibrary.onlibrary_api.model.entities.Biblioteca;
-import com.onlibrary.onlibrary_api.model.entities.Exemplar;
-import com.onlibrary.onlibrary_api.model.entities.Livro;
-import com.onlibrary.onlibrary_api.model.entities.Reserva;
+import com.onlibrary.onlibrary_api.model.entities.*;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoReserva;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,8 +19,17 @@ public interface ReservaRepository extends JpaRepository<Reserva, UUID> {
             @Param("situacao") SituacaoReserva situacao,
             @Param("livro") Livro livro);
 
+    Optional<Reserva> findByUsuarioAndSituacao(Usuario usuario, SituacaoReserva situacao);
 
-    @Query("SELECT r FROM Reserva r WHERE r.livro.id = :livroId AND r.situacao = :situacao ORDER BY r.dataEmissao ASC")
-    List<Reserva> findReservasPorLivroComSituacao(@Param("livroId") UUID livroId, @Param("situacao") SituacaoReserva situacao);
+    @Query("""
+    SELECT r FROM Reserva r
+    WHERE r.livro.id = :livroId AND r.biblioteca.id = :bibliotecaId AND r.situacao = :situacao
+    ORDER BY r.dataEmissao ASC
+""")
+    List<Reserva> findReservasPorLivroEBibliotecaComSituacao(
+            @Param("livroId") UUID livroId,
+            @Param("bibliotecaId") UUID bibliotecaId,
+            @Param("situacao") SituacaoReserva situacao
+    );
 
 }

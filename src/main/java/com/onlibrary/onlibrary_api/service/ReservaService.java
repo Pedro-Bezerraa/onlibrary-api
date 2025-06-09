@@ -10,6 +10,7 @@ import com.onlibrary.onlibrary_api.model.entities.*;
 import com.onlibrary.onlibrary_api.model.enums.ContaSituacao;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoExemplar;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoReserva;
+import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
 import com.onlibrary.onlibrary_api.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ReservaService {
+    private final NotificacaoService notificacaoService;
     private final ReservaRepository reservaRepository;
     private final LivroRepository livroRepository;
     private final ExemplarRepository exemplarRepository;
@@ -65,12 +67,10 @@ public class ReservaService {
         BigDecimal quantidadePendente = BigDecimal.valueOf(quantidadeSolicitada - quantidadeAtendida);
 
         SituacaoReserva situacao;
-        if (quantidadePendente.intValue() == 0) {
-            situacao = SituacaoReserva.ATENDIDO_COMPLETAMENTE;
-        } else if (quantidadeAtendida > 0) {
-            situacao = SituacaoReserva.ATENDIDO_PARCIALMENTE;
-        } else {
+        if (quantidadePendente.compareTo(BigDecimal.ZERO) > 0) {
             situacao = SituacaoReserva.PENDENTE;
+        } else {
+            situacao = SituacaoReserva.ATENDIDO_PARCIALMENTE;
         }
 
         Reserva reserva = Reserva.builder()
@@ -123,21 +123,45 @@ public class ReservaService {
         Reserva reserva = reservaRepository.findById(idReserva)
                 .orElseThrow(() -> new ResourceNotFoundException("Reserva não encontrada"));
 
-        boolean todosReservados = reserva.getExemplares().stream()
-                .allMatch(re -> re.getExemplar().getSituacao() == SituacaoExemplar.RESERVADO);
-
-        if (!todosReservados) {
-            throw new BusinessException("Reserva não está completa para definir data de retirada.");
-        }
-
         Usuario bibliotecario = usuarioRepository.findById(dto.bibliotecarioId())
                 .orElseThrow(() -> new ResourceNotFoundException("Bibliotecário não encontrado"));
+
+        List<ReservaExemplar> exemplares = reservaExemplarRepository.findByReservaIdComExemplar(idReserva);
+
+        if (exemplares.isEmpty()) {
+            throw new BusinessException("Nenhum exemplar associado à reserva.");
+        }
+
+        boolean todosDisponiveis = exemplares.stream()
+                .allMatch(re -> SituacaoExemplar.DISPONIVEL.equals(re.getExemplar().getSituacao()));
+
+        if (!todosDisponiveis) {
+            throw new BusinessException("Nem todos os exemplares estão disponíveis para retirada.");
+        }
 
         reserva.setDataRetirada(LocalDate.now());
         reserva.setSituacao(SituacaoReserva.ATENDIDO_COMPLETAMENTE);
         reserva.setBibliotecario(bibliotecario);
 
+        exemplares.forEach(re -> {
+            Exemplar exemplar = re.getExemplar();
+            exemplar.setSituacao(SituacaoExemplar.RESERVADO);
+            exemplarRepository.save(exemplar);
+        });
+
         reservaRepository.save(reserva);
+
+        String titulo = "Reserva pronta para retirada";
+        String conteudo = "Sua reserva do livro '" + reserva.getLivro().getTitulo() +
+                "' na biblioteca '" + reserva.getBiblioteca().getNome() +
+                "' está disponível para retirada.";
+
+        notificacaoService.notificarUsuario(
+                reserva.getUsuario(),
+                titulo,
+                conteudo,
+                TipoUsuario.COMUM
+        );
 
         return new AttReservaResponseDTO(
                 reserva.getId(),
