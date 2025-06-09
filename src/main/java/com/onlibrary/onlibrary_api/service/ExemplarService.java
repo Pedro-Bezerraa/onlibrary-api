@@ -8,12 +8,14 @@ import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.*;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoExemplar;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoReserva;
+import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
 import com.onlibrary.onlibrary_api.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -25,10 +27,10 @@ public class ExemplarService {
     private final BibliotecaRepository bibliotecaRepository;
     private final ReservaRepository reservaRepository;
     private final BibliotecaLivroRepository bibliotecaLivroRepository;
+    private final NotificacaoService notificacaoService;
 
     @Transactional
     public ExemplarResponseDTO criarExemplar(ExemplarRequestDTO dto) {
-
         Biblioteca biblioteca = bibliotecaRepository.findById(dto.bibliotecaId())
                 .orElseThrow(() -> new ResourceNotFoundException("Biblioteca não encontrada"));
 
@@ -56,6 +58,8 @@ public class ExemplarService {
 
         exemplarRepository.save(exemplar);
 
+        atenderReservasPendentes(exemplar);
+
         return new ExemplarResponseDTO(
                 exemplar.getId(),
                 exemplar.getNumeroTombo(),
@@ -73,35 +77,31 @@ public class ExemplarService {
         Exemplar exemplar = exemplarRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Exemplar não encontrado."));
 
-        if (exemplar.getSituacao() != SituacaoExemplar.DISPONIVEL) {
-            throw new BusinessException("Exemplar não está disponível para alteração.");
+        if (exemplar.getSituacao() == SituacaoExemplar.RESERVADO || exemplar.getSituacao() == SituacaoExemplar.EMPRESTADO) {
+            throw new BusinessException("Exemplar está sendo usado no momento, não disponível para alteração.");
         }
 
-        Livro livro = livroRepository.findById(dto.livroId())
-                .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado."));
+        if (dto.livroId() != null) {
+            Livro livro = livroRepository.findById(dto.livroId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado."));
+            exemplar.setLivro(livro);
+        }
 
-        exemplar.setLivro(livro);
-        exemplar.setNumeroTombo(dto.numeroTombo());
-        exemplar.setEstante(dto.estante());
-        exemplar.setPrateleira(dto.prateleira());
-        exemplar.setSetor(dto.setor());
-        exemplar.setSituacao(dto.situacao());
+        if (dto.numeroTombo() != null) exemplar.setNumeroTombo(dto.numeroTombo());
+        if (dto.estante() != null) exemplar.setEstante(dto.estante());
+        if (dto.prateleira() != null) exemplar.setPrateleira(dto.prateleira());
+        if (dto.setor() != null) exemplar.setSetor(dto.setor());
+
+        if (dto.situacao() != null) {
+            exemplar.setSituacao(dto.situacao());
+
+            if (dto.situacao() == SituacaoExemplar.DISPONIVEL) {
+                exemplarRepository.save(exemplar);
+                atenderReservasPendentes(exemplar);
+            }
+        }
 
         exemplarRepository.save(exemplar);
-
-        reservaRepository.findFirstBySituacaoAndLivroOrderByDataEmissaoAsc(SituacaoReserva.PENDENTE, livro)
-                .ifPresent(reserva -> {
-                    ReservaExemplar reservaExemplar = ReservaExemplar.builder()
-                            .exemplar(exemplar)
-                            .reserva(reserva)
-                            .build();
-                    reservaExemplarRepository.save(reservaExemplar);
-
-                    if (reserva.getQuantidadePendente().compareTo(BigDecimal.ZERO) > 0) {
-                        reserva.setQuantidadePendente(reserva.getQuantidadePendente().subtract(BigDecimal.ONE));
-                        reservaRepository.save(reserva);
-                    }
-                });
 
         return new ExemplarResponseDTO(
                 exemplar.getId(),
@@ -113,5 +113,45 @@ public class ExemplarService {
                 exemplar.getLivro().getId(),
                 exemplar.getBiblioteca().getId()
         );
+    }
+
+    private void atenderReservasPendentes(Exemplar exemplar) {
+        List<Reserva> reservasPendentes = reservaRepository.findReservasPorLivroEBibliotecaComSituacao(
+                exemplar.getLivro().getId(),
+                exemplar.getBiblioteca().getId(),
+                SituacaoReserva.PENDENTE
+        );
+
+        for (Reserva reserva : reservasPendentes) {
+            BigDecimal qntPendente = reserva.getQuantidadePendente();
+            if (qntPendente != null && qntPendente.compareTo(BigDecimal.ZERO) > 0) {
+                ReservaExemplar reservaExemplar = ReservaExemplar.builder()
+                        .exemplar(exemplar)
+                        .reserva(reserva)
+                        .build();
+                reservaExemplarRepository.save(reservaExemplar);
+
+                reserva.setQuantidadePendente(qntPendente.subtract(BigDecimal.ONE));
+
+                if (reserva.getQuantidadePendente().compareTo(BigDecimal.ZERO) <= 0) {
+                    reserva.setSituacao(SituacaoReserva.ATENDIDO_PARCIALMENTE);
+
+                    notificacaoService.notificarUsuario(
+                            reserva.getUsuario(),
+                            "Reserva pronta para retirada",
+                            "Sua reserva do livro '" + reserva.getLivro().getTitulo() +
+                                    "' na biblioteca '" + reserva.getBiblioteca().getNome() +
+                                    "' está disponível para retirada.",
+                            TipoUsuario.COMUM
+                    );
+                }
+
+                exemplar.setSituacao(SituacaoExemplar.RESERVADO);
+
+                reservaRepository.save(reserva);
+                exemplarRepository.save(exemplar);
+                break;
+            }
+        }
     }
 }

@@ -96,32 +96,40 @@ public class UsuarioBibliotecaService {
         UsuarioBiblioteca usuarioBiblioteca = usuarioBibliotecaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Relação Usuário-Biblioteca não encontrada."));
 
-        PerfilUsuario perfilUsuario = perfilUsuarioRepository.findById(dto.perfilUsuarioId())
-                .orElseThrow(() -> new ResourceNotFoundException("Perfil não encontrado."));
+        if (dto.perfilUsuarioId() != null) {
+            PerfilUsuario perfilUsuario = perfilUsuarioRepository.findById(dto.perfilUsuarioId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Perfil não encontrado."));
 
-        String nomePerfil = perfilUsuario.getNome().toLowerCase();
+            String nomePerfil = perfilUsuario.getNome().toLowerCase();
 
-        if (dto.tipoUsuario() == TipoUsuario.COMUM && nomePerfil.equalsIgnoreCase("bibliotecario")) {
-            throw new BusinessException("Usuários do tipo COMUM não podem ter o perfil de BIBLIOTECARIO.");
+            if (dto.tipoUsuario() != null) {
+                if (dto.tipoUsuario() == TipoUsuario.COMUM && nomePerfil.equalsIgnoreCase("bibliotecario")) {
+                    throw new BusinessException("Usuários do tipo COMUM não podem ter o perfil de BIBLIOTECARIO.");
+                }
+
+                if (dto.tipoUsuario() == TipoUsuario.ADMIN && nomePerfil.equalsIgnoreCase("outro")) {
+                    throw new BusinessException("Usuários do tipo ADMIN não podem ter o perfil de OUTRO.");
+                }
+
+                if (nomePerfil.equalsIgnoreCase("bibliotecario") && dto.tipoUsuario() != TipoUsuario.ADMIN) {
+                    throw new BusinessException("Perfis de BIBLIOTECARIO devem ser do tipo ADMIN.");
+                }
+            }
+
+            usuarioBiblioteca.setPerfilUsuario(perfilUsuario);
         }
 
-        if (dto.tipoUsuario() == TipoUsuario.ADMIN && nomePerfil.equalsIgnoreCase("outro")) {
-            throw new BusinessException("Usuários do tipo ADMIN não podem ter o perfil de OUTRO.");
+        if (dto.tipoUsuario() != null) {
+            usuarioBiblioteca.setTipoUsuario(dto.tipoUsuario());
         }
 
-        if (nomePerfil.equalsIgnoreCase("bibliotecario") && dto.tipoUsuario() != TipoUsuario.ADMIN) {
-            throw new BusinessException("Perfis de BIBLIOTECARIO devem ser do tipo ADMIN.");
-        }
-        ContaSituacao situacao = ContaSituacao.ATIVO;
-
-        if (dto.situacao() == ContaSituacao.BLOQUEADO) {
-            situacao = ContaSituacao.BLOQUEADO;
+        if (dto.numeroMatricula() != null) {
+            usuarioBiblioteca.setNumeroMatricula(dto.numeroMatricula());
         }
 
-        usuarioBiblioteca.setPerfilUsuario(perfilUsuario);
-        usuarioBiblioteca.setTipoUsuario(dto.tipoUsuario());
-        usuarioBiblioteca.setNumeroMatricula(dto.numeroMatricula());
-        usuarioBiblioteca.setSituacao(situacao);
+        if (dto.situacao() != null) {
+            usuarioBiblioteca.setSituacao(dto.situacao());
+        }
 
         usuarioBibliotecaRepository.save(usuarioBiblioteca);
 

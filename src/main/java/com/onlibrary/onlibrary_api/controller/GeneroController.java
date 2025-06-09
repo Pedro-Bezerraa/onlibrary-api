@@ -26,7 +26,6 @@ public class GeneroController {
                 .body(new ResponseDTO<>(true, "Gênero criado com sucesso!", genero));
     }
 
-
     @PutMapping("/atualizar-genero/{id}")
     public ResponseEntity<?> atualizarGenero(@PathVariable UUID id, @RequestBody GeneroRequestDTO dto) {
         GeneroResponseDTO generoAtualizado = generoService.atualizarGenero(id, dto);

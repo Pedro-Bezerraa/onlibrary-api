@@ -6,4 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
 public interface LivroAutorRepository extends JpaRepository<LivroAutor, UUID> {
+    void deleteByLivroId(UUID livroId);
+
 }

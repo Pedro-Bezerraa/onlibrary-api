@@ -123,45 +123,50 @@ public class ReservaService {
         Reserva reserva = reservaRepository.findById(idReserva)
                 .orElseThrow(() -> new ResourceNotFoundException("Reserva não encontrada"));
 
-        Usuario bibliotecario = usuarioRepository.findById(dto.bibliotecarioId())
-                .orElseThrow(() -> new ResourceNotFoundException("Bibliotecário não encontrado"));
+        if (dto.dataRetirada() != null) {
+            reserva.setDataRetirada(dto.dataRetirada());
 
-        List<ReservaExemplar> exemplares = reservaExemplarRepository.findByReservaIdComExemplar(idReserva);
+            List<ReservaExemplar> exemplares = reservaExemplarRepository.findByReservaIdComExemplar(idReserva);
 
-        if (exemplares.isEmpty()) {
-            throw new BusinessException("Nenhum exemplar associado à reserva.");
+            if (exemplares.isEmpty()) {
+                throw new BusinessException("Nenhum exemplar associado à reserva.");
+            }
+
+            boolean todosDisponiveis = exemplares.stream()
+                    .allMatch(re -> SituacaoExemplar.DISPONIVEL.equals(re.getExemplar().getSituacao()));
+
+            if (!todosDisponiveis) {
+                throw new BusinessException("Nem todos os exemplares estão disponíveis para retirada.");
+            }
+
+            reserva.setSituacao(SituacaoReserva.ATENDIDO_COMPLETAMENTE);
+
+            exemplares.forEach(re -> {
+                Exemplar exemplar = re.getExemplar();
+                exemplar.setSituacao(SituacaoExemplar.RESERVADO);
+                exemplarRepository.save(exemplar);
+            });
+
+            String titulo = "Reserva pronta para retirada";
+            String conteudo = "Sua reserva do livro '" + reserva.getLivro().getTitulo() +
+                    "' na biblioteca '" + reserva.getBiblioteca().getNome() +
+                    "' está disponível para retirada.";
+
+            notificacaoService.notificarUsuario(
+                    reserva.getUsuario(),
+                    titulo,
+                    conteudo,
+                    TipoUsuario.COMUM
+            );
         }
 
-        boolean todosDisponiveis = exemplares.stream()
-                .allMatch(re -> SituacaoExemplar.DISPONIVEL.equals(re.getExemplar().getSituacao()));
-
-        if (!todosDisponiveis) {
-            throw new BusinessException("Nem todos os exemplares estão disponíveis para retirada.");
+        if (dto.bibliotecarioId() != null) {
+            Usuario bibliotecario = usuarioRepository.findById(dto.bibliotecarioId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Bibliotecário não encontrado"));
+            reserva.setBibliotecario(bibliotecario);
         }
-
-        reserva.setDataRetirada(LocalDate.now());
-        reserva.setSituacao(SituacaoReserva.ATENDIDO_COMPLETAMENTE);
-        reserva.setBibliotecario(bibliotecario);
-
-        exemplares.forEach(re -> {
-            Exemplar exemplar = re.getExemplar();
-            exemplar.setSituacao(SituacaoExemplar.RESERVADO);
-            exemplarRepository.save(exemplar);
-        });
 
         reservaRepository.save(reserva);
-
-        String titulo = "Reserva pronta para retirada";
-        String conteudo = "Sua reserva do livro '" + reserva.getLivro().getTitulo() +
-                "' na biblioteca '" + reserva.getBiblioteca().getNome() +
-                "' está disponível para retirada.";
-
-        notificacaoService.notificarUsuario(
-                reserva.getUsuario(),
-                titulo,
-                conteudo,
-                TipoUsuario.COMUM
-        );
 
         return new AttReservaResponseDTO(
                 reserva.getId(),

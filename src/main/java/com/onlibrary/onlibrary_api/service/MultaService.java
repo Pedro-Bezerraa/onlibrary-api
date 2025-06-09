@@ -67,10 +67,23 @@ public class MultaService {
             throw new BusinessException("Não é possível atualizar multa já finalizada.");
         }
 
-        multa.setMotivo(dto.motivo());
+        if (dto.motivo() != null) {
+            multa.setMotivo(dto.motivo());
+        }
 
         multaRepository.save(multa);
 
-        return new AttMultaResponseDTO(multa.getId(), multa.getUsuario().getId(), multa.getBibliotecario().getId(), multa.getValor(), multa.getDataEmissao(), multa.getDataVencimento(), multa.getSituacao(), multa.getMotivo(), multa.getBiblioteca().getId(), null);
+        return new AttMultaResponseDTO(
+                multa.getId(),
+                multa.getUsuario().getId(),
+                multa.getBibliotecario().getId(),
+                multa.getValor(),
+                multa.getDataEmissao(),
+                multa.getDataVencimento(),
+                multa.getSituacao(),
+                multa.getMotivo(),
+                multa.getBiblioteca().getId(),
+                null
+        );
     }
 }

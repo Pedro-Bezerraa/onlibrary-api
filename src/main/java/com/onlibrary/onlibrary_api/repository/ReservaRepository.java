@@ -32,4 +32,5 @@ public interface ReservaRepository extends JpaRepository<Reserva, UUID> {
             @Param("situacao") SituacaoReserva situacao
     );
 
+    boolean existsByBibliotecaIdAndSituacao(UUID idBiblioteca, SituacaoReserva situacao);
 }

@@ -144,19 +144,21 @@ public class EmprestimoService {
             throw new BusinessException("Não é possível atualizar um empréstimo já finalizado.");
         }
 
-        SituacaoEmprestimo novaSituacao = dto.situacao();
-        LocalDate novaDevolucao = dto.dataDevolucao();
-
-        if (novaDevolucao != null) {
-            emprestimo.setDataDevolucao(novaDevolucao);
+        if (dto.dataDevolucao() != null) {
+            emprestimo.setDataDevolucao(dto.dataDevolucao());
         }
 
-        boolean mudouSituacao = emprestimo.getSituacao() != novaSituacao;
-        emprestimo.setSituacao(novaSituacao);
-        emprestimoRepository.save(emprestimo);
+        if (dto.situacao() != null && dto.situacao() != emprestimo.getSituacao()) {
+            SituacaoEmprestimo novaSituacao = dto.situacao();
+            emprestimo.setSituacao(novaSituacao);
 
-        if (mudouSituacao && (novaSituacao == SituacaoEmprestimo.CONCLUIDO || novaSituacao == SituacaoEmprestimo.CANCELADO)) {
-            liberarExemplares(emprestimo);
+            emprestimoRepository.save(emprestimo);
+
+            if (novaSituacao == SituacaoEmprestimo.CONCLUIDO || novaSituacao == SituacaoEmprestimo.CANCELADO) {
+                liberarExemplares(emprestimo);
+            }
+        } else {
+            emprestimoRepository.save(emprestimo);
         }
 
         return new EmprestimoResponseDTO(

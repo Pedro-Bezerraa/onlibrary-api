@@ -4,6 +4,8 @@ import com.onlibrary.onlibrary_api.dto.autor.AutorResponseDTO;
 import com.onlibrary.onlibrary_api.dto.categoria.CategoriaResponseDTO;
 import com.onlibrary.onlibrary_api.dto.editora.EditoraResponseDTO;
 import com.onlibrary.onlibrary_api.dto.genero.GeneroResponseDTO;
+import com.onlibrary.onlibrary_api.dto.livro.AttLivroRequestDTO;
+import com.onlibrary.onlibrary_api.dto.livro.AttLivroResponseDTO;
 import com.onlibrary.onlibrary_api.dto.livro.LivroRequestDTO;
 import com.onlibrary.onlibrary_api.dto.livro.LivroResponseDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -137,6 +140,108 @@ public class LivroService {
                 generosDTO,
                 editorasDTO
         );
+    }
 
+    public AttLivroResponseDTO atualizarLivro(UUID id, AttLivroRequestDTO dto, MultipartFile imagem) {
+        Livro livro = livroRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado"));
+
+        if (imagem != null && !imagem.isEmpty()) {
+            String novaImagem = supabaseStorageService.uploadImagem(imagem);
+            livro.setCapa(novaImagem);
+        }
+
+        if (dto.isbn() != null && !dto.isbn().equalsIgnoreCase(livro.getIsbn())) {
+            if (livroRepository.existsByIsbnIgnoreCase(dto.isbn())) {
+                throw new BusinessException("ISBN já cadastrado");
+            }
+            livro.setIsbn(dto.isbn());
+        }
+
+        if (dto.titulo() != null && !dto.titulo().equalsIgnoreCase(livro.getTitulo())) {
+            if (livroRepository.existsByTituloIgnoreCase(dto.titulo())) {
+                throw new BusinessException("Título já cadastrado");
+            }
+            livro.setTitulo(dto.titulo());
+        }
+
+        if (dto.descricao() != null) {
+            livro.setDescricao(dto.descricao());
+        }
+
+        if (dto.anoLancamento() != null) {
+            livro.setAnoLancamento(dto.anoLancamento());
+        }
+
+        livroRepository.save(livro);
+
+        List<LivroAutor> autores = List.of();
+        List<LivroCategoria> categorias = List.of();
+        List<LivroEditora> editoras = List.of();
+        List<LivroGenero> generos = List.of();
+
+        if (dto.autores() != null) {
+            livroAutorRepository.deleteByLivroId(livro.getId());
+            autores = dto.autores().stream()
+                    .map(autorId -> {
+                        Autor autor = autorRepository.findById(autorId)
+                                .orElseThrow(() -> new ResourceNotFoundException("Autor não encontrado"));
+                        return LivroAutor.builder().livro(livro).autor(autor).build();
+                    }).toList();
+            livroAutorRepository.saveAll(autores);
+        }
+
+        if (dto.categorias() != null) {
+            livroCategoriaRepository.deleteByLivroId(livro.getId());
+            categorias = dto.categorias().stream()
+                    .map(categoriaId -> {
+                        Categoria categoria = categoriaRepository.findById(categoriaId)
+                                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada"));
+                        return LivroCategoria.builder().livro(livro).categoria(categoria).build();
+                    }).toList();
+            livroCategoriaRepository.saveAll(categorias);
+        }
+
+        if (dto.editoras() != null) {
+            livroEditoraRepository.deleteByLivroId(livro.getId());
+            editoras = dto.editoras().stream()
+                    .map(editoraId -> {
+                        Editora editora = editoraRepository.findById(editoraId)
+                                .orElseThrow(() -> new ResourceNotFoundException("Editora não encontrada"));
+                        return LivroEditora.builder().livro(livro).editora(editora).build();
+                    }).toList();
+            livroEditoraRepository.saveAll(editoras);
+        }
+
+        if (dto.generos() != null) {
+            livroGeneroRepository.deleteByLivroId(livro.getId());
+            generos = dto.generos().stream()
+                    .map(generoId -> {
+                        Genero genero = generoRepository.findById(generoId)
+                                .orElseThrow(() -> new ResourceNotFoundException("Gênero não encontrado"));
+                        return LivroGenero.builder().livro(livro).genero(genero).build();
+                    }).toList();
+            livroGeneroRepository.saveAll(generos);
+        }
+
+        return new AttLivroResponseDTO(
+                livro.getId(),
+                livro.getIsbn(),
+                livro.getTitulo(),
+                livro.getDescricao(),
+                livro.getAnoLancamento(),
+                autores.stream()
+                        .map(a -> new AutorResponseDTO(a.getAutor().getId(), a.getAutor().getNome()))
+                        .toList(),
+                categorias.stream()
+                        .map(c -> new CategoriaResponseDTO(c.getCategoria().getId(), c.getCategoria().getNome()))
+                        .toList(),
+                generos.stream()
+                        .map(g -> new GeneroResponseDTO(g.getGenero().getId(), g.getGenero().getNome()))
+                        .toList(),
+                editoras.stream()
+                        .map(e -> new EditoraResponseDTO(e.getEditora().getId(), e.getEditora().getNome()))
+                        .toList()
+        );
     }
 }

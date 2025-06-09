@@ -2,6 +2,8 @@ package com.onlibrary.onlibrary_api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
+import com.onlibrary.onlibrary_api.dto.livro.AttLivroRequestDTO;
+import com.onlibrary.onlibrary_api.dto.livro.AttLivroResponseDTO;
 import com.onlibrary.onlibrary_api.dto.livro.LivroRequestDTO;
 import com.onlibrary.onlibrary_api.dto.livro.LivroResponseDTO;
 import com.onlibrary.onlibrary_api.service.LivroService;
@@ -9,11 +11,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/livro")
@@ -33,10 +34,14 @@ public class LivroController {
                 .body(new ResponseDTO<>(true, "Livro criado com sucesso.", livroResponseDTO));
     }
 
-//
-//    @GetMapping("/autores")
-//    public ResponseEntity<List<AutorDTO>> listarAutores() {
-//        List<AutorDTO> autores = livroService.listarAutores();
-//        return ResponseEntity.ok(autores);
-//    }
+    @PutMapping(value = "/atualizar-livro/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> atualizarLivro(
+            @PathVariable UUID id,
+            @RequestPart(required = false) AttLivroRequestDTO dto,
+            @RequestPart(required = false) MultipartFile imagem
+    ) {
+        AttLivroResponseDTO response = livroService.atualizarLivro(id, dto, imagem);
+        return ResponseEntity.ok()
+                .body(new ResponseDTO<>(true, "Livro atualizado com sucesso.", response));
+    }
 }

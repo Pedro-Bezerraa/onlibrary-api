@@ -1,9 +1,7 @@
 package com.onlibrary.onlibrary_api.controller;
 
-import com.onlibrary.onlibrary_api.dto.biblioteca.ContagemResponseDTO;
-import com.onlibrary.onlibrary_api.dto.biblioteca.BibliotecaRequestDTO;
-import com.onlibrary.onlibrary_api.dto.biblioteca.BibliotecaResponseDTO;
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
+import com.onlibrary.onlibrary_api.dto.biblioteca.*;
 import com.onlibrary.onlibrary_api.exception.AuthenticationException;
 import com.onlibrary.onlibrary_api.service.BibliotecaService;
 import com.onlibrary.onlibrary_api.service.JwtService;
@@ -44,6 +42,13 @@ public class BibliotecaController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ResponseDTO<>(true, "Biblioteca criada com sucesso", Map.of("idBiblioteca", idBiblioteca)));
+    }
+
+    @PutMapping("/atualizar-biblioteca/{id}")
+    public ResponseEntity<?> atualizarBibioteca(@PathVariable UUID id, @RequestBody AttBibliotecaRequestDTO dto) {
+        AttBibliotecaResponseDTO bibliotecaAtualizada = bibliotecaService.atualizarBiblioteca(id, dto);
+        return ResponseEntity.ok()
+                .body(new ResponseDTO<>(true, "Biblioteca atualizada com sucesso.", bibliotecaAtualizada));
     }
 
     @GetMapping("/minhas-bibliotecas")

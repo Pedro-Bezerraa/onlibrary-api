@@ -35,5 +35,4 @@ public class ExemplarController {
         ExemplarResponseDTO exemplarAtualizado = exemplarService.atualizarExemplar(id, dto);
         return ResponseEntity.ok(new ResponseDTO<>(true, "Exemplar atualizado com sucesso!", exemplarAtualizado));
     }
-
 }

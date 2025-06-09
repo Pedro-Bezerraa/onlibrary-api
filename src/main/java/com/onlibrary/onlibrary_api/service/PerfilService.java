@@ -70,27 +70,35 @@ public class PerfilService {
         PerfilUsuario perfil = perfilUsuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Perfil não encontrado."));
 
-        if (dto.multaPadrao() < 0) {
-            throw new BusinessException("Multa padrão não pode ser negativa.");
-        }
-        if (dto.prazoMultaPadrao() < 0) {
-            throw new BusinessException("Prazo de multa padrão não pode ser negativo.");
-        }
-        if (dto.prazoDevolucaoPadrao() < 0) {
-            throw new BusinessException("Prazo de devolução padrão não pode ser negativo.");
-        }
-
-        boolean nomeExiste = perfilUsuarioRepository.existsByNomeAndBibliotecaIdAndIdNot(
-                dto.nome(), perfil.getBiblioteca().getId(), id);
-
-        if (nomeExiste) {
-            throw new ConflictException("Já existe um perfil com esse nome nessa biblioteca.");
+        if (dto.nome() != null) {
+            boolean nomeExiste = perfilUsuarioRepository.existsByNomeAndBibliotecaIdAndIdNot(
+                    dto.nome(), perfil.getBiblioteca().getId(), id);
+            if (nomeExiste) {
+                throw new ConflictException("Já existe um perfil com esse nome nessa biblioteca.");
+            }
+            perfil.setNome(dto.nome());
         }
 
-        perfil.setNome(dto.nome());
-        perfil.setMultaPadrao(dto.multaPadrao());
-        perfil.setPrazoMultaPadrao(dto.prazoMultaPadrao());
-        perfil.setPrazoDevolucaoPadrao(dto.prazoDevolucaoPadrao());
+        if (dto.multaPadrao() != null) {
+            if (dto.multaPadrao() < 0) {
+                throw new BusinessException("Multa padrão não pode ser negativa.");
+            }
+            perfil.setMultaPadrao(dto.multaPadrao());
+        }
+
+        if (dto.prazoMultaPadrao() != null) {
+            if (dto.prazoMultaPadrao() < 0) {
+                throw new BusinessException("Prazo de multa padrão não pode ser negativo.");
+            }
+            perfil.setPrazoMultaPadrao(dto.prazoMultaPadrao());
+        }
+
+        if (dto.prazoDevolucaoPadrao() != null) {
+            if (dto.prazoDevolucaoPadrao() < 0) {
+                throw new BusinessException("Prazo de devolução padrão não pode ser negativo.");
+            }
+            perfil.setPrazoDevolucaoPadrao(dto.prazoDevolucaoPadrao());
+        }
 
         perfilUsuarioRepository.save(perfil);
 
