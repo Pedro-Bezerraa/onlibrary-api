@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/livro")
+@RequestMapping("/api/livro")
 @AllArgsConstructor
 public class LivroController {
     private final LivroService livroService;

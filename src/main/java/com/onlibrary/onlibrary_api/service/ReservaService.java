@@ -88,6 +88,18 @@ public class ReservaService {
 
         reservaRepository.save(reserva);
 
+        String titulo = "Reserva solicitada com sucesso";
+        String conteudo = "Sua solicitação de reserva do livro '" + livro.getTitulo() +
+                "' na biblioteca '" + biblioteca.getNome() +
+                "' foi realizada com sucesso. Aguarde a data de retirada.";
+
+        notificacaoService.notificarUsuario(
+                usuario,
+                titulo,
+                conteudo,
+                TipoUsuario.COMUM
+        );
+
         List<ReservaExemplar> reservasExemplares = new ArrayList<>();
 
         for (int i = 0; i < quantidadeAtendida; i++) {

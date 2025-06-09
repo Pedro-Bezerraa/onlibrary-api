@@ -110,7 +110,8 @@ public class EmprestimoService {
 
         String livroTitulo = exemplares.get(0).getLivro().getTitulo();
         String titulo = "Empréstimo realizado com sucesso";
-        String conteudo = "Você retirou o livro '" + livroTitulo + "' na biblioteca '" + biblioteca.getNome() + "'.";
+        String conteudo = "Você retirou o livro '" + livroTitulo + "' na biblioteca '" + biblioteca.getNome() +
+                "'. A devolução deve ser feita até " + emprestimo.getDataDevolucao().toString() + ".";
 
         notificacaoService.notificarUsuario(
                 usuarioBiblioteca.getUsuario(),
@@ -118,7 +119,6 @@ public class EmprestimoService {
                 conteudo,
                 TipoUsuario.COMUM
         );
-
         return new EmprestimoResponseDTO(
                 emprestimo.getId(),
                 emprestimo.getDataEmissao(),
@@ -196,7 +196,6 @@ public class EmprestimoService {
                         .orElse(BigDecimal.ZERO);
 
                 if (qntPendente.compareTo(BigDecimal.ZERO) > 0) {
-                    // Vincular exemplar à reserva
                     ReservaExemplar reservaExemplar = ReservaExemplar.builder()
                             .exemplar(exemplar)
                             .reserva(reserva)
