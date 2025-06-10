@@ -57,16 +57,13 @@ public class ReservaService {
         List<Exemplar> exemplaresDisponiveis = exemplarRepository
                 .findByLivroAndBibliotecaAndSituacao(livro, biblioteca, SituacaoExemplar.DISPONIVEL);
 
-        if (exemplaresDisponiveis.isEmpty()) {
-            throw new BusinessException("Nenhum exemplar disponível para reserva.");
-        }
-
         int quantidadeSolicitada = dto.quantidade().intValue();
         int quantidadeDisponivel = exemplaresDisponiveis.size();
         int quantidadeAtendida = Math.min(quantidadeSolicitada, quantidadeDisponivel);
         BigDecimal quantidadePendente = BigDecimal.valueOf(quantidadeSolicitada - quantidadeAtendida);
 
         SituacaoReserva situacao;
+
         if (quantidadePendente.compareTo(BigDecimal.ZERO) > 0) {
             situacao = SituacaoReserva.PENDENTE;
         } else {
@@ -113,8 +110,13 @@ public class ReservaService {
             exemplar.setSituacao(SituacaoExemplar.RESERVADO);
         }
 
-        reservaExemplarRepository.saveAll(reservasExemplares);
-        exemplarRepository.saveAll(exemplaresDisponiveis.subList(0, quantidadeAtendida));
+        if (!reservasExemplares.isEmpty()) {
+            reservaExemplarRepository.saveAll(reservasExemplares);
+        }
+        if (quantidadeAtendida > 0) {
+            exemplarRepository.saveAll(exemplaresDisponiveis.subList(0, quantidadeAtendida));
+        }
+
 
         return new ReservaResponseDTO(
                 reserva.getId(),
@@ -135,6 +137,33 @@ public class ReservaService {
         Reserva reserva = reservaRepository.findById(idReserva)
                 .orElseThrow(() -> new ResourceNotFoundException("Reserva não encontrada"));
 
+        if (dto.situacao() != null && dto.situacao() == SituacaoReserva.CANCELADO) {
+            boolean hasPendingEmprestimos = reservaRepository.hasPendingEmprestimosByReservaId(idReserva);
+            if (hasPendingEmprestimos) {
+                throw new BusinessException("Não é possível cancelar a reserva: Há um empréstimo ativo associado a ela.");
+            }
+
+            reserva.setSituacao(SituacaoReserva.CANCELADO);
+
+            List<ReservaExemplar> reservasExemplares = reservaExemplarRepository.findByReservaIdComExemplar(idReserva);
+
+            for (ReservaExemplar re : reservasExemplares) {
+                Exemplar exemplar = re.getExemplar();
+                atenderReservasPendentesAposCancelamento(exemplar);
+            }
+
+            reservaExemplarRepository.deleteAll(reservasExemplares);
+
+            notificacaoService.notificarUsuario(
+                    reserva.getUsuario(),
+                    "Reserva Cancelada",
+                    "Sua reserva do livro '" + reserva.getLivro().getTitulo() +
+                            "' na biblioteca '" + reserva.getBiblioteca().getNome() +
+                            "' foi cancelada.",
+                    TipoUsuario.COMUM
+            );
+        }
+
         if (dto.dataRetirada() != null) {
             reserva.setDataRetirada(dto.dataRetirada());
 
@@ -151,8 +180,9 @@ public class ReservaService {
                 throw new BusinessException("Nem todos os exemplares estão no estado correto (RESERVADO) para confirmar a retirada.");
             }
 
-            reserva.setSituacao(SituacaoReserva.ATENDIDO_COMPLETAMENTE);
-
+            if (reserva.getQuantidadePendente() == null || reserva.getQuantidadePendente().compareTo(BigDecimal.ZERO) <= 0) {
+                reserva.setSituacao(SituacaoReserva.ATENDIDO_COMPLETAMENTE);
+            }
 
             String titulo = "Reserva pronta para retirada";
             String conteudo = "Sua reserva do livro '" + reserva.getLivro().getTitulo() +
@@ -233,5 +263,38 @@ public class ReservaService {
                         "' foi arquivada do sistema. Não há mais pendências associadas a ela.",
                 TipoUsuario.COMUM
         );
+    }
+
+    private void atenderReservasPendentesAposCancelamento(Exemplar exemplar) {
+        List<Reserva> proximasReservas = reservaRepository.findReservasPorLivroEBibliotecaComSituacao(
+                exemplar.getLivro().getId(),
+                exemplar.getBiblioteca().getId(),
+                SituacaoReserva.PENDENTE
+        );
+
+        boolean exemplarReatribuido = false;
+        if (!proximasReservas.isEmpty()) {
+            Reserva proximaReserva = proximasReservas.get(0);
+
+            ReservaExemplar novaReservaExemplar = new ReservaExemplar();
+            novaReservaExemplar.setReserva(proximaReserva);
+            novaReservaExemplar.setExemplar(exemplar);
+            reservaExemplarRepository.save(novaReservaExemplar);
+
+            proximaReserva.setQuantidadePendente(proximaReserva.getQuantidadePendente().subtract(BigDecimal.ONE));
+            if (proximaReserva.getQuantidadePendente().compareTo(BigDecimal.ZERO) <= 0) {
+                proximaReserva.setSituacao(SituacaoReserva.ATENDIDO_PARCIALMENTE);
+            }
+            reservaRepository.save(proximaReserva);
+
+            exemplar.setSituacao(SituacaoExemplar.RESERVADO);
+            exemplarReatribuido = true;
+        }
+
+        if (!exemplarReatribuido) {
+            exemplar.setSituacao(SituacaoExemplar.DISPONIVEL);
+        }
+
+        exemplarRepository.save(exemplar);
     }
 }

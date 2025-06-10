@@ -14,7 +14,8 @@ import java.util.UUID;
 public interface UsuarioBibliotecaRepository extends JpaRepository<UsuarioBiblioteca, UUID> {
     Optional<UsuarioBiblioteca> findByUsuarioIdAndBibliotecaId(UUID usuarioId, UUID bibliotecaId);
     List<UsuarioBiblioteca> findByUsuarioIdAndTipoUsuarioIn(UUID usuarioId, List<TipoUsuario> tipos);
-    boolean existsByUsuarioId(UUID usuarioId);
+    boolean existsByUsuarioIdAndBibliotecaId(UUID usuarioId, UUID bibliotecaId);
+
     @Query("SELECT COUNT(r) > 0 " +
             "FROM UsuarioBiblioteca ub " +
             "JOIN ub.usuario u " +

@@ -74,6 +74,16 @@ public class MultaService {
             multa.setMotivo(dto.motivo());
         }
 
+        if (dto.situacao() != null) {
+            multa.setSituacao(dto.situacao());
+        }
+
+        if (dto.bibliotecarioId() != null) {
+            Usuario novoBibliotecario = usuarioRepository.findById(dto.bibliotecarioId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Novo bibliotecário não encontrado."));
+            multa.setBibliotecario(novoBibliotecario);
+        }
+
         multaRepository.save(multa);
 
         return new AttMultaResponseDTO(

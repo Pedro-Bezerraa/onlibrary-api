@@ -42,11 +42,12 @@ public class UsuarioBibliotecaService {
         PerfilUsuario perfilUsuario = perfilUsuarioRepository.findById(dto.perfilUsuarioId())
                 .orElseThrow(() -> new ResourceNotFoundException("Perfil não encontrado."));
 
-        boolean usuarioExiste = usuarioBibliotecaRepository.existsByUsuarioId(dto.usuarioId());
+        boolean usuarioExisteNaBiblioteca = usuarioBibliotecaRepository.existsByUsuarioIdAndBibliotecaId(dto.usuarioId(), dto.bibliotecaId());
 
-        if (usuarioExiste) {
-            throw new BusinessException("Usuario já cadastrado na biblioteca");
+        if (usuarioExisteNaBiblioteca) {
+            throw new BusinessException("Usuario já cadastrado nesta biblioteca");
         }
+        // --- FIM DA CORREÇÃO ---
 
         if (!usuario.getCpf().equals(dto.cpf())) {
             throw new BusinessException("O CPF informado não corresponde ao CPF do usuário.");
@@ -187,7 +188,6 @@ public class UsuarioBibliotecaService {
                 throw new BusinessException("Não é possível excluir a relação Usuário-Biblioteca: Este usuário é o único ADMIN_MASTER ativo da biblioteca. É necessário transferir ou adicionar outro ADMIN_MASTER antes de excluí-lo.");
             }
         }
-
 
         usuarioBiblioteca.setDeletado(true);
         usuarioBibliotecaRepository.save(usuarioBiblioteca);

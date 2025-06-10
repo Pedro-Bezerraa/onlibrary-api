@@ -7,7 +7,8 @@ public enum SituacaoReserva {
     PENDENTE,
     ATENDIDO_PARCIALMENTE,
     ATENDIDO_COMPLETAMENTE,
-    CONCLUIDO;
+    CONCLUIDO,
+    CANCELADO;
 
     @JsonValue
     public String toLower() {
