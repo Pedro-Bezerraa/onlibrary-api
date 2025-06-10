@@ -8,7 +8,9 @@ import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.*;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoMulta;
+import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
 import com.onlibrary.onlibrary_api.repository.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,7 @@ public class MultaService {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioBibliotecaRepository usuarioBibliotecaRepository;
     private final BibliotecaRepository bibliotecaRepository;
+    private final NotificacaoService notificacaoService;
 
     public MultaResponseDTO cadastrarMulta(MultaRequestDTO dto) {
         Usuario usuario = usuarioRepository.findById(dto.usuarioId())
@@ -84,6 +87,36 @@ public class MultaService {
                 multa.getMotivo(),
                 multa.getBiblioteca().getId(),
                 null
+        );
+    }
+
+    @Transactional
+    public void deletarMulta(UUID idMulta) {
+        Multa multa = multaRepository.findById(idMulta)
+                .orElseThrow(() -> new ResourceNotFoundException("Multa não encontrada."));
+
+        if (multa.getSituacao() == SituacaoMulta.PENDENTE) {
+            notificacaoService.notificarUsuario(
+                    multa.getBibliotecario(),
+                    "Não foi possível excluir a multa",
+                    "A multa para o usuário '" + multa.getUsuario().getUsername() +
+                            "' na biblioteca '" + multa.getBiblioteca().getNome() +
+                            "' não pode ser excluída pois está com status PENDENTE.",
+                    TipoUsuario.ADMIN
+            );
+            throw new BusinessException("Não é possível excluir uma multa com situação PENDENTE.");
+        }
+
+        multa.setDeletado(true);
+        multaRepository.save(multa);
+
+        notificacaoService.notificarUsuario(
+                multa.getUsuario(),
+                "Multa arquivada",
+                "Sua multa no valor de " + multa.getValor() +
+                        " na biblioteca '" + multa.getBiblioteca().getNome() +
+                        "' foi arquivada do sistema. Não há mais pendências associadas a ela.",
+                TipoUsuario.COMUM
         );
     }
 }

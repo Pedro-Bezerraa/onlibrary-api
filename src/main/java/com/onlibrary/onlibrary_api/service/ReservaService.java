@@ -144,20 +144,15 @@ public class ReservaService {
                 throw new BusinessException("Nenhum exemplar associado à reserva.");
             }
 
-            boolean todosDisponiveis = exemplares.stream()
-                    .allMatch(re -> SituacaoExemplar.DISPONIVEL.equals(re.getExemplar().getSituacao()));
+            boolean todosReservados = exemplares.stream()
+                    .allMatch(re -> SituacaoExemplar.RESERVADO.equals(re.getExemplar().getSituacao()));
 
-            if (!todosDisponiveis) {
-                throw new BusinessException("Nem todos os exemplares estão disponíveis para retirada.");
+            if (!todosReservados) {
+                throw new BusinessException("Nem todos os exemplares estão no estado correto (RESERVADO) para confirmar a retirada.");
             }
 
             reserva.setSituacao(SituacaoReserva.ATENDIDO_COMPLETAMENTE);
 
-            exemplares.forEach(re -> {
-                Exemplar exemplar = re.getExemplar();
-                exemplar.setSituacao(SituacaoExemplar.RESERVADO);
-                exemplarRepository.save(exemplar);
-            });
 
             String titulo = "Reserva pronta para retirada";
             String conteudo = "Sua reserva do livro '" + reserva.getLivro().getTitulo() +
@@ -191,6 +186,52 @@ public class ReservaService {
                 reserva.getQuantidadeTotal(),
                 reserva.getQuantidadePendente(),
                 reserva.getLivro().getId()
+        );
+    }
+
+    @Transactional
+    public void deletarReserva(UUID idReserva) {
+        Reserva reserva = reservaRepository.findById(idReserva)
+                .orElseThrow(() -> new ResourceNotFoundException("Reserva não encontrada."));
+
+        if (reserva.getSituacao() == SituacaoReserva.PENDENTE ||
+                reserva.getSituacao() == SituacaoReserva.ATENDIDO_PARCIALMENTE ||
+                reserva.getSituacao() == SituacaoReserva.ATENDIDO_COMPLETAMENTE) {
+
+            boolean hasPendingEmprestimos = reservaRepository.hasPendingEmprestimosByReservaId(idReserva);
+            if (hasPendingEmprestimos) {
+                notificacaoService.notificarUsuario(
+                        reserva.getUsuario(),
+                        "Não foi possível excluir a reserva",
+                        "Sua reserva do livro '" + reserva.getLivro().getTitulo() +
+                                "' na biblioteca '" + reserva.getBiblioteca().getNome() +
+                                "' não pode ser excluída pois há um empréstimo ativo associado a ela.",
+                        TipoUsuario.COMUM
+                );
+                throw new BusinessException("Não é possível excluir a reserva: Há um empréstimo ativo associado a ela.");
+            }
+
+            notificacaoService.notificarUsuario(
+                    reserva.getUsuario(),
+                    "Não foi possível excluir a reserva",
+                    "Sua reserva do livro '" + reserva.getLivro().getTitulo() +
+                            "' na biblioteca '" + reserva.getBiblioteca().getNome() +
+                            "' não pode ser excluída pois está em andamento (Pendente ou Atendida).",
+                    TipoUsuario.COMUM
+            );
+            throw new BusinessException("Não é possível excluir uma reserva com situação PENDENTE, ATENDIDO_PARCIALMENTE ou ATENDIDO_COMPLETAMENTE.");
+        }
+
+        reserva.setDeletado(true);
+        reservaRepository.save(reserva);
+
+        notificacaoService.notificarUsuario(
+                reserva.getUsuario(),
+                "Reserva arquivada",
+                "Sua reserva do livro '" + reserva.getLivro().getTitulo() +
+                        "' na biblioteca '" + reserva.getBiblioteca().getNome() +
+                        "' foi arquivada do sistema. Não há mais pendências associadas a ela.",
+                TipoUsuario.COMUM
         );
     }
 }

@@ -57,6 +57,11 @@ public class AuthController {
         return ResponseEntity.ok(new ResponseDTO<>(true, "Dados válidos", request.dados()));
     }
 
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity<?> deletarUsuario(@PathVariable UUID id) {
+        authService.deletarUsuario(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Usuário deletado com sucesso.", null));
+    }
 
     @GetMapping("/ping")
     public String ping() {

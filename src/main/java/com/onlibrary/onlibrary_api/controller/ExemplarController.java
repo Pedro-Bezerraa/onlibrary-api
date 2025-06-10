@@ -35,4 +35,10 @@ public class ExemplarController {
         ExemplarResponseDTO exemplarAtualizado = exemplarService.atualizarExemplar(id, dto);
         return ResponseEntity.ok(new ResponseDTO<>(true, "Exemplar atualizado com sucesso!", exemplarAtualizado));
     }
+
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity<ResponseDTO<Void>> deletarExemplar(@PathVariable UUID id) {
+        exemplarService.deletarExemplar(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Exemplar marcado como deletado com sucesso.", null));
+    }
 }

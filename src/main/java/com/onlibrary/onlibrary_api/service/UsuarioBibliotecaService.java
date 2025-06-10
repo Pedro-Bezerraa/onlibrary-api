@@ -19,6 +19,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -28,6 +29,7 @@ public class UsuarioBibliotecaService {
     private final BibliotecaRepository bibliotecaRepository;
     private final UsuarioRepository usuarioRepository;
     private final PerfilUsuarioRepository perfilUsuarioRepository;
+    private final NotificacaoService notificacaoService;
 
     @Transactional
     public UsuarioBibliotecaResponseDTO criarUsuarioBiblioteca(UsuarioBibliotecaRequestDTO dto) {
@@ -142,6 +144,60 @@ public class UsuarioBibliotecaService {
                 usuarioBiblioteca.getNumeroMatricula(),
                 usuarioBiblioteca.getCpf(),
                 usuarioBiblioteca.getSituacao().toString()
+        );
+    }
+
+    @Transactional
+    public void deletarUsuarioBiblioteca(UUID idUsuarioBiblioteca) {
+        UsuarioBiblioteca usuarioBiblioteca = usuarioBibliotecaRepository.findById(idUsuarioBiblioteca)
+                .orElseThrow(() -> new ResourceNotFoundException("Relação Usuário-Biblioteca não encontrada."));
+
+        boolean hasActiveReservas = usuarioBibliotecaRepository.hasActiveReservasByUsuarioBibliotecaId(idUsuarioBiblioteca);
+        if (hasActiveReservas) {
+            notificacaoService.notificarUsuario(
+                    usuarioBiblioteca.getUsuario(),
+                    "Não foi possível excluir a relação Usuário-Biblioteca",
+                    "A relação com a biblioteca '" + usuarioBiblioteca.getBiblioteca().getNome() +
+                            "' não pode ser excluída pois existem reservas ativas associadas a ela.",
+                    usuarioBiblioteca.getTipoUsuario()
+            );
+            throw new BusinessException("Não é possível excluir a relação Usuário-Biblioteca: Existem reservas ativas associadas a ela.");
+        }
+
+        boolean hasPendingEmprestimos = usuarioBibliotecaRepository.hasPendingEmprestimosByUsuarioBibliotecaId(idUsuarioBiblioteca);
+        if (hasPendingEmprestimos) {
+            notificacaoService.notificarUsuario(
+                    usuarioBiblioteca.getUsuario(),
+                    "Não foi possível excluir a relação Usuário-Biblioteca",
+                    "A relação com a biblioteca '" + usuarioBiblioteca.getBiblioteca().getNome() +
+                            "' não pode ser excluída pois existem empréstimos pendentes associados a ela.",
+                    usuarioBiblioteca.getTipoUsuario()
+            );
+            throw new BusinessException("Não é possível excluir a relação Usuário-Biblioteca: Existem empréstimos pendentes associados a ela.");
+        }
+
+        if (usuarioBiblioteca.getTipoUsuario() == TipoUsuario.ADMIN_MASTER) {
+            long adminMastersCount = usuarioBibliotecaRepository.findByUsuarioIdAndTipoUsuarioIn(
+                            usuarioBiblioteca.getUsuario().getId(), List.of(TipoUsuario.ADMIN_MASTER))
+                    .stream()
+                    .filter(ub -> !ub.getId().equals(idUsuarioBiblioteca) && !ub.getDeletado())
+                    .count();
+
+            if (adminMastersCount == 0 && !usuarioBiblioteca.getDeletado()) { // Se ele for o único ADMIN_MASTER ativo
+                throw new BusinessException("Não é possível excluir a relação Usuário-Biblioteca: Este usuário é o único ADMIN_MASTER ativo da biblioteca. É necessário transferir ou adicionar outro ADMIN_MASTER antes de excluí-lo.");
+            }
+        }
+
+
+        usuarioBiblioteca.setDeletado(true);
+        usuarioBibliotecaRepository.save(usuarioBiblioteca);
+
+        notificacaoService.notificarUsuario(
+                usuarioBiblioteca.getUsuario(),
+                "Relação com a biblioteca encerrada",
+                "Sua relação com a biblioteca '" + usuarioBiblioteca.getBiblioteca().getNome() +
+                        "' foi encerrada com sucesso.",
+                usuarioBiblioteca.getTipoUsuario()
         );
     }
 }

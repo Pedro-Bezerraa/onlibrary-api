@@ -11,14 +11,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ReservaRepository extends JpaRepository<Reserva, UUID> {
-    @Query("SELECT r FROM Reserva r " +
-            "JOIN r.exemplares e " +
-            "WHERE r.situacao = :situacao AND e.exemplar.livro = :livro " +
-            "ORDER BY r.dataEmissao ASC")
-    Optional<Reserva> findFirstBySituacaoAndLivroOrderByDataEmissaoAsc(
-            @Param("situacao") SituacaoReserva situacao,
-            @Param("livro") Livro livro);
-
     Optional<Reserva> findByUsuarioAndSituacao(Usuario usuario, SituacaoReserva situacao);
 
     @Query("""
@@ -31,6 +23,9 @@ public interface ReservaRepository extends JpaRepository<Reserva, UUID> {
             @Param("bibliotecaId") UUID bibliotecaId,
             @Param("situacao") SituacaoReserva situacao
     );
+
+    @Query("SELECT COUNT(e) > 0 FROM Emprestimo e WHERE e.reserva.id = :reservaId AND e.situacao = 'PENDENTE'")
+    boolean hasPendingEmprestimosByReservaId(@Param("reservaId") UUID reservaId);
 
     boolean existsByBibliotecaIdAndSituacao(UUID idBiblioteca, SituacaoReserva situacao);
 }

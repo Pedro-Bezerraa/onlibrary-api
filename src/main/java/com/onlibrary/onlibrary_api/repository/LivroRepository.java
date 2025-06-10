@@ -8,4 +8,5 @@ import java.util.UUID;
 public interface LivroRepository extends JpaRepository<Livro, UUID> {
     boolean existsByIsbnIgnoreCase(String isbn);
     boolean existsByTituloIgnoreCase(String titulo);
+
 }

@@ -6,6 +6,7 @@ import com.onlibrary.onlibrary_api.dto.exemplar.ExemplarResponseDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.*;
+import com.onlibrary.onlibrary_api.model.enums.SituacaoEmprestimo;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoExemplar;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoReserva;
 import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
@@ -28,6 +29,7 @@ public class ExemplarService {
     private final ReservaRepository reservaRepository;
     private final BibliotecaLivroRepository bibliotecaLivroRepository;
     private final NotificacaoService notificacaoService;
+    private final EmprestimoRepository emprestimoRepository;
 
     @Transactional
     public ExemplarResponseDTO criarExemplar(ExemplarRequestDTO dto) {
@@ -113,6 +115,26 @@ public class ExemplarService {
                 exemplar.getLivro().getId(),
                 exemplar.getBiblioteca().getId()
         );
+    }
+
+    @Transactional
+    public void deletarExemplar(UUID idExemplar) {
+        Exemplar exemplar = exemplarRepository.findById(idExemplar)
+                .orElseThrow(() -> new ResourceNotFoundException("Exemplar não encontrado."));
+
+        boolean hasActiveReserva = reservaExemplarRepository.existsActiveReservasByExemplarId(idExemplar);
+
+        if (hasActiveReserva) {
+            throw new BusinessException("Não é possível excluir o exemplar: Existem reservas ativas associadas a ele.");
+        }
+
+        boolean hasActiveEmprestimo = emprestimoRepository.existsByExemplarAndSituacao(exemplar, SituacaoEmprestimo.PENDENTE);
+        if (hasActiveEmprestimo) {
+            throw new BusinessException("Não é possível excluir o exemplar: Existem empréstimos pendentes associados a ele.");
+        }
+
+        exemplar.setDeletado(true);
+        exemplarRepository.save(exemplar);
     }
 
     private void atenderReservasPendentes(Exemplar exemplar) {

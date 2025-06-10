@@ -4,6 +4,7 @@ import com.onlibrary.onlibrary_api.dto.usuario.*;
 import com.onlibrary.onlibrary_api.exception.*;
 import com.onlibrary.onlibrary_api.model.entities.Usuario;
 import com.onlibrary.onlibrary_api.model.enums.ContaSituacao;
+import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
 import com.onlibrary.onlibrary_api.repository.UsuarioRepository;
 import com.onlibrary.onlibrary_api.security.UsuarioDetails;
 import jakarta.transaction.Transactional;
@@ -27,6 +28,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final NotificacaoService notificacaoService;
 
     @Transactional
     public UsuarioResponseDTO registerUsuario(UsuarioRequestDTO requestDTO) {
@@ -87,6 +89,50 @@ public class AuthService {
                 atualizado.getCpf(),
                 atualizado.getSituacao()
         );
+    }
+
+    @Transactional
+    public void deletarUsuario(UUID idUsuario) {
+        Usuario usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+
+        boolean hasActiveReservas = usuarioRepository.hasActiveReservas(idUsuario);
+        boolean hasActiveEmprestimos = usuarioRepository.hasActiveEmprestimos(idUsuario);
+        boolean hasActiveMultas = usuarioRepository.hasActiveMultas(idUsuario);
+
+        if (hasActiveReservas) {
+            throw new BusinessException("Não é possível excluir o usuário: Existem reservas ativas associadas a ele.");
+        }
+        if (hasActiveEmprestimos) {
+            throw new BusinessException("Não é possível excluir o usuário: Existem empréstimos pendentes associados a ele.");
+        }
+        if (hasActiveMultas) {
+            throw new BusinessException("Não é possível excluir o usuário: Existem multas pendentes associadas a ele.");
+        }
+
+        boolean isAdminMaster = usuarioRepository.isAdminMasterOfAnyBiblioteca(idUsuario);
+
+        if (isAdminMaster) {
+            notificacaoService.notificarUsuario(
+                    usuario,
+                    "Conta marcada para exclusão",
+                    "Como você é ADMIN_MASTER de uma biblioteca, Não poderá excluir sua conta até excluir sua biblioteca." +
+                            "Por favor, revise o status de suas bibliotecas associadas.",
+                    TipoUsuario.ADMIN_MASTER
+            );
+            usuario.setDeletado(false);
+        } else {
+            notificacaoService.notificarUsuario(
+                    usuario,
+                    "Conta marcada para exclusão",
+                    "Sua conta foi marcada para exclusão. Todos os seus dados serão anonimizados e você não terá mais acesso à plataforma.",
+                    TipoUsuario.COMUM
+
+            );
+            usuario.setDeletado(true);
+        }
+
+        usuarioRepository.save(usuario);
     }
 
     public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {

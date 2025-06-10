@@ -35,4 +35,10 @@ public class PerfilController {
                 new ResponseDTO<>(true, "Perfil atualizado com sucesso!", perfilAtualizado)
         );
     }
+
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity<ResponseDTO<Void>> deletarPerfilUsuario(@PathVariable UUID id) {
+        perfilService.deletarPerfilUsuario(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Perfil de usuário marcado como deletado com sucesso.", null));
+    }
 }

@@ -58,7 +58,29 @@ public class EmprestimoService {
             if (!exemplar.getBiblioteca().getId().equals(biblioteca.getId())) {
                 throw new BusinessException("O exemplar " + exemplar.getId() + " não pertence à biblioteca.");
             }
-            if (exemplar.getSituacao() == SituacaoExemplar.INDISPONIVEL || exemplar.getSituacao() == SituacaoExemplar.EMPRESTADO) {
+
+            if (exemplar.getSituacao() == SituacaoExemplar.EMPRESTADO) {
+                throw new BusinessException("O exemplar " + exemplar.getNumeroTombo() + " já está emprestado.");
+            }
+
+            if (exemplar.getSituacao() == SituacaoExemplar.RESERVADO) {
+                ReservaExemplar reservaExemplarAtiva = exemplar.getReservas().stream()
+                        .filter(re -> {
+                            SituacaoReserva situacao = re.getReserva().getSituacao();
+                            return situacao == SituacaoReserva.ATENDIDO_COMPLETAMENTE || situacao == SituacaoReserva.ATENDIDO_PARCIALMENTE;
+                        })
+                        .findFirst()
+                        .orElse(null);
+
+                if (reservaExemplarAtiva != null) {
+                    Usuario usuarioDaReserva = reservaExemplarAtiva.getReserva().getUsuario();
+                    if (!usuarioDaReserva.getId().equals(usuarioBiblioteca.getUsuario().getId())) {
+                        throw new BusinessException("O exemplar " + exemplar.getNumeroTombo() + " está reservado para outro usuário.");
+                    }
+                } else {
+                    throw new BusinessException("O exemplar " + exemplar.getNumeroTombo() + " possui um estado de reserva inconsistente.");
+                }
+            } else if (exemplar.getSituacao() == SituacaoExemplar.INDISPONIVEL) {
                 throw new BusinessException("O exemplar " + exemplar.getId() + " está indisponível.");
             }
         }
@@ -205,7 +227,7 @@ public class EmprestimoService {
                     reserva.setQuantidadePendente(qntPendente.subtract(BigDecimal.ONE));
 
                     if (reserva.getQuantidadePendente().compareTo(BigDecimal.ZERO) <= 0) {
-                        reserva.setSituacao(SituacaoReserva.ATENDIDO_COMPLETAMENTE);
+                        reserva.setSituacao(SituacaoReserva.ATENDIDO_PARCIALMENTE);
 
                         notificacaoService.notificarUsuario(
                                 reserva.getUsuario(),
@@ -230,5 +252,36 @@ public class EmprestimoService {
         exemplarRepository.saveAll(exemplaresAtualizados);
         reservaRepository.saveAll(reservasAtualizadas);
         reservaExemplarRepository.saveAll(reservaExemplaresCriados);
+    }
+
+    @Transactional
+    public void deletarEmprestimo(UUID idEmprestimo) {
+        Emprestimo emprestimo = emprestimoRepository.findById(idEmprestimo)
+                .orElseThrow(() -> new ResourceNotFoundException("Empréstimo não encontrado."));
+
+        if (emprestimo.getSituacao() == SituacaoEmprestimo.PENDENTE) {
+            notificacaoService.notificarUsuario(
+                    emprestimo.getBibliotecario(),
+                    "Não foi possível excluir o empréstimo",
+                    "O empréstimo do livro '" + emprestimo.getExemplares().get(0).getExemplar().getLivro().getTitulo() +
+                            "' para o usuário '" + emprestimo.getUsuarioBiblioteca().getUsuario().getUsername() +
+                            "' na biblioteca '" + emprestimo.getBiblioteca().getNome() +
+                            "' não pode ser excluído pois está com status PENDENTE.",
+                    TipoUsuario.ADMIN
+            );
+            throw new BusinessException("Não é possível excluir um empréstimo com situação PENDENTE.");
+        }
+
+        emprestimo.setDeletado(true);
+        emprestimoRepository.save(emprestimo);
+
+        notificacaoService.notificarUsuario(
+                emprestimo.getUsuarioBiblioteca().getUsuario(),
+                "Empréstimo arquivado",
+                "Seu empréstimo do livro '" + emprestimo.getExemplares().get(0).getExemplar().getLivro().getTitulo() +
+                        "' na biblioteca '" + emprestimo.getBiblioteca().getNome() +
+                        "' foi arquivado do sistema. Não há mais pendências associadas a ele.",
+                TipoUsuario.COMUM
+        );
     }
 }

@@ -32,4 +32,10 @@ public class ReservaController {
         return ResponseEntity.ok()
                 .body(new ResponseDTO<>(true, "Reserva atualizada com sucesso.", reserva));
     }
+
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity<ResponseDTO<Void>> deletarReserva(@PathVariable UUID id) {
+        reservaService.deletarReserva(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Reserva marcada como deletada com sucesso.", null));
+    }
 }

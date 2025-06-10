@@ -37,4 +37,10 @@ public class EmprestimoController {
                 new ResponseDTO<>(true, "Empréstimo atualizado com sucesso!", emprestimoAtualizado)
         );
     }
+
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity<ResponseDTO<Void>> deletarEmprestimo(@PathVariable UUID id) {
+        emprestimoService.deletarEmprestimo(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Empréstimo marcado como deletado com sucesso.", null));
+    }
 }

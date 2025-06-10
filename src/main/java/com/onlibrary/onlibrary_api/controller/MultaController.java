@@ -37,4 +37,10 @@ public class MultaController {
         AttMultaResponseDTO multa = multaService.atualizarMulta(multaId, dto);
         return ResponseEntity.ok(new ResponseDTO<>(true, "Multa atualizada com sucesso.", multa));
     }
+
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity<ResponseDTO<Void>> deletarMulta(@PathVariable UUID id) {
+        multaService.deletarMulta(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Multa marcada como deletada com sucesso.", null));
+    }
 }

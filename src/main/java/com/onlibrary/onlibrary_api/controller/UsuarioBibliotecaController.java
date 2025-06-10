@@ -33,4 +33,10 @@ public class UsuarioBibliotecaController {
                 new ResponseDTO<>(true, "Relação usuário-biblioteca atualizada com sucesso!", usuarioBiblioteca)
         );
     }
+
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity<ResponseDTO<Void>> deletarUsuarioBiblioteca(@PathVariable UUID id) {
+        usuarioBibliotecaService.deletarUsuarioBiblioteca(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Relação Usuário-Biblioteca marcada como deletada com sucesso.", null));
+    }
 }

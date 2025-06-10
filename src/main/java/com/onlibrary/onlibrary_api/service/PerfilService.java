@@ -111,4 +111,19 @@ public class PerfilService {
                 perfil.getBiblioteca().getId()
         );
     }
+
+    @Transactional
+    public void deletarPerfilUsuario(UUID idPerfilUsuario) {
+        PerfilUsuario perfilUsuario = perfilUsuarioRepository.findById(idPerfilUsuario)
+                .orElseThrow(() -> new ResourceNotFoundException("Perfil de Usuário não encontrado."));
+
+        boolean hasActiveUsuarioBiblioteca = perfilUsuarioRepository.existsActiveUsuarioBibliotecaByPerfilUsuarioId(idPerfilUsuario);
+
+        if (hasActiveUsuarioBiblioteca) {
+            throw new BusinessException("Não é possível excluir o perfil: Existem usuários de biblioteca ativos utilizando este perfil.");
+        }
+
+        perfilUsuario.setDeletado(true);
+        perfilUsuarioRepository.save(perfilUsuario);
+    }
 }
