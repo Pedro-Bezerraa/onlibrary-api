@@ -26,8 +26,4 @@ public class LivroAutor {
     @ManyToOne
     @JoinColumn(name = "fk_id_autor")
     private Autor autor;
-
-    @Column(nullable = false)
-    @Builder.Default
-    private Boolean deletado = false;
 }

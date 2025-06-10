@@ -24,7 +24,7 @@ public class Genero {
     private String nome;
 
     @OneToMany(mappedBy = "genero")
-
+    private List<LivroGenero> livros;
 
     @Column(nullable = false)
     @Builder.Default
