@@ -13,4 +13,6 @@ public interface MultaRepository extends JpaRepository<Multa, UUID> {
     boolean existsPendingMultaById(@Param("multaId") UUID multaId);
 
     boolean existsByBibliotecaIdAndSituacao(UUID idBiblioteca, SituacaoMulta situacao);
+    boolean existsByUsuarioIdAndBibliotecaIdAndSituacao(UUID usuarioId, UUID bibliotecaId, SituacaoMulta situacao);
+
 }

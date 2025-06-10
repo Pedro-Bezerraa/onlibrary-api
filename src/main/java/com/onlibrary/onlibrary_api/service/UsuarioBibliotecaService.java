@@ -10,11 +10,9 @@ import com.onlibrary.onlibrary_api.model.entities.PerfilUsuario;
 import com.onlibrary.onlibrary_api.model.entities.Usuario;
 import com.onlibrary.onlibrary_api.model.entities.UsuarioBiblioteca;
 import com.onlibrary.onlibrary_api.model.enums.ContaSituacao;
+import com.onlibrary.onlibrary_api.model.enums.SituacaoMulta;
 import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
-import com.onlibrary.onlibrary_api.repository.BibliotecaRepository;
-import com.onlibrary.onlibrary_api.repository.PerfilUsuarioRepository;
-import com.onlibrary.onlibrary_api.repository.UsuarioBibliotecaRepository;
-import com.onlibrary.onlibrary_api.repository.UsuarioRepository;
+import com.onlibrary.onlibrary_api.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +28,7 @@ public class UsuarioBibliotecaService {
     private final UsuarioRepository usuarioRepository;
     private final PerfilUsuarioRepository perfilUsuarioRepository;
     private final NotificacaoService notificacaoService;
+    private final MultaRepository multaRepository;
 
     @Transactional
     public UsuarioBibliotecaResponseDTO criarUsuarioBiblioteca(UsuarioBibliotecaRequestDTO dto) {
@@ -154,26 +153,22 @@ public class UsuarioBibliotecaService {
 
         boolean hasActiveReservas = usuarioBibliotecaRepository.hasActiveReservasByUsuarioBibliotecaId(idUsuarioBiblioteca);
         if (hasActiveReservas) {
-//            notificacaoService.notificarUsuario(
-//                    usuarioBiblioteca.getUsuario(),
-//                    "Não foi possível excluir a relação Usuário-Biblioteca",
-//                    "A relação com a biblioteca '" + usuarioBiblioteca.getBiblioteca().getNome() +
-//                            "' não pode ser excluída pois existem reservas ativas associadas a ela.",
-//                    usuarioBiblioteca.getTipoUsuario()
-//            );
             throw new BusinessException("Não é possível excluir a relação Usuário-Biblioteca: Existem reservas ativas associadas a ela.");
         }
 
         boolean hasPendingEmprestimos = usuarioBibliotecaRepository.hasPendingEmprestimosByUsuarioBibliotecaId(idUsuarioBiblioteca);
         if (hasPendingEmprestimos) {
-//            notificacaoService.notificarUsuario(
-//                    usuarioBiblioteca.getUsuario(),
-//                    "Não foi possível excluir a relação Usuário-Biblioteca",
-//                    "A relação com a biblioteca '" + usuarioBiblioteca.getBiblioteca().getNome() +
-//                            "' não pode ser excluída, pois existem empréstimos pendentes associados a ela.",
-//                    usuarioBiblioteca.getTipoUsuario()
-//            );
             throw new BusinessException("Não é possível excluir a relação Usuário-Biblioteca: Existem empréstimos pendentes associados a ela.");
+        }
+
+        boolean hasPendingMultas = multaRepository.existsByUsuarioIdAndBibliotecaIdAndSituacao(
+                usuarioBiblioteca.getUsuario().getId(),
+                usuarioBiblioteca.getBiblioteca().getId(),
+                SituacaoMulta.PENDENTE
+        );
+
+        if (hasPendingMultas) {
+            throw new BusinessException("Não é possível excluir a relação Usuário-Biblioteca: Existem multas pendentes associadas a este usuário na biblioteca.");
         }
 
         if (usuarioBiblioteca.getTipoUsuario() == TipoUsuario.ADMIN_MASTER) {
@@ -183,7 +178,7 @@ public class UsuarioBibliotecaService {
                     .filter(ub -> !ub.getId().equals(idUsuarioBiblioteca) && !ub.getDeletado())
                     .count();
 
-            if (adminMastersCount == 0 && !usuarioBiblioteca.getDeletado()) { // Se ele for o único ADMIN_MASTER ativo
+            if (adminMastersCount == 0 && !usuarioBiblioteca.getDeletado()) {
                 throw new BusinessException("Não é possível excluir a relação Usuário-Biblioteca: Este usuário é o dono ativo da biblioteca.");
             }
         }
