@@ -15,7 +15,13 @@ public interface UsuarioBibliotecaRepository extends JpaRepository<UsuarioBiblio
     Optional<UsuarioBiblioteca> findByUsuarioIdAndBibliotecaId(UUID usuarioId, UUID bibliotecaId);
     List<UsuarioBiblioteca> findByUsuarioIdAndTipoUsuarioIn(UUID usuarioId, List<TipoUsuario> tipos);
     boolean existsByUsuarioId(UUID usuarioId);
-    @Query("SELECT COUNT(r) > 0 FROM Reserva r WHERE r.usuarioBiblioteca.id = :usuarioBibliotecaId AND (r.situacao = 'PENDENTE' OR r.situacao = 'ATENDIDO_PARCIALMENTE' OR r.situacao = 'ATENDIDO_COMPLETAMENTE')")
+    @Query("SELECT COUNT(r) > 0 " +
+            "FROM UsuarioBiblioteca ub " +
+            "JOIN ub.usuario u " +
+            "JOIN u.reservas r " +
+            "WHERE ub.id = :usuarioBibliotecaId " +
+            "AND r.biblioteca.id = ub.biblioteca.id " +
+            "AND r.situacao IN ('PENDENTE', 'ATENDIDO_PARCIALMENTE', 'ATENDIDO_COMPLETAMENTE')")
     boolean hasActiveReservasByUsuarioBibliotecaId(@Param("usuarioBibliotecaId") UUID usuarioBibliotecaId);
 
     @Query("SELECT COUNT(e) > 0 FROM Emprestimo e WHERE e.usuarioBiblioteca.id = :usuarioBibliotecaId AND e.situacao = 'PENDENTE'")
