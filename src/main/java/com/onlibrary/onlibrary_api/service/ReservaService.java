@@ -32,6 +32,7 @@ public class ReservaService {
     private final ReservaExemplarRepository reservaExemplarRepository;
     private final BibliotecaRepository bibliotecaRepository;
     private final UsuarioRepository usuarioRepository;
+    private final UsuarioBibliotecaRepository usuarioBibliotecaRepository;
 
     @Transactional
     public ReservaResponseDTO criarReserva(ReservaRequestDTO dto) {
@@ -40,6 +41,14 @@ public class ReservaService {
 
         Usuario usuario = usuarioRepository.findById(dto.usuarioId())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        UsuarioBiblioteca usuarioBiblioteca = usuarioBibliotecaRepository
+                .findByUsuarioIdAndBibliotecaId(usuario.getId(), biblioteca.getId())
+                .orElseThrow(() -> new BusinessException("Usuário não possui vínculo com esta biblioteca."));
+
+        if (usuarioBiblioteca.getSituacao() == ContaSituacao.BLOQUEADO) {
+            throw new BusinessException("O usuário está bloqueado nesta biblioteca e não pode fazer reservas.");
+        }
 
         Usuario bibliotecario = null;
         if (dto.bibliotecarioId() != null) {
