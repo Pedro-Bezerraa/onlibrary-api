@@ -34,6 +34,7 @@ public class ReservaService {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioBibliotecaRepository usuarioBibliotecaRepository;
 
+
     @Transactional
     public ReservaResponseDTO criarReserva(ReservaRequestDTO dto) {
         Biblioteca biblioteca = bibliotecaRepository.findById(dto.bibliotecaId())
@@ -41,14 +42,6 @@ public class ReservaService {
 
         Usuario usuario = usuarioRepository.findById(dto.usuarioId())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
-
-        UsuarioBiblioteca usuarioBiblioteca = usuarioBibliotecaRepository
-                .findByUsuarioIdAndBibliotecaId(usuario.getId(), biblioteca.getId())
-                .orElseThrow(() -> new BusinessException("Usuário não possui vínculo com esta biblioteca."));
-
-        if (usuarioBiblioteca.getSituacao() == ContaSituacao.BLOQUEADO) {
-            throw new BusinessException("O usuário está bloqueado nesta biblioteca e não pode fazer reservas.");
-        }
 
         Usuario bibliotecario = null;
         if (dto.bibliotecarioId() != null) {
@@ -60,8 +53,15 @@ public class ReservaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado"));
 
         if (usuario.getSituacao() == ContaSituacao.BLOQUEADO) {
-            throw new BusinessException("Usuário bloqueado");
+            throw new BusinessException("Usuário bloqueado no sistema.");
         }
+
+        usuarioBibliotecaRepository.findByUsuarioIdAndBibliotecaId(usuario.getId(), biblioteca.getId())
+                .ifPresent(usuarioBiblioteca -> {
+                    if (usuarioBiblioteca.getSituacao() == ContaSituacao.BLOQUEADO) {
+                        throw new BusinessException("O usuário está bloqueado nesta biblioteca e não pode fazer reservas.");
+                    }
+                });
 
         List<Exemplar> exemplaresDisponiveis = exemplarRepository
                 .findByLivroAndBibliotecaAndSituacao(livro, biblioteca, SituacaoExemplar.DISPONIVEL);
@@ -239,39 +239,39 @@ public class ReservaService {
 
             boolean hasPendingEmprestimos = reservaRepository.hasPendingEmprestimosByReservaId(idReserva);
             if (hasPendingEmprestimos) {
-                notificacaoService.notificarUsuario(
-                        reserva.getUsuario(),
-                        "Não foi possível excluir a reserva",
-                        "Sua reserva do livro '" + reserva.getLivro().getTitulo() +
-                                "' na biblioteca '" + reserva.getBiblioteca().getNome() +
-                                "' não pode ser excluída pois há um empréstimo ativo associado a ela.",
-                        TipoUsuario.COMUM
-                );
+//                notificacaoService.notificarUsuario(
+//                        reserva.getUsuario(),
+//                        "Não foi possível excluir a reserva",
+//                        "Sua reserva do livro '" + reserva.getLivro().getTitulo() +
+//                                "' na biblioteca '" + reserva.getBiblioteca().getNome() +
+//                                "' não pode ser excluída pois há um empréstimo ativo associado a ela.",
+//                        TipoUsuario.COMUM
+//                );
                 throw new BusinessException("Não é possível excluir a reserva: Há um empréstimo ativo associado a ela.");
             }
 
-            notificacaoService.notificarUsuario(
-                    reserva.getUsuario(),
-                    "Não foi possível excluir a reserva",
-                    "Sua reserva do livro '" + reserva.getLivro().getTitulo() +
-                            "' na biblioteca '" + reserva.getBiblioteca().getNome() +
-                            "' não pode ser excluída pois está em andamento (Pendente ou Atendida).",
-                    TipoUsuario.COMUM
-            );
-            throw new BusinessException("Não é possível excluir uma reserva com situação PENDENTE, ATENDIDO_PARCIALMENTE ou ATENDIDO_COMPLETAMENTE.");
+//            notificacaoService.notificarUsuario(
+//                    reserva.getUsuario(),
+//                    "Não foi possível excluir a reserva",
+//                    "Sua reserva do livro '" + reserva.getLivro().getTitulo() +
+//                            "' na biblioteca '" + reserva.getBiblioteca().getNome() +
+//                            "' não pode ser excluída pois está em andamento (Pendente ou Atendida).",
+//                    TipoUsuario.COMUM
+//            );
+            throw new BusinessException("Não é possível excluir uma reserva com situação em andamento");
         }
 
         reserva.setDeletado(true);
         reservaRepository.save(reserva);
 
-        notificacaoService.notificarUsuario(
-                reserva.getUsuario(),
-                "Reserva arquivada",
-                "Sua reserva do livro '" + reserva.getLivro().getTitulo() +
-                        "' na biblioteca '" + reserva.getBiblioteca().getNome() +
-                        "' foi arquivada do sistema. Não há mais pendências associadas a ela.",
-                TipoUsuario.COMUM
-        );
+//        notificacaoService.notificarUsuario(
+//                reserva.getUsuario(),
+//                "Reserva arquivada",
+//                "Sua reserva do livro '" + reserva.getLivro().getTitulo() +
+//                        "' na biblioteca '" + reserva.getBiblioteca().getNome() +
+//                        "' foi arquivada do sistema. Não há mais pendências associadas a ela.",
+//                TipoUsuario.COMUM
+//        );
     }
 
     private void atenderReservasPendentesAposCancelamento(Exemplar exemplar) {

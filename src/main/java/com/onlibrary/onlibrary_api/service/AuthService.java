@@ -113,14 +113,7 @@ public class AuthService {
         boolean isAdminMaster = usuarioRepository.isAdminMasterOfAnyBiblioteca(idUsuario);
 
         if (isAdminMaster) {
-            notificacaoService.notificarUsuario(
-                    usuario,
-                    "Conta marcada para exclusão",
-                    "Como você é ADMIN_MASTER de uma biblioteca, Não poderá excluir sua conta até excluir sua biblioteca." +
-                            "Por favor, revise o status de suas bibliotecas associadas.",
-                    TipoUsuario.ADMIN_MASTER
-            );
-            usuario.setDeletado(false);
+            throw new BusinessException("Não é possível excluir sua conta no memento. Exclua sua biblioteca primeiro.");
         } else {
             notificacaoService.notificarUsuario(
                     usuario,

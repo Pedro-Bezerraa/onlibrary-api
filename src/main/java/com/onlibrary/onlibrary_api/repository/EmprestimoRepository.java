@@ -19,7 +19,7 @@ public interface EmprestimoRepository extends JpaRepository<Emprestimo, UUID> {
     boolean existsByExemplarAndSituacao(
             @Param("exemplar") Exemplar exemplar,
             @Param("situacao") SituacaoEmprestimo situacao);
-
-    @Query("SELECT e FROM Emprestimo e LEFT JOIN FETCH e.exemplares ex LEFT JOIN FETCH ex.exemplar WHERE e.id = :id")
-    Optional<Emprestimo> findByIdWithExemplares(@Param("id") UUID id);
+    
+    @Query("SELECT COUNT(e) > 0 FROM Emprestimo e WHERE e.biblioteca.id = :bibliotecaId AND e.situacao = 'PENDENTE'")
+    boolean hasActiveEmprestimos(@Param("bibliotecaId") UUID bibliotecaId);
 }

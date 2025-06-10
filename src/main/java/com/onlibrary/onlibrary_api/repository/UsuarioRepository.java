@@ -28,6 +28,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
     @Query("SELECT COUNT(m) > 0 FROM Multa m WHERE m.usuario.id = :usuarioId AND m.situacao = 'PENDENTE'")
     boolean hasActiveMultas(@Param("usuarioId") UUID usuarioId);
 
-    @Query("SELECT COUNT(ub) > 0 FROM UsuarioBiblioteca ub WHERE ub.usuario.id = :usuarioId AND ub.tipoUsuario = 'ADMIN_MASTER'")
+    @Query("SELECT COUNT(ub) > 0 FROM UsuarioBiblioteca ub JOIN ub.biblioteca b WHERE ub.usuario.id = :usuarioId AND ub.tipoUsuario = 'ADMIN_MASTER' AND b.deletado = false")
     boolean isAdminMasterOfAnyBiblioteca(@Param("usuarioId") UUID usuarioId);
 }

@@ -106,27 +106,27 @@ public class MultaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Multa não encontrada."));
 
         if (multa.getSituacao() == SituacaoMulta.PENDENTE) {
-            notificacaoService.notificarUsuario(
-                    multa.getBibliotecario(),
-                    "Não foi possível excluir a multa",
-                    "A multa para o usuário '" + multa.getUsuario().getUsername() +
-                            "' na biblioteca '" + multa.getBiblioteca().getNome() +
-                            "' não pode ser excluída pois está com status PENDENTE.",
-                    TipoUsuario.ADMIN
-            );
-            throw new BusinessException("Não é possível excluir uma multa com situação PENDENTE.");
+//            notificacaoService.notificarUsuario(
+//                    multa.getBibliotecario(),
+//                    "Não foi possível excluir a multa",
+//                    "A multa para o usuário '" + multa.getUsuario().getUsername() +
+//                            "' na biblioteca '" + multa.getBiblioteca().getNome() +
+//                            "' não pode ser excluída pois está com status PENDENTE.",
+//                    TipoUsuario.ADMIN
+//            );
+            throw new BusinessException("Não é possível excluir uma multa pendente.");
         }
 
         multa.setDeletado(true);
         multaRepository.save(multa);
 
-        notificacaoService.notificarUsuario(
-                multa.getUsuario(),
-                "Multa arquivada",
-                "Sua multa no valor de " + multa.getValor() +
-                        " na biblioteca '" + multa.getBiblioteca().getNome() +
-                        "' foi arquivada do sistema. Não há mais pendências associadas a ela.",
-                TipoUsuario.COMUM
-        );
+//        notificacaoService.notificarUsuario(
+//                multa.getUsuario(),
+//                "Multa arquivada",
+//                "Sua multa no valor de " + multa.getValor() +
+//                        " na biblioteca '" + multa.getBiblioteca().getNome() +
+//                        "' foi arquivada do sistema. Não há mais pendências associadas a ela.",
+//                TipoUsuario.COMUM
+//        );
     }
 }

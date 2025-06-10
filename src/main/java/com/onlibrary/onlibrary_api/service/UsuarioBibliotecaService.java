@@ -47,7 +47,6 @@ public class UsuarioBibliotecaService {
         if (usuarioExisteNaBiblioteca) {
             throw new BusinessException("Usuario já cadastrado nesta biblioteca");
         }
-        // --- FIM DA CORREÇÃO ---
 
         if (!usuario.getCpf().equals(dto.cpf())) {
             throw new BusinessException("O CPF informado não corresponde ao CPF do usuário.");
@@ -155,25 +154,25 @@ public class UsuarioBibliotecaService {
 
         boolean hasActiveReservas = usuarioBibliotecaRepository.hasActiveReservasByUsuarioBibliotecaId(idUsuarioBiblioteca);
         if (hasActiveReservas) {
-            notificacaoService.notificarUsuario(
-                    usuarioBiblioteca.getUsuario(),
-                    "Não foi possível excluir a relação Usuário-Biblioteca",
-                    "A relação com a biblioteca '" + usuarioBiblioteca.getBiblioteca().getNome() +
-                            "' não pode ser excluída pois existem reservas ativas associadas a ela.",
-                    usuarioBiblioteca.getTipoUsuario()
-            );
+//            notificacaoService.notificarUsuario(
+//                    usuarioBiblioteca.getUsuario(),
+//                    "Não foi possível excluir a relação Usuário-Biblioteca",
+//                    "A relação com a biblioteca '" + usuarioBiblioteca.getBiblioteca().getNome() +
+//                            "' não pode ser excluída pois existem reservas ativas associadas a ela.",
+//                    usuarioBiblioteca.getTipoUsuario()
+//            );
             throw new BusinessException("Não é possível excluir a relação Usuário-Biblioteca: Existem reservas ativas associadas a ela.");
         }
 
         boolean hasPendingEmprestimos = usuarioBibliotecaRepository.hasPendingEmprestimosByUsuarioBibliotecaId(idUsuarioBiblioteca);
         if (hasPendingEmprestimos) {
-            notificacaoService.notificarUsuario(
-                    usuarioBiblioteca.getUsuario(),
-                    "Não foi possível excluir a relação Usuário-Biblioteca",
-                    "A relação com a biblioteca '" + usuarioBiblioteca.getBiblioteca().getNome() +
-                            "' não pode ser excluída pois existem empréstimos pendentes associados a ela.",
-                    usuarioBiblioteca.getTipoUsuario()
-            );
+//            notificacaoService.notificarUsuario(
+//                    usuarioBiblioteca.getUsuario(),
+//                    "Não foi possível excluir a relação Usuário-Biblioteca",
+//                    "A relação com a biblioteca '" + usuarioBiblioteca.getBiblioteca().getNome() +
+//                            "' não pode ser excluída, pois existem empréstimos pendentes associados a ela.",
+//                    usuarioBiblioteca.getTipoUsuario()
+//            );
             throw new BusinessException("Não é possível excluir a relação Usuário-Biblioteca: Existem empréstimos pendentes associados a ela.");
         }
 
@@ -185,7 +184,7 @@ public class UsuarioBibliotecaService {
                     .count();
 
             if (adminMastersCount == 0 && !usuarioBiblioteca.getDeletado()) { // Se ele for o único ADMIN_MASTER ativo
-                throw new BusinessException("Não é possível excluir a relação Usuário-Biblioteca: Este usuário é o único ADMIN_MASTER ativo da biblioteca. É necessário transferir ou adicionar outro ADMIN_MASTER antes de excluí-lo.");
+                throw new BusinessException("Não é possível excluir a relação Usuário-Biblioteca: Este usuário é o dono ativo da biblioteca.");
             }
         }
 

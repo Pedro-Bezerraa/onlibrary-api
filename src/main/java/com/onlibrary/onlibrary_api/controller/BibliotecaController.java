@@ -64,6 +64,11 @@ public class BibliotecaController {
         return ResponseEntity.ok(new ResponseDTO<>(true, "Bibliotecas recuperadas com sucesso", bibliotecas));
     }
 
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity<ResponseDTO<Void>> deletarBiblioteca(@PathVariable UUID id) {
+        bibliotecaService.deletarBiblioteca(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Biblioteca marcada como deletada com sucesso.", null));
+    }
 
     @GetMapping("/contagem/{type}/{id}")
     public ResponseEntity<ContagemResponseDTO> contarPorBibliotecas(

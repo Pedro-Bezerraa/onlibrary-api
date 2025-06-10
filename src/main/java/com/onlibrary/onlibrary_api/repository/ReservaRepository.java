@@ -24,6 +24,9 @@ public interface ReservaRepository extends JpaRepository<Reserva, UUID> {
             @Param("situacao") SituacaoReserva situacao
     );
 
+    @Query("SELECT COUNT(r) > 0 FROM Reserva r WHERE r.biblioteca.id = :bibliotecaId AND r.situacao IN ('PENDENTE', 'ATENDIDO_PARCIALMENTE', 'ATENDIDO_COMPLETAMENTE')")
+    boolean hasActiveReservas(@Param("bibliotecaId") UUID bibliotecaId);
+
     @Query("SELECT COUNT(e) > 0 FROM Emprestimo e WHERE e.reserva.id = :reservaId AND e.situacao = 'PENDENTE'")
     boolean hasPendingEmprestimosByReservaId(@Param("reservaId") UUID reservaId);
 

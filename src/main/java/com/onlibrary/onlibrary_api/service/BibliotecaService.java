@@ -8,6 +8,7 @@ import com.onlibrary.onlibrary_api.model.entities.PerfilUsuario;
 import com.onlibrary.onlibrary_api.model.entities.Usuario;
 import com.onlibrary.onlibrary_api.model.entities.UsuarioBiblioteca;
 import com.onlibrary.onlibrary_api.model.enums.ContaSituacao;
+import com.onlibrary.onlibrary_api.model.enums.SituacaoMulta;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoReserva;
 import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
 import com.onlibrary.onlibrary_api.repository.*;
@@ -30,6 +31,8 @@ public class BibliotecaService {
     private final UsuarioRepository usuarioRepository;
     private final BibliotecaLivroRepository bibliotecaLivroRepository;
     private final ReservaRepository reservaRepository;
+    private final EmprestimoRepository emprestimoRepository;
+    private final MultaRepository multaRepository;
 
     public UUID criarBiblioteca(BibliotecaRequestDTO dto, UUID idUsuarioCriador) {
         Biblioteca biblioteca = new Biblioteca();
@@ -114,6 +117,30 @@ public class BibliotecaService {
                 biblioteca.getReservaOnline(),
                 biblioteca.getAplicacaoBloqueio()
         );
+    }
+
+    @Transactional
+    public void deletarBiblioteca(UUID bibliotecaId) {
+        Biblioteca biblioteca = bibliotecaRepository.findById(bibliotecaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Biblioteca não encontrada."));
+
+        boolean hasActiveReservas = reservaRepository.hasActiveReservas(bibliotecaId);
+        if (hasActiveReservas) {
+            throw new BusinessException("Não é possível excluir a biblioteca: Existem reservas ativas associadas a ela.");
+        }
+
+        boolean hasActiveEmprestimos = emprestimoRepository.hasActiveEmprestimos(bibliotecaId);
+        if (hasActiveEmprestimos) {
+            throw new BusinessException("Não é possível excluir a biblioteca: Existem empréstimos pendentes associados a ela.");
+        }
+
+        boolean hasPendingMultas = multaRepository.existsByBibliotecaIdAndSituacao(bibliotecaId, SituacaoMulta.PENDENTE);
+        if (hasPendingMultas) {
+            throw new BusinessException("Não é possível excluir a biblioteca: Existem multas pendentes associadas a ela.");
+        }
+
+        biblioteca.setDeletado(true);
+        bibliotecaRepository.save(biblioteca);
     }
 
     public List<BibliotecaResponseDTO> listarBibliotecasAdminOuFuncionario(String token) {
