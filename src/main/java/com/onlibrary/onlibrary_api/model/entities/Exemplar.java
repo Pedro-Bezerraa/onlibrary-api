@@ -43,4 +43,8 @@ public class Exemplar {
 
     @OneToMany(mappedBy = "exemplar")
     private List<ReservaExemplar> reservas;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean deletado = false;
 }

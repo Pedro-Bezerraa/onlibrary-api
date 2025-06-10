@@ -62,4 +62,7 @@ public class Reserva {
     @OneToMany(mappedBy = "reserva")
     private List<Emprestimo> emprestimos;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean deletado = false;
 }

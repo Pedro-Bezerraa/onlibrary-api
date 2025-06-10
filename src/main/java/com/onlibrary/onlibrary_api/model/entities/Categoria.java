@@ -25,4 +25,8 @@ public class Categoria {
 
     @OneToMany(mappedBy = "categoria")
     private List<LivroCategoria> livros;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean deletado = false;
 }

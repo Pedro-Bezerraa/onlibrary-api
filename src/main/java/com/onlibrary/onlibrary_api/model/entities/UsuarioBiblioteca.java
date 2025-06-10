@@ -47,4 +47,8 @@ public class UsuarioBiblioteca {
 
     @OneToMany(mappedBy = "usuarioBiblioteca")
     private List<Emprestimo> emprestimos;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean deletado = false;
 }

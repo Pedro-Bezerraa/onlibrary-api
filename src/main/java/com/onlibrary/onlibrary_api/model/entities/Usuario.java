@@ -59,4 +59,7 @@ public class Usuario {
         this.username = username;
     }
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean deletado = false;
 }

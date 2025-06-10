@@ -26,4 +26,8 @@ public class LivroEditora {
     @ManyToOne
     @JoinColumn(name = "fk_id_editora")
     private Editora editora;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean deletado = false;
 }

@@ -37,4 +37,8 @@ public class PerfilUsuario {
 
     @OneToMany(mappedBy = "perfilUsuario")
     private List<UsuarioBiblioteca> usuarios;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean deletado = false;
 }

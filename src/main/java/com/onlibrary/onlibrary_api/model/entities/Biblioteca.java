@@ -35,6 +35,10 @@ public class Biblioteca {
     @Column(name = "aplicacao_bloqueio")
     private Boolean aplicacaoBloqueio;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean deletado = false;
+
     @OneToMany(mappedBy = "biblioteca")
     private List<UsuarioBiblioteca> usuarioBibliotecas;
 

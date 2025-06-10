@@ -25,4 +25,8 @@ public class Autor {
 
     @OneToMany(mappedBy = "autor")
     private List<LivroAutor> livros;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean deletado = false;
 }

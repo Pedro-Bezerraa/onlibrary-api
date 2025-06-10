@@ -46,4 +46,8 @@ public class Livro {
 
     @OneToMany(mappedBy = "livro")
     private List<BibliotecaLivro> bibliotecaLivros;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean deletado = false;
 }

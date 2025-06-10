@@ -26,4 +26,8 @@ public class LivroGenero {
     @ManyToOne
     @JoinColumn(name = "fk_id_genero")
     private Genero genero;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean deletado = false;
 }

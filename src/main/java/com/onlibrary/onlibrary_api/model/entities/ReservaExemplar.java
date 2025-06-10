@@ -26,4 +26,8 @@ public class ReservaExemplar {
     @ManyToOne
     @JoinColumn(name = "fk_id_exemplar")
     private Exemplar exemplar;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean deletado = false;
 }

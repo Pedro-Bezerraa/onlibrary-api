@@ -50,4 +50,8 @@ public class Emprestimo {
 
     @OneToMany(mappedBy = "emprestimo")
     private List<EmprestimoExemplar> exemplares;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean deletado = false;
 }

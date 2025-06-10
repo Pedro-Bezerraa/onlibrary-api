@@ -39,4 +39,8 @@ public class Notificacao {
     @ManyToOne
     @JoinColumn(name = "fk_id_biblioteca")
     private Biblioteca biblioteca;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean deletado = false;
 }
