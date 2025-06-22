@@ -1,16 +1,16 @@
 package com.onlibrary.onlibrary_api.service;
 
-import com.onlibrary.onlibrary_api.dto.editora.AttEditoraRequestDTO;
-import com.onlibrary.onlibrary_api.dto.editora.AttEditoraResponseDTO;
+import com.onlibrary.onlibrary_api.dto.editora.UpdateEditoraRequestDTO;
+import com.onlibrary.onlibrary_api.dto.editora.UpdateEditoraResponseDTO;
 import com.onlibrary.onlibrary_api.dto.editora.EditoraRequestDTO;
 import com.onlibrary.onlibrary_api.dto.editora.EditoraResponseDTO;
 import com.onlibrary.onlibrary_api.exception.ConflictException;
-import com.onlibrary.onlibrary_api.exception.InvalidCredentialsException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Editora;
 import com.onlibrary.onlibrary_api.repository.EditoraRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -19,6 +19,7 @@ import java.util.UUID;
 public class EditoraService {
     private final EditoraRepository editoraRepository;
 
+    @Transactional
     public EditoraResponseDTO criarEditora(EditoraRequestDTO dto) {
         boolean nomeExiste = editoraRepository.existsByNome(dto.nome());
         if (nomeExiste) {
@@ -34,7 +35,8 @@ public class EditoraService {
         return new EditoraResponseDTO(editora.getId(), editora.getNome());
     }
 
-    public AttEditoraResponseDTO atualizar(UUID id, AttEditoraRequestDTO dto) {
+    @Transactional
+    public UpdateEditoraResponseDTO atualizar(UUID id, UpdateEditoraRequestDTO dto) {
         Editora editora = editoraRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Editora não encontrada"));
 
@@ -47,6 +49,6 @@ public class EditoraService {
 
         editoraRepository.save(editora);
 
-        return new AttEditoraResponseDTO(editora.getId(), editora.getNome());
+        return new UpdateEditoraResponseDTO(editora.getId(), editora.getNome());
     }
 }

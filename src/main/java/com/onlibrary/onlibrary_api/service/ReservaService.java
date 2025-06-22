@@ -1,7 +1,7 @@
 package com.onlibrary.onlibrary_api.service;
 
-import com.onlibrary.onlibrary_api.dto.reserva.AttReservaRequestDTO;
-import com.onlibrary.onlibrary_api.dto.reserva.AttReservaResponseDTO;
+import com.onlibrary.onlibrary_api.dto.reserva.UpdateReservaRequestDTO;
+import com.onlibrary.onlibrary_api.dto.reserva.UpdateReservaResponseDTO;
 import com.onlibrary.onlibrary_api.dto.reserva.ReservaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.reserva.ReservaResponseDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
@@ -12,7 +12,7 @@ import com.onlibrary.onlibrary_api.model.enums.SituacaoExemplar;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoReserva;
 import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
 import com.onlibrary.onlibrary_api.repository.*;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -142,7 +142,7 @@ public class ReservaService {
     }
 
     @Transactional
-    public AttReservaResponseDTO atualizarReserva(UUID idReserva, AttReservaRequestDTO dto) {
+    public UpdateReservaResponseDTO atualizarReserva(UUID idReserva, UpdateReservaRequestDTO dto) {
         Reserva reserva = reservaRepository.findById(idReserva)
                 .orElseThrow(() -> new ResourceNotFoundException("Reserva não encontrada"));
 
@@ -214,7 +214,7 @@ public class ReservaService {
 
         reservaRepository.save(reserva);
 
-        return new AttReservaResponseDTO(
+        return new UpdateReservaResponseDTO(
                 reserva.getId(),
                 reserva.getBiblioteca().getId(),
                 reserva.getUsuario().getId(),

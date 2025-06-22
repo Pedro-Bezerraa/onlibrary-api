@@ -36,7 +36,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = recuperarToken(request);
+        String token = jwtService.extractTokenFromRequest(request);
 
         if (token != null) {
             String username = jwtService.extractUsername(token);
@@ -55,23 +55,5 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private String recuperarToken(HttpServletRequest request) {
-        // 🔍 Buscar no Cookie
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if ("jwt".equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            return authHeader.substring(7);
-        }
-
-        return null;
     }
 }

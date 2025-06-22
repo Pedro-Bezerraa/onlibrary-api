@@ -1,15 +1,12 @@
 package com.onlibrary.onlibrary_api.service;
 
-import com.onlibrary.onlibrary_api.dto.autor.AttAutorRequestDTO;
-import com.onlibrary.onlibrary_api.dto.autor.AttAutorResponseDTO;
 import com.onlibrary.onlibrary_api.dto.autor.AutorRequestDTO;
 import com.onlibrary.onlibrary_api.dto.autor.AutorResponseDTO;
 import com.onlibrary.onlibrary_api.exception.ConflictException;
-import com.onlibrary.onlibrary_api.exception.InvalidCredentialsException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Autor;
 import com.onlibrary.onlibrary_api.repository.AutorRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

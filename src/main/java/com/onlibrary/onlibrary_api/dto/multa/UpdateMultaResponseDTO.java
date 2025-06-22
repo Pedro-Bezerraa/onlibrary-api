@@ -5,7 +5,7 @@ import com.onlibrary.onlibrary_api.model.enums.SituacaoMulta;
 import java.time.LocalDate;
 import java.util.UUID;
 
-public record AttMultaResponseDTO(
+public record UpdateMultaResponseDTO(
         UUID id,
         UUID usuarioId,
         UUID bibliotecarioId,

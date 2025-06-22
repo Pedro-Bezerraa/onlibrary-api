@@ -1,6 +1,6 @@
 package com.onlibrary.onlibrary_api.dto.usuario;
 
-public record AttUsuarioRequestDTO (
+public record UpdateUsuarioRequestDTO(
         String nome,
         String sobrenome,
         String username,

@@ -2,8 +2,8 @@ package com.onlibrary.onlibrary_api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
-import com.onlibrary.onlibrary_api.dto.livro.AttLivroRequestDTO;
-import com.onlibrary.onlibrary_api.dto.livro.AttLivroResponseDTO;
+import com.onlibrary.onlibrary_api.dto.livro.UpdateLivroRequestDTO;
+import com.onlibrary.onlibrary_api.dto.livro.UpdateLivroResponseDTO;
 import com.onlibrary.onlibrary_api.dto.livro.LivroRequestDTO;
 import com.onlibrary.onlibrary_api.dto.livro.LivroResponseDTO;
 import com.onlibrary.onlibrary_api.service.LivroService;
@@ -37,10 +37,10 @@ public class LivroController {
     @PutMapping(value = "/atualizar-livro/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> atualizarLivro(
             @PathVariable UUID id,
-            @RequestPart(required = false) AttLivroRequestDTO dto,
+            @RequestPart(required = false) UpdateLivroRequestDTO dto,
             @RequestPart(required = false) MultipartFile imagem
     ) {
-        AttLivroResponseDTO response = livroService.atualizarLivro(id, dto, imagem);
+        UpdateLivroResponseDTO response = livroService.atualizarLivro(id, dto, imagem);
         return ResponseEntity.ok()
                 .body(new ResponseDTO<>(true, "Livro atualizado com sucesso.", response));
     }

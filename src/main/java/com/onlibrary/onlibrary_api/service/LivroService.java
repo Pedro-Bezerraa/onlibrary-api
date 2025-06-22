@@ -4,8 +4,8 @@ import com.onlibrary.onlibrary_api.dto.autor.AutorResponseDTO;
 import com.onlibrary.onlibrary_api.dto.categoria.CategoriaResponseDTO;
 import com.onlibrary.onlibrary_api.dto.editora.EditoraResponseDTO;
 import com.onlibrary.onlibrary_api.dto.genero.GeneroResponseDTO;
-import com.onlibrary.onlibrary_api.dto.livro.AttLivroRequestDTO;
-import com.onlibrary.onlibrary_api.dto.livro.AttLivroResponseDTO;
+import com.onlibrary.onlibrary_api.dto.livro.UpdateLivroRequestDTO;
+import com.onlibrary.onlibrary_api.dto.livro.UpdateLivroResponseDTO;
 import com.onlibrary.onlibrary_api.dto.livro.LivroRequestDTO;
 import com.onlibrary.onlibrary_api.dto.livro.LivroResponseDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
@@ -13,9 +13,8 @@ import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.*;
 import com.onlibrary.onlibrary_api.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -36,6 +35,7 @@ public class LivroService {
     private final LivroEditoraRepository livroEditoraRepository ;
     private final SupabaseStorageService supabaseStorageService;
 
+    @Transactional
     public LivroResponseDTO criarLivro(LivroRequestDTO dto, MultipartFile imagem) {
         if (livroRepository.existsByIsbnIgnoreCase(dto.isbn())) {
             throw new BusinessException("ISBN já cadastrado");
@@ -142,7 +142,8 @@ public class LivroService {
         );
     }
 
-    public AttLivroResponseDTO atualizarLivro(UUID id, AttLivroRequestDTO dto, MultipartFile imagem) {
+    @Transactional
+    public UpdateLivroResponseDTO atualizarLivro(UUID id, UpdateLivroRequestDTO dto, MultipartFile imagem) {
         Livro livro = livroRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado"));
 
@@ -224,7 +225,7 @@ public class LivroService {
             livroGeneroRepository.saveAll(generos);
         }
 
-        return new AttLivroResponseDTO(
+        return new UpdateLivroResponseDTO(
                 livro.getId(),
                 livro.getIsbn(),
                 livro.getTitulo(),

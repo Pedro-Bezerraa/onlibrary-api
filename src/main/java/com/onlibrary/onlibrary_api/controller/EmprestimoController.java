@@ -1,10 +1,9 @@
 package com.onlibrary.onlibrary_api.controller;
 
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
-import com.onlibrary.onlibrary_api.dto.emprestimo.AttEmprestimoRequestDTO;
+import com.onlibrary.onlibrary_api.dto.emprestimo.UpdateEmprestimoRequestDTO;
 import com.onlibrary.onlibrary_api.dto.emprestimo.EmprestimoRequestDTO;
 import com.onlibrary.onlibrary_api.dto.emprestimo.EmprestimoResponseDTO;
-import com.onlibrary.onlibrary_api.model.entities.Reserva;
 import com.onlibrary.onlibrary_api.service.EmprestimoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,7 +28,7 @@ public class EmprestimoController {
     @PutMapping("/atualizar-emprestimo/{id}")
     public ResponseEntity<?> atualizarEmprestimo(
             @PathVariable UUID id,
-            @RequestBody AttEmprestimoRequestDTO dto) {
+            @RequestBody UpdateEmprestimoRequestDTO dto) {
 
         EmprestimoResponseDTO emprestimoAtualizado = emprestimoService.atualizarEmprestimo(id, dto);
 

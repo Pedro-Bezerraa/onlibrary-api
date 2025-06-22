@@ -1,8 +1,8 @@
 package com.onlibrary.onlibrary_api.controller;
 
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
-import com.onlibrary.onlibrary_api.dto.reserva.AttReservaRequestDTO;
-import com.onlibrary.onlibrary_api.dto.reserva.AttReservaResponseDTO;
+import com.onlibrary.onlibrary_api.dto.reserva.UpdateReservaRequestDTO;
+import com.onlibrary.onlibrary_api.dto.reserva.UpdateReservaResponseDTO;
 import com.onlibrary.onlibrary_api.dto.reserva.ReservaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.reserva.ReservaResponseDTO;
 import com.onlibrary.onlibrary_api.service.ReservaService;
@@ -27,8 +27,8 @@ public class ReservaController {
     }
 
     @PutMapping("/atualiza-reserva/{reservaId}")
-    public ResponseEntity<?> reservar(@PathVariable UUID reservaId, @RequestBody AttReservaRequestDTO dto) {
-        AttReservaResponseDTO reserva = reservaService.atualizarReserva(reservaId, dto);
+    public ResponseEntity<?> reservar(@PathVariable UUID reservaId, @RequestBody UpdateReservaRequestDTO dto) {
+        UpdateReservaResponseDTO reserva = reservaService.atualizarReserva(reservaId, dto);
         return ResponseEntity.ok()
                 .body(new ResponseDTO<>(true, "Reserva atualizada com sucesso.", reserva));
     }

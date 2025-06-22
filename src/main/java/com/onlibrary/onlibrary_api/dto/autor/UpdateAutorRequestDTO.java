@@ -1,6 +1,6 @@
 package com.onlibrary.onlibrary_api.dto.autor;
 
-public record AttAutorRequestDTO(
+public record UpdateAutorRequestDTO(
         String nome
 ) {
 }

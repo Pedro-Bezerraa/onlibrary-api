@@ -1,8 +1,8 @@
 package com.onlibrary.onlibrary_api.controller;
 
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
-import com.onlibrary.onlibrary_api.dto.multa.AttMultaRequestDTO;
-import com.onlibrary.onlibrary_api.dto.multa.AttMultaResponseDTO;
+import com.onlibrary.onlibrary_api.dto.multa.UpdateMultaRequestDTO;
+import com.onlibrary.onlibrary_api.dto.multa.UpdateMultaResponseDTO;
 import com.onlibrary.onlibrary_api.dto.multa.MultaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.multa.MultaResponseDTO;
 import com.onlibrary.onlibrary_api.service.MultaService;
@@ -32,9 +32,9 @@ public class MultaController {
     @PutMapping("/atualizar-multa/{multaId}")
     public ResponseEntity<?> atualizarMulta(
             @PathVariable UUID multaId,
-            @RequestBody AttMultaRequestDTO dto
+            @RequestBody UpdateMultaRequestDTO dto
     ) {
-        AttMultaResponseDTO multa = multaService.atualizarMulta(multaId, dto);
+        UpdateMultaResponseDTO multa = multaService.atualizarMulta(multaId, dto);
         return ResponseEntity.ok(new ResponseDTO<>(true, "Multa atualizada com sucesso.", multa));
     }
 

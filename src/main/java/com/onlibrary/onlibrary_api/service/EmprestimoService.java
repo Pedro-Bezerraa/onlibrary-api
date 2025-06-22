@@ -1,6 +1,6 @@
 package com.onlibrary.onlibrary_api.service;
 
-import com.onlibrary.onlibrary_api.dto.emprestimo.AttEmprestimoRequestDTO;
+import com.onlibrary.onlibrary_api.dto.emprestimo.UpdateEmprestimoRequestDTO;
 import com.onlibrary.onlibrary_api.dto.emprestimo.EmprestimoRequestDTO;
 import com.onlibrary.onlibrary_api.dto.emprestimo.EmprestimoResponseDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
@@ -8,7 +8,7 @@ import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.*;
 import com.onlibrary.onlibrary_api.model.enums.*;
 import com.onlibrary.onlibrary_api.repository.*;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -155,7 +155,7 @@ public class EmprestimoService {
 
 
     @Transactional
-    public EmprestimoResponseDTO atualizarEmprestimo(UUID id, AttEmprestimoRequestDTO dto) {
+    public EmprestimoResponseDTO atualizarEmprestimo(UUID id, UpdateEmprestimoRequestDTO dto) {
         Emprestimo emprestimo = emprestimoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Empréstimo não encontrado!"));
 

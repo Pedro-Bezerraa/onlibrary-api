@@ -1,12 +1,10 @@
 package com.onlibrary.onlibrary_api.controller;
 
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
-import com.onlibrary.onlibrary_api.dto.exemplar.AttExemplarRequestDTO;
+import com.onlibrary.onlibrary_api.dto.exemplar.UpdateExemplarRequestDTO;
 import com.onlibrary.onlibrary_api.dto.exemplar.ExemplarRequestDTO;
 import com.onlibrary.onlibrary_api.dto.exemplar.ExemplarResponseDTO;
-import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.service.ExemplarService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,9 +27,8 @@ public class ExemplarController {
                 .body(new ResponseDTO<>(true, "Exemplar criado com sucesso!", exemplar));
     }
 
-
     @PutMapping("/atualizar-exemplar/{id}")
-    public ResponseEntity<?> atualizarExemplar(@PathVariable UUID id, @RequestBody AttExemplarRequestDTO dto) {
+    public ResponseEntity<?> atualizarExemplar(@PathVariable UUID id, @RequestBody UpdateExemplarRequestDTO dto) {
         ExemplarResponseDTO exemplarAtualizado = exemplarService.atualizarExemplar(id, dto);
         return ResponseEntity.ok(new ResponseDTO<>(true, "Exemplar atualizado com sucesso!", exemplarAtualizado));
     }

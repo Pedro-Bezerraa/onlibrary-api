@@ -1,6 +1,6 @@
 package com.onlibrary.onlibrary_api.service;
 
-import com.onlibrary.onlibrary_api.dto.usuarioBiblioteca.AttUsuarioBibliotecaRequestDTO;
+import com.onlibrary.onlibrary_api.dto.usuarioBiblioteca.UpdateUsuarioBibliotecaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.usuarioBiblioteca.UsuarioBibliotecaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.usuarioBiblioteca.UsuarioBibliotecaResponseDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
@@ -13,7 +13,7 @@ import com.onlibrary.onlibrary_api.model.enums.ContaSituacao;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoMulta;
 import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
 import com.onlibrary.onlibrary_api.repository.*;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -93,7 +93,7 @@ public class UsuarioBibliotecaService {
     }
 
     @Transactional
-    public UsuarioBibliotecaResponseDTO atualizarUsuarioBiblioteca(AttUsuarioBibliotecaRequestDTO dto, UUID id) {
+    public UsuarioBibliotecaResponseDTO atualizarUsuarioBiblioteca(UpdateUsuarioBibliotecaRequestDTO dto, UUID id) {
         UsuarioBiblioteca usuarioBiblioteca = usuarioBibliotecaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Relação Usuário-Biblioteca não encontrada."));
 

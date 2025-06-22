@@ -1,17 +1,16 @@
 package com.onlibrary.onlibrary_api.service;
 
-import com.onlibrary.onlibrary_api.dto.perfilUsuario.AttPerfilUsuarioRequestDTO;
+import com.onlibrary.onlibrary_api.dto.perfilUsuario.UpdatePerfilUsuarioRequestDTO;
 import com.onlibrary.onlibrary_api.dto.perfilUsuario.PerfilUsuarioRequestDTO;
 import com.onlibrary.onlibrary_api.dto.perfilUsuario.PerfilUsuarioResponseDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ConflictException;
-import com.onlibrary.onlibrary_api.exception.InvalidCredentialsException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Biblioteca;
 import com.onlibrary.onlibrary_api.model.entities.PerfilUsuario;
 import com.onlibrary.onlibrary_api.repository.BibliotecaRepository;
 import com.onlibrary.onlibrary_api.repository.PerfilUsuarioRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -66,7 +65,7 @@ public class PerfilService {
     }
 
     @Transactional
-    public PerfilUsuarioResponseDTO atualizarPerfil(AttPerfilUsuarioRequestDTO dto, UUID id) {
+    public PerfilUsuarioResponseDTO atualizarPerfil(UpdatePerfilUsuarioRequestDTO dto, UUID id) {
         PerfilUsuario perfil = perfilUsuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Perfil não encontrado."));
 

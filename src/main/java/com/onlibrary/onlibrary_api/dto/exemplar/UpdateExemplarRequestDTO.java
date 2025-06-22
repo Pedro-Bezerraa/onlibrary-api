@@ -5,7 +5,7 @@ import com.onlibrary.onlibrary_api.model.enums.SituacaoExemplar;
 
 import java.util.UUID;
 
-public record AttExemplarRequestDTO(
+public record UpdateExemplarRequestDTO(
         @JsonProperty("fk_id_livro") UUID livroId,
         @JsonProperty("numero_tombo") String numeroTombo,
         Boolean disponivel,

@@ -3,6 +3,8 @@ package com.onlibrary.onlibrary_api.controller;
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
 import com.onlibrary.onlibrary_api.dto.biblioteca.*;
 import com.onlibrary.onlibrary_api.exception.AuthenticationException;
+import com.onlibrary.onlibrary_api.model.views.VwTableEmprestimo;
+import com.onlibrary.onlibrary_api.repository.VwTableEmprestimoRepository;
 import com.onlibrary.onlibrary_api.service.BibliotecaService;
 import com.onlibrary.onlibrary_api.service.JwtService;
 import jakarta.servlet.http.Cookie;
@@ -25,39 +27,31 @@ import java.util.UUID;
 public class BibliotecaController {
     private final BibliotecaService bibliotecaService;
     private final JwtService jwtService;
+    private final VwTableEmprestimoRepository vwTableEmprestimoRepository;
 
     @PostMapping("/criar-biblioteca")
     public ResponseEntity<ResponseDTO<Map<String, UUID>>> criarBiblioteca(
             @RequestBody @Valid BibliotecaRequestDTO dto,
             HttpServletRequest request
     ) {
-        String token = recuperarToken(request);
+        String token = jwtService.extractTokenFromRequest(request);
 
-        if (token == null || token.isBlank()) {
-            throw new AuthenticationException("Token ausente ou inválido");
-        }
-
-        UUID idUsuario = jwtService.extractIdForUser(token);
-        UUID idBiblioteca = bibliotecaService.criarBiblioteca(dto, idUsuario);
+        UUID idBiblioteca = bibliotecaService.criarBiblioteca(dto, token);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ResponseDTO<>(true, "Biblioteca criada com sucesso", Map.of("idBiblioteca", idBiblioteca)));
     }
 
     @PutMapping("/atualizar-biblioteca/{id}")
-    public ResponseEntity<?> atualizarBibioteca(@PathVariable UUID id, @RequestBody AttBibliotecaRequestDTO dto) {
-        AttBibliotecaResponseDTO bibliotecaAtualizada = bibliotecaService.atualizarBiblioteca(id, dto);
+    public ResponseEntity<?> atualizarBibioteca(@PathVariable UUID id, @RequestBody UpdateBibliotecaRequestDTO dto) {
+        UpdateBibliotecaResponseDTO bibliotecaAtualizada = bibliotecaService.atualizarBiblioteca(id, dto);
         return ResponseEntity.ok()
                 .body(new ResponseDTO<>(true, "Biblioteca atualizada com sucesso.", bibliotecaAtualizada));
     }
 
     @GetMapping("/minhas-bibliotecas")
     public ResponseEntity<ResponseDTO<List<BibliotecaResponseDTO>>> listarMinhasBibliotecas(HttpServletRequest request) {
-        String token = recuperarToken(request);
-
-        if (token == null || token.isBlank()) {
-            throw new AuthenticationException("Token ausente ou inválido");
-        }
+        String token = jwtService.extractTokenFromRequest(request);
 
         List<BibliotecaResponseDTO> bibliotecas = bibliotecaService.listarBibliotecasAdminOuFuncionario(token);
 
@@ -78,21 +72,8 @@ public class BibliotecaController {
         return ResponseEntity.ok(response);
     }
 
-
-    private String recuperarToken(HttpServletRequest request) {
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if ("jwt".equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            return authHeader.substring(7);
-        }
-
-        return null;
+@GetMapping("/get")
+    public List<VwTableEmprestimo> litarView() {
+        return vwTableEmprestimoRepository.findByDataDevolucaoHoje();
     }
 }

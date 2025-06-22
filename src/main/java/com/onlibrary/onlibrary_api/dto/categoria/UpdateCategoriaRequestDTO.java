@@ -1,6 +1,6 @@
 package com.onlibrary.onlibrary_api.dto.categoria;
 
-public record AttCategoriaRequestDTO(
+public record UpdateCategoriaRequestDTO(
         String nome
 ) {
 }

@@ -1,16 +1,15 @@
 package com.onlibrary.onlibrary_api.service;
 
-import com.onlibrary.onlibrary_api.dto.multa.AttMultaRequestDTO;
-import com.onlibrary.onlibrary_api.dto.multa.AttMultaResponseDTO;
+import com.onlibrary.onlibrary_api.dto.multa.UpdateMultaRequestDTO;
+import com.onlibrary.onlibrary_api.dto.multa.UpdateMultaResponseDTO;
 import com.onlibrary.onlibrary_api.dto.multa.MultaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.multa.MultaResponseDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.*;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoMulta;
-import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
 import com.onlibrary.onlibrary_api.repository.*;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -62,7 +61,7 @@ public class MultaService {
         return new MultaResponseDTO(multa.getId(), multa.getUsuario().getId(), multa.getBibliotecario().getId(), multa.getValor(), multa.getDataEmissao(), multa.getDataVencimento(), multa.getSituacao(), multa.getMotivo(), multa.getBiblioteca().getId(), null);
     }
 
-    public AttMultaResponseDTO atualizarMulta(UUID multaId, AttMultaRequestDTO dto) {
+    public UpdateMultaResponseDTO atualizarMulta(UUID multaId, UpdateMultaRequestDTO dto) {
         Multa multa = multaRepository.findById(multaId)
                 .orElseThrow(() -> new ResourceNotFoundException("Multa não encontrada."));
 
@@ -86,7 +85,7 @@ public class MultaService {
 
         multaRepository.save(multa);
 
-        return new AttMultaResponseDTO(
+        return new UpdateMultaResponseDTO(
                 multa.getId(),
                 multa.getUsuario().getId(),
                 multa.getBibliotecario().getId(),

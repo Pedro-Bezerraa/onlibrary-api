@@ -1,11 +1,9 @@
 package com.onlibrary.onlibrary_api.controller;
 
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
-import com.onlibrary.onlibrary_api.dto.perfilUsuario.AttPerfilUsuarioRequestDTO;
+import com.onlibrary.onlibrary_api.dto.perfilUsuario.UpdatePerfilUsuarioRequestDTO;
 import com.onlibrary.onlibrary_api.dto.perfilUsuario.PerfilUsuarioRequestDTO;
 import com.onlibrary.onlibrary_api.dto.perfilUsuario.PerfilUsuarioResponseDTO;
-import com.onlibrary.onlibrary_api.exception.InvalidCredentialsException;
-import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.service.PerfilService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,7 +27,7 @@ public class PerfilController {
 
 
     @PutMapping("/atualizar-perfil/{id}")
-    public ResponseEntity<?> atualizarPerfil(@RequestBody AttPerfilUsuarioRequestDTO dto, @PathVariable UUID id) {
+    public ResponseEntity<?> atualizarPerfil(@RequestBody UpdatePerfilUsuarioRequestDTO dto, @PathVariable UUID id) {
         PerfilUsuarioResponseDTO perfilAtualizado = perfilService.atualizarPerfil(dto, id);
         return ResponseEntity.ok(
                 new ResponseDTO<>(true, "Perfil atualizado com sucesso!", perfilAtualizado)

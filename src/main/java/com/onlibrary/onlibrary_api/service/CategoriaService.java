@@ -1,7 +1,7 @@
 package com.onlibrary.onlibrary_api.service;
 
-import com.onlibrary.onlibrary_api.dto.categoria.AttCategoriaRequestDTO;
-import com.onlibrary.onlibrary_api.dto.categoria.AttCategoriaResponseDTO;
+import com.onlibrary.onlibrary_api.dto.categoria.UpdateCategoriaRequestDTO;
+import com.onlibrary.onlibrary_api.dto.categoria.UpdateCategoriaResponseDTO;
 import com.onlibrary.onlibrary_api.dto.categoria.CategoriaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.categoria.CategoriaResponseDTO;
 import com.onlibrary.onlibrary_api.exception.ConflictException;
@@ -10,6 +10,7 @@ import com.onlibrary.onlibrary_api.model.entities.Categoria;
 import com.onlibrary.onlibrary_api.repository.CategoriaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -18,6 +19,7 @@ import java.util.UUID;
 public class CategoriaService {
     private final CategoriaRepository categoriaRepository;
 
+    @Transactional
     public CategoriaResponseDTO criarCategoria(CategoriaRequestDTO dto) {
         boolean nomeExiste = categoriaRepository.existsByNome(dto.nome());
         if (nomeExiste) {
@@ -33,7 +35,8 @@ public class CategoriaService {
         return new CategoriaResponseDTO(categoria.getId(), categoria.getNome());
     }
 
-    public AttCategoriaResponseDTO atualizarCategoria(UUID id, AttCategoriaRequestDTO dto) {
+    @Transactional
+    public UpdateCategoriaResponseDTO atualizarCategoria(UUID id, UpdateCategoriaRequestDTO dto) {
         Categoria categoria = categoriaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada"));
 
@@ -46,6 +49,6 @@ public class CategoriaService {
 
         categoriaRepository.save(categoria);
 
-        return new AttCategoriaResponseDTO(categoria.getId(), categoria.getNome());
+        return new UpdateCategoriaResponseDTO(categoria.getId(), categoria.getNome());
     }
 }

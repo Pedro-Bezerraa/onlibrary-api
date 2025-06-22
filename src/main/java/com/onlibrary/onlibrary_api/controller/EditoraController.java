@@ -1,12 +1,10 @@
 package com.onlibrary.onlibrary_api.controller;
 
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
-import com.onlibrary.onlibrary_api.dto.editora.AttEditoraRequestDTO;
-import com.onlibrary.onlibrary_api.dto.editora.AttEditoraResponseDTO;
+import com.onlibrary.onlibrary_api.dto.editora.UpdateEditoraRequestDTO;
+import com.onlibrary.onlibrary_api.dto.editora.UpdateEditoraResponseDTO;
 import com.onlibrary.onlibrary_api.dto.editora.EditoraRequestDTO;
 import com.onlibrary.onlibrary_api.dto.editora.EditoraResponseDTO;
-import com.onlibrary.onlibrary_api.exception.InvalidCredentialsException;
-import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.service.EditoraService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,9 +28,9 @@ public class EditoraController {
 
 
     @PutMapping("/atualizar-editora/{id}")
-    public ResponseEntity<?> atualizarEditora(@PathVariable UUID id, @RequestBody AttEditoraRequestDTO dto) {
-        AttEditoraResponseDTO editoraAtualizada = editoraService.atualizar(id, dto);
-        return ResponseEntity.status(HttpStatus.CREATED)
+    public ResponseEntity<?> atualizarEditora(@PathVariable UUID id, @RequestBody UpdateEditoraRequestDTO dto) {
+        UpdateEditoraResponseDTO editoraAtualizada = editoraService.atualizar(id, dto);
+        return ResponseEntity.ok()
                 .body(new ResponseDTO<>(true, "Editora criada com sucesso", editoraAtualizada));
     }
 }

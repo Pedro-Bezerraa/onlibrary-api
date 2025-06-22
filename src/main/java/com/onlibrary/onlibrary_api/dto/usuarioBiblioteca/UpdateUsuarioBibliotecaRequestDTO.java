@@ -6,7 +6,7 @@ import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
 
 import java.util.UUID;
 
-public record AttUsuarioBibliotecaRequestDTO(
+public record UpdateUsuarioBibliotecaRequestDTO(
         @JsonProperty("fk_id_perfil_usuario") UUID perfilUsuarioId,
         @JsonProperty("tipo_usuario") TipoUsuario tipoUsuario,
         @JsonProperty("numero_matricula") String numeroMatricula,

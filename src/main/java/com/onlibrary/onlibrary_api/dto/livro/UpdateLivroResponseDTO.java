@@ -8,7 +8,7 @@ import com.onlibrary.onlibrary_api.dto.genero.GeneroResponseDTO;
 import java.util.List;
 import java.util.UUID;
 
-public record AttLivroResponseDTO(
+public record UpdateLivroResponseDTO(
         UUID id,
         String isbn,
         String titulo,

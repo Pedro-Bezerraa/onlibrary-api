@@ -1,6 +1,6 @@
 package com.onlibrary.onlibrary_api.service;
 
-import com.onlibrary.onlibrary_api.dto.exemplar.AttExemplarRequestDTO;
+import com.onlibrary.onlibrary_api.dto.exemplar.UpdateExemplarRequestDTO;
 import com.onlibrary.onlibrary_api.dto.exemplar.ExemplarRequestDTO;
 import com.onlibrary.onlibrary_api.dto.exemplar.ExemplarResponseDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
@@ -11,7 +11,7 @@ import com.onlibrary.onlibrary_api.model.enums.SituacaoExemplar;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoReserva;
 import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
 import com.onlibrary.onlibrary_api.repository.*;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -75,7 +75,7 @@ public class ExemplarService {
     }
 
     @Transactional
-    public ExemplarResponseDTO atualizarExemplar(UUID id, AttExemplarRequestDTO dto) {
+    public ExemplarResponseDTO atualizarExemplar(UUID id, UpdateExemplarRequestDTO dto) {
         Exemplar exemplar = exemplarRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Exemplar não encontrado."));
 

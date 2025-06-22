@@ -1,6 +1,7 @@
 package com.onlibrary.onlibrary_api.service;
 
 import com.onlibrary.onlibrary_api.dto.biblioteca.*;
+import com.onlibrary.onlibrary_api.exception.AuthenticationException;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Biblioteca;
@@ -12,7 +13,7 @@ import com.onlibrary.onlibrary_api.model.enums.SituacaoMulta;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoReserva;
 import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
 import com.onlibrary.onlibrary_api.repository.*;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +35,13 @@ public class BibliotecaService {
     private final EmprestimoRepository emprestimoRepository;
     private final MultaRepository multaRepository;
 
-    public UUID criarBiblioteca(BibliotecaRequestDTO dto, UUID idUsuarioCriador) {
+    public UUID criarBiblioteca(BibliotecaRequestDTO dto, String token) {
+        if (token == null || token.isBlank()) {
+            throw new AuthenticationException("Token ausente ou inválido");
+        }
+
+        UUID idUsuarioCriador = jwtService.extractIdForUser(token);
+
         Biblioteca biblioteca = new Biblioteca();
         biblioteca.setNome(dto.nome());
         biblioteca.setTelefone(dto.telefone());
@@ -74,7 +81,7 @@ public class BibliotecaService {
     }
 
     @Transactional
-    public AttBibliotecaResponseDTO atualizarBiblioteca(UUID idBiblioteca, AttBibliotecaRequestDTO dto) {
+    public UpdateBibliotecaResponseDTO atualizarBiblioteca(UUID idBiblioteca, UpdateBibliotecaRequestDTO dto) {
         Biblioteca biblioteca = bibliotecaRepository.findById(idBiblioteca)
                 .orElseThrow(() -> new ResourceNotFoundException("Biblioteca não encontrada"));
 
@@ -106,7 +113,7 @@ public class BibliotecaService {
 
         bibliotecaRepository.save(biblioteca);
 
-        return new AttBibliotecaResponseDTO(
+        return new UpdateBibliotecaResponseDTO(
                 biblioteca.getId(),
                 biblioteca.getNome(),
                 biblioteca.getTelefone(),
@@ -144,6 +151,10 @@ public class BibliotecaService {
     }
 
     public List<BibliotecaResponseDTO> listarBibliotecasAdminOuFuncionario(String token) {
+        if (token == null || token.isBlank()) {
+            throw new AuthenticationException("Token ausente ou inválido");
+        }
+
         UUID usuarioId = jwtService.extractIdForUser(token);
 
         List<TipoUsuario> tiposPermitidos = List.of(TipoUsuario.ADMIN, TipoUsuario.ADMIN_MASTER);

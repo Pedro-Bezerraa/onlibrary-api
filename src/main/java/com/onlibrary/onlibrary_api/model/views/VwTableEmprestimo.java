@@ -1,5 +1,6 @@
 package com.onlibrary.onlibrary_api.model.views;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class VwTableEmprestimo {
+
     @Column(name = "Username")
     private String username;
 
@@ -27,9 +29,11 @@ public class VwTableEmprestimo {
     private String bibliotecario;
 
     @Column(name = "Data de Emissão")
+    @JsonProperty("Data de Emissão")
     private String dataDeEmissao;
 
     @Column(name = "Data de Devolução")
+    @JsonProperty("Data de Devolução")
     private String dataDeDevolucao;
 
     @Column(name = "Situação")
@@ -37,6 +41,9 @@ public class VwTableEmprestimo {
 
     @Column(name = "fk_id_biblioteca")
     private UUID fkIdBiblioteca;
+
+    @Column(name = "fk_id_usuario")
+    private UUID fkIdUsuario;
 
     @Id
     private UUID id;

@@ -2,7 +2,7 @@ package com.onlibrary.onlibrary_api.dto.perfilUsuario;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record AttPerfilUsuarioRequestDTO(
+public record UpdatePerfilUsuarioRequestDTO(
         String nome,
         @JsonProperty("multa_padrao") Integer multaPadrao,
         @JsonProperty("prazo_devolucao_padrao") Integer prazoDevolucaoPadrao,

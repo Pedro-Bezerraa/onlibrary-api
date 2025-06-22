@@ -29,8 +29,8 @@ public class AuthController {
     }
 
     @PutMapping("/atualizar-usuario/{usuarioId}")
-    public ResponseEntity<?> atualizarUsuario(@PathVariable UUID usuarioId, @RequestBody AttUsuarioRequestDTO dto) {
-        AttUsuarioResponseDTO usuarioAtualizado = authService.atualizarUsuario(usuarioId, dto);
+    public ResponseEntity<?> atualizarUsuario(@PathVariable UUID usuarioId, @RequestBody UpdateUsuarioRequestDTO dto) {
+        UpdateUsuarioResponseDTO usuarioAtualizado = authService.atualizarUsuario(usuarioId, dto);
         return ResponseEntity.ok()
                 .body(new ResponseDTO<>(true, "Usuario atualizado com sucesso.", usuarioAtualizado));
     }

@@ -5,7 +5,7 @@ import com.onlibrary.onlibrary_api.model.enums.SituacaoEmprestimo;
 
 import java.time.LocalDate;
 
-public record AttEmprestimoRequestDTO(
+public record UpdateEmprestimoRequestDTO(
         SituacaoEmprestimo situacao,
         @JsonProperty("data_devolucao") LocalDate dataDevolucao
 ) {

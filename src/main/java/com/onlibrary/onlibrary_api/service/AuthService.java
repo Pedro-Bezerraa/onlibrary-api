@@ -7,7 +7,7 @@ import com.onlibrary.onlibrary_api.model.enums.ContaSituacao;
 import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
 import com.onlibrary.onlibrary_api.repository.UsuarioRepository;
 import com.onlibrary.onlibrary_api.security.UsuarioDetails;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -51,7 +51,7 @@ public class AuthService {
     }
 
     @Transactional
-    public AttUsuarioResponseDTO atualizarUsuario(UUID id, AttUsuarioRequestDTO dto) {
+    public UpdateUsuarioResponseDTO atualizarUsuario(UUID id, UpdateUsuarioRequestDTO dto) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
@@ -81,7 +81,7 @@ public class AuthService {
 
         Usuario atualizado = usuarioRepository.save(usuario);
 
-        return new AttUsuarioResponseDTO(
+        return new UpdateUsuarioResponseDTO(
                 atualizado.getNome(),
                 atualizado.getSobrenome(),
                 atualizado.getUsername(),

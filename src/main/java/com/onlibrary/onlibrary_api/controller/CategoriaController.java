@@ -1,12 +1,10 @@
 package com.onlibrary.onlibrary_api.controller;
 
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
-import com.onlibrary.onlibrary_api.dto.categoria.AttCategoriaRequestDTO;
-import com.onlibrary.onlibrary_api.dto.categoria.AttCategoriaResponseDTO;
+import com.onlibrary.onlibrary_api.dto.categoria.UpdateCategoriaRequestDTO;
+import com.onlibrary.onlibrary_api.dto.categoria.UpdateCategoriaResponseDTO;
 import com.onlibrary.onlibrary_api.dto.categoria.CategoriaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.categoria.CategoriaResponseDTO;
-import com.onlibrary.onlibrary_api.exception.InvalidCredentialsException;
-import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.service.CategoriaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,9 +28,9 @@ public class CategoriaController {
 
 
     @PutMapping("/atualizar-categoria/{id}")
-    public ResponseEntity<?> atualizarCategoria(@PathVariable UUID id, @RequestBody AttCategoriaRequestDTO dto) {
-        AttCategoriaResponseDTO categoriaAtualizado =categoriaService.atualizarCategoria(id, dto);
-        return ResponseEntity.status(HttpStatus.CREATED)
+    public ResponseEntity<?> atualizarCategoria(@PathVariable UUID id, @RequestBody UpdateCategoriaRequestDTO dto) {
+        UpdateCategoriaResponseDTO categoriaAtualizado =categoriaService.atualizarCategoria(id, dto);
+        return ResponseEntity.ok()
                 .body(new ResponseDTO<>(true, "Categoria atualizada com sucesso", categoriaAtualizado));
     }
 }

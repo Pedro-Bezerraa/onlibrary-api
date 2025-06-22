@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.UUID;
 
-public record AttLivroRequestDTO(
+public record UpdateLivroRequestDTO(
         String isbn,
         String titulo,
         String descricao,
