@@ -17,11 +17,11 @@ public class VwTableLivro {
     @Column(name = "Título")
     private String titulo;
 
+    @Column(name = "Ano de lançamento")
+    private Integer anoLancamento;
+
     @Column(name = "ISBN")
     private String isbn;
-
-    @Column(name = "Exemplares")
-    private Long exemplares;
 
     @Column(name = "Autores")
     private String autores;
@@ -36,6 +36,6 @@ public class VwTableLivro {
     private String editoras;
 
     @Id
-    @Column(name = "fk_id_biblioteca")
-    private UUID fkIdBiblioteca;
+    @Column(name = "id")
+    private UUID idLivro;
 }
