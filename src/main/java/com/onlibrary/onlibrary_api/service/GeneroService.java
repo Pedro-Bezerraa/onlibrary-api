@@ -5,7 +5,7 @@ import com.onlibrary.onlibrary_api.dto.genero.GeneroResponseDTO;
 import com.onlibrary.onlibrary_api.exception.ConflictException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Genero;
-import com.onlibrary.onlibrary_api.repository.GeneroRepository;
+import com.onlibrary.onlibrary_api.repository.entities.GeneroRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

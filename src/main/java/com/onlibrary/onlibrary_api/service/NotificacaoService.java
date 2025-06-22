@@ -3,7 +3,7 @@ package com.onlibrary.onlibrary_api.service;
 import com.onlibrary.onlibrary_api.model.entities.Notificacao;
 import com.onlibrary.onlibrary_api.model.entities.Usuario;
 import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
-import com.onlibrary.onlibrary_api.repository.NotificacaoRepository;
+import com.onlibrary.onlibrary_api.repository.entities.NotificacaoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

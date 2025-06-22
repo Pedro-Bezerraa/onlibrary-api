@@ -5,7 +5,7 @@ import com.onlibrary.onlibrary_api.exception.*;
 import com.onlibrary.onlibrary_api.model.entities.Usuario;
 import com.onlibrary.onlibrary_api.model.enums.ContaSituacao;
 import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
-import com.onlibrary.onlibrary_api.repository.UsuarioRepository;
+import com.onlibrary.onlibrary_api.repository.entities.UsuarioRepository;
 import com.onlibrary.onlibrary_api.security.UsuarioDetails;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;

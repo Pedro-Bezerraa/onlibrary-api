@@ -5,7 +5,7 @@ import com.onlibrary.onlibrary_api.dto.autor.AutorResponseDTO;
 import com.onlibrary.onlibrary_api.exception.ConflictException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Autor;
-import com.onlibrary.onlibrary_api.repository.AutorRepository;
+import com.onlibrary.onlibrary_api.repository.entities.AutorRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

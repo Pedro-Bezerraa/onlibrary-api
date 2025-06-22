@@ -14,28 +14,31 @@ import java.util.UUID;
 @Getter
 @Setter
 public class VwTableLivro {
-    @Column(name = "Título")
-    private String titulo;
-
-    @Column(name = "Ano de lançamento")
-    private Integer anoLancamento;
-
-    @Column(name = "ISBN")
-    private String isbn;
-
-    @Column(name = "Autores")
-    private String autores;
-
-    @Column(name = "Categorias")
-    private String categorias;
-
-    @Column(name = "Generos")
-    private String generos;
-
-    @Column(name = "Editoras")
-    private String editoras;
-
     @Id
     @Column(name = "id")
-    private UUID idLivro;
+    private UUID id;
+
+    @Column(name = "\"Título\"")
+    private String titulo;
+
+    @Column(name = "\"Ano de Lançamento\"")
+    private Integer anoLancamento;
+
+    @Column(name = "\"ISBN\"")
+    private String isbn;
+
+    @Column(name = "\"Descrição\"")
+    private String descricao;
+
+    @Column(name = "\"Autores\"")
+    private String autores;
+
+    @Column(name = "\"Categorias\"")
+    private String categorias;
+
+    @Column(name = "\"Generos\"")
+    private String generos;
+
+    @Column(name = "\"Editoras\"")
+    private String editoras;
 }

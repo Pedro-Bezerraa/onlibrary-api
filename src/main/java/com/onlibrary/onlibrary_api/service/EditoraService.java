@@ -7,7 +7,7 @@ import com.onlibrary.onlibrary_api.dto.editora.EditoraResponseDTO;
 import com.onlibrary.onlibrary_api.exception.ConflictException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Editora;
-import com.onlibrary.onlibrary_api.repository.EditoraRepository;
+import com.onlibrary.onlibrary_api.repository.entities.EditoraRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

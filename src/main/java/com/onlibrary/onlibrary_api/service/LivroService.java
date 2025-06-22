@@ -11,7 +11,7 @@ import com.onlibrary.onlibrary_api.dto.livro.LivroResponseDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.*;
-import com.onlibrary.onlibrary_api.repository.*;
+import com.onlibrary.onlibrary_api.repository.entities.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

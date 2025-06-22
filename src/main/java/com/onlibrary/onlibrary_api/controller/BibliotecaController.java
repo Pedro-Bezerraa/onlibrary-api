@@ -2,12 +2,10 @@ package com.onlibrary.onlibrary_api.controller;
 
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
 import com.onlibrary.onlibrary_api.dto.biblioteca.*;
-import com.onlibrary.onlibrary_api.exception.AuthenticationException;
 import com.onlibrary.onlibrary_api.model.views.VwTableEmprestimo;
-import com.onlibrary.onlibrary_api.repository.VwTableEmprestimoRepository;
+import com.onlibrary.onlibrary_api.repository.views.VwTableEmprestimoRepository;
 import com.onlibrary.onlibrary_api.service.BibliotecaService;
 import com.onlibrary.onlibrary_api.service.JwtService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

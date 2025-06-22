@@ -7,7 +7,7 @@ import com.onlibrary.onlibrary_api.dto.categoria.CategoriaResponseDTO;
 import com.onlibrary.onlibrary_api.exception.ConflictException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Categoria;
-import com.onlibrary.onlibrary_api.repository.CategoriaRepository;
+import com.onlibrary.onlibrary_api.repository.entities.CategoriaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

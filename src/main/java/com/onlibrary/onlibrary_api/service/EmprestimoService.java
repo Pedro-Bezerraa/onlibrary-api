@@ -7,7 +7,7 @@ import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.*;
 import com.onlibrary.onlibrary_api.model.enums.*;
-import com.onlibrary.onlibrary_api.repository.*;
+import com.onlibrary.onlibrary_api.repository.entities.*;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

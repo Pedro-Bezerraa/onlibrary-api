@@ -12,7 +12,7 @@ import com.onlibrary.onlibrary_api.model.enums.ContaSituacao;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoMulta;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoReserva;
 import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
-import com.onlibrary.onlibrary_api.repository.*;
+import com.onlibrary.onlibrary_api.repository.entities.*;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

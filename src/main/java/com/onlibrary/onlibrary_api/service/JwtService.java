@@ -1,7 +1,7 @@
 package com.onlibrary.onlibrary_api.service;
 
 import com.onlibrary.onlibrary_api.model.entities.Usuario;
-import com.onlibrary.onlibrary_api.repository.UsuarioRepository;
+import com.onlibrary.onlibrary_api.repository.entities.UsuarioRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
