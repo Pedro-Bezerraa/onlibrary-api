@@ -59,11 +59,16 @@ public class MultaService {
                 usuario.getId()
         );
 
+        var situacaoInfo = new MultaDependenciesDTO.LabelValue<>(
+                multa.getSituacao().toLower(),
+                multa.getSituacao().toLower()
+        );
+
         return new MultaDependenciesDTO(
                 multa.getValor(),
                 multa.getMotivo(),
                 multa.getDataVencimento(),
-                multa.getSituacao(),
+                situacaoInfo,
                 usuarioInfo
         );
     }

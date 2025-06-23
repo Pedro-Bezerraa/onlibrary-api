@@ -9,7 +9,7 @@ public record MultaDependenciesDTO(
         Integer valor,
         String motivo,
         LocalDate data_vencimento,
-        SituacaoMulta situacao,
+        LabelValue<String> situacao, // <-- CORREÇÃO: Alterado para LabelValue<String>
         LabelValue<UUID> usuarios_biblioteca
 ) {
     public record LabelValue<T>(String label, T value) {}

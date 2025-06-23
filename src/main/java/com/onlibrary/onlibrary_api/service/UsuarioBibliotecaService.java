@@ -75,20 +75,13 @@ public class UsuarioBibliotecaService {
                 usuarioBiblioteca.getPerfilUsuario().getId()
         );
 
-        List<UsuarioBibliotecaDependenciesDTO.LabelValue<UUID>> todosOsPerfis = perfilUsuarioRepository
-                .findByBibliotecaIdAndDeletadoFalse(usuarioBiblioteca.getBiblioteca().getId())
-                .stream()
-                .map(p -> new UsuarioBibliotecaDependenciesDTO.LabelValue<>(p.getNome(), p.getId()))
-                .toList();
-
         return new UsuarioBibliotecaDependenciesDTO(
                 usuarioBiblioteca.getNumeroMatricula(),
                 usuarioBiblioteca.getCpf(),
                 tipoUsuario,
                 situacao,
                 usuario,
-                perfilAtual,
-                todosOsPerfis
+                perfilAtual
         );
     }
 
