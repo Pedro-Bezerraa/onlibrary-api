@@ -64,12 +64,16 @@ public class AuthService {
 
         boolean isSelfUpdate = caller.getId().equals(target.getId());
 
-        if (dto.tipoUsuario() != null || dto.situacao() != null) {
-            TipoUsuario callerType = caller.getTipo();
-            TipoUsuario targetType = target.getTipo();
+        if (isSelfUpdate) {
+            if (dto.tipoUsuario() != null || dto.situacao() != null) {
+                throw new BusinessException("Você não pode alterar seu próprio tipo de usuário ou situação.");
+            }
+        } else {
+            TipoUsuario callerType = caller.getTipo() != null ? caller.getTipo() : TipoUsuario.COMUM;
+            TipoUsuario targetType = target.getTipo() != null ? target.getTipo() : TipoUsuario.COMUM;
 
-            if (callerType == null || callerType == TipoUsuario.COMUM) {
-                throw new BusinessException("Usuário comum não tem permissão para alterar tipo ou situação.");
+            if (callerType == TipoUsuario.COMUM) {
+                throw new BusinessException("Usuário comum não tem permissão para alterar outros usuários.");
             }
 
             if (callerType == TipoUsuario.ADMIN) {
@@ -77,17 +81,13 @@ public class AuthService {
                     throw new BusinessException("Administradores não podem alterar as permissões de outros administradores.");
                 }
             }
-        } else {
-            if (!isSelfUpdate) {
-                throw new BusinessException("Você só tem permissão para atualizar o seu próprio perfil.");
-            }
-        }
 
-        if (dto.tipoUsuario() != null) {
-            target.setTipo(dto.tipoUsuario());
-        }
-        if (dto.situacao() != null) {
-            target.setSituacao(dto.situacao());
+            if (dto.tipoUsuario() != null) {
+                target.setTipo(dto.tipoUsuario());
+            }
+            if (dto.situacao() != null) {
+                target.setSituacao(dto.situacao());
+            }
         }
 
         if (dto.username() != null && !dto.username().equals(target.getUsername())) {

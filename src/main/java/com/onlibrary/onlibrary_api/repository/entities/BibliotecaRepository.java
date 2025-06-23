@@ -8,5 +8,5 @@ import java.util.UUID;
 
 public interface BibliotecaRepository extends JpaRepository<Biblioteca, UUID> {
     Optional<Biblioteca> findByNome(String nome);
-
+    long countByDeletadoFalse();
 }

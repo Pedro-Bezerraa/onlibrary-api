@@ -51,6 +51,7 @@ public class DataService {
     private final ExemplarRepository exemplarRepository;
     private final ReservaRepository reservaRepository;
     private final UsuarioRepository usuarioRepository;
+    private final BibliotecaRepository bibliotecaRepository;
 
     public Object getGroupData(String type, UUID bibliotecaId) {
         switch (type.toLowerCase()) {
@@ -124,6 +125,9 @@ public class DataService {
         boolean aviso = false;
 
         switch (type.toLowerCase()) {
+            case "library":
+                quantidade = bibliotecaRepository.countByDeletadoFalse();
+                break;
             case "book":
                 quantidade = livroRepository.countByDeletadoFalse();
                 break;
