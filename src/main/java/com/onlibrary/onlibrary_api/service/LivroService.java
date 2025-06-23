@@ -1,5 +1,6 @@
 package com.onlibrary.onlibrary_api.service;
 
+import com.onlibrary.onlibrary_api.dto.livro.LivroHomePageSearchDTO;
 import com.onlibrary.onlibrary_api.dto.autor.AutorResponseDTO;
 import com.onlibrary.onlibrary_api.dto.categoria.CategoriaResponseDTO;
 import com.onlibrary.onlibrary_api.dto.editora.EditoraResponseDTO;
@@ -11,12 +12,19 @@ import com.onlibrary.onlibrary_api.dto.livro.LivroResponseDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.*;
+import com.onlibrary.onlibrary_api.model.views.VwBibliotecaReservaExemplar;
+import com.onlibrary.onlibrary_api.model.views.VwLivro;
+import com.onlibrary.onlibrary_api.model.views.VwTableBibliotecaLivro;
 import com.onlibrary.onlibrary_api.repository.entities.*;
+import com.onlibrary.onlibrary_api.repository.views.VwBibliotecaReservaExemplarRepository;
+import com.onlibrary.onlibrary_api.repository.views.VwLivroRepository;
+import com.onlibrary.onlibrary_api.repository.views.VwTableBibliotecaLivroRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -34,6 +42,47 @@ public class LivroService {
     private final LivroGeneroRepository livroGeneroRepository ;
     private final LivroEditoraRepository livroEditoraRepository ;
     private final SupabaseStorageService supabaseStorageService;
+    private final VwLivroRepository vwLivroRepository;
+    private final VwBibliotecaReservaExemplarRepository vwBibliotecaReservaExemplarRepository;
+    private final VwTableBibliotecaLivroRepository vwTableBibliotecaLivroRepository;
+
+    @Transactional(readOnly = true)
+    public List<VwTableBibliotecaLivro> searchLivrosInBiblioteca(String value, String filter, UUID bibliotecaId) {
+        if (value == null || value.trim().isEmpty()) {
+            return vwTableBibliotecaLivroRepository.findByFkIdBiblioteca(bibliotecaId);
+        }
+
+        return switch (filter.toLowerCase()) {
+            case "título" -> vwTableBibliotecaLivroRepository.searchByTituloInBiblioteca(bibliotecaId, value);
+            case "isbn" -> vwTableBibliotecaLivroRepository.searchByIsbnInBiblioteca(bibliotecaId, value);
+            case "todos" -> vwTableBibliotecaLivroRepository.searchByAllInBiblioteca(bibliotecaId, value);
+            default -> new ArrayList<>();
+        };
+    }
+
+    @Transactional(readOnly = true)
+    public List<LivroHomePageSearchDTO> searchLivrosHomePage(String value, String filter) {
+        if (value == null || value.trim().isEmpty()) {
+            return vwLivroRepository.findAllAsHomePageSearchDTO();
+        }
+
+        return switch (filter.toLowerCase()) {
+            case "título" -> vwLivroRepository.searchByTitulo(value);
+            case "todos" -> vwLivroRepository.searchByAll(value);
+            default -> new ArrayList<>();
+        };
+    }
+
+    @Transactional(readOnly = true)
+    public List<VwBibliotecaReservaExemplar> getBibliotecasForLivro(UUID livroId) {
+        return vwBibliotecaReservaExemplarRepository.findByFkIdLivro(livroId);
+    }
+
+    @Transactional(readOnly = true)
+    public VwLivro getLivroDetails(UUID livroId) {
+        return vwLivroRepository.findById(livroId)
+                .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado."));
+    }
 
     @Transactional
     public LivroResponseDTO criarLivro(LivroRequestDTO dto, MultipartFile imagem) {

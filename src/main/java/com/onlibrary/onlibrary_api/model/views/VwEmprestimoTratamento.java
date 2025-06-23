@@ -1,5 +1,6 @@
 package com.onlibrary.onlibrary_api.model.views;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -27,11 +28,14 @@ public class VwEmprestimoTratamento {
     private UUID idUsuario;
 
     @Column(name = "situacao")
+    @JsonProperty("Situação")
     private String situacao;
 
     @Column(name = "multar")
+    @JsonProperty("Multar")
     private Boolean multar;
 
     @Column(name = "bloquear")
+    @JsonProperty("Bloquear")
     private Boolean bloquear;
 }

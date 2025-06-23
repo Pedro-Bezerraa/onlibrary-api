@@ -1,5 +1,6 @@
 package com.onlibrary.onlibrary_api.service;
 
+import com.onlibrary.onlibrary_api.dto.perfilUsuario.PerfilDependenciesDTO;
 import com.onlibrary.onlibrary_api.dto.perfilUsuario.UpdatePerfilUsuarioRequestDTO;
 import com.onlibrary.onlibrary_api.dto.perfilUsuario.PerfilUsuarioRequestDTO;
 import com.onlibrary.onlibrary_api.dto.perfilUsuario.PerfilUsuarioResponseDTO;
@@ -8,12 +9,16 @@ import com.onlibrary.onlibrary_api.exception.ConflictException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Biblioteca;
 import com.onlibrary.onlibrary_api.model.entities.PerfilUsuario;
+import com.onlibrary.onlibrary_api.model.views.VwTabelaPerfilUsuario;
 import com.onlibrary.onlibrary_api.repository.entities.BibliotecaRepository;
 import com.onlibrary.onlibrary_api.repository.entities.PerfilUsuarioRepository;
+import com.onlibrary.onlibrary_api.repository.views.VwTabelaPerfilUsuarioRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -21,6 +26,7 @@ import java.util.UUID;
 public class PerfilService {
     private final PerfilUsuarioRepository perfilUsuarioRepository;
     private final BibliotecaRepository bibliotecaRepository;
+    private final VwTabelaPerfilUsuarioRepository vwTabelaPerfilUsuarioRepository;
 
     @Transactional
     public PerfilUsuarioResponseDTO criarPerfil(PerfilUsuarioRequestDTO dto) {
@@ -124,5 +130,37 @@ public class PerfilService {
 
         perfilUsuario.setDeletado(true);
         perfilUsuarioRepository.save(perfilUsuario);
+    }
+
+    @Transactional(readOnly = true)
+    public List<VwTabelaPerfilUsuario> searchPerfis(String value, String filter, UUID bibliotecaId) {
+        if (value == null || value.trim().isEmpty()) {
+            return vwTabelaPerfilUsuarioRepository.findByFkIdBiblioteca(bibliotecaId);
+        }
+
+        // Normalizando o filtro para corresponder aos nomes das colunas da view
+        String normalizedFilter = filter.toLowerCase().replace(" ", "_");
+
+        return switch (normalizedFilter) {
+            case "nome" -> vwTabelaPerfilUsuarioRepository.searchByNomeInBiblioteca(bibliotecaId, value);
+            case "valor_da_multa" -> vwTabelaPerfilUsuarioRepository.searchByValorDaMultaInBiblioteca(bibliotecaId, value);
+            case "prazo_de_devolução" -> vwTabelaPerfilUsuarioRepository.searchByPrazoDeDevolucaoInBiblioteca(bibliotecaId, value);
+            case "prazo_de_multa" -> vwTabelaPerfilUsuarioRepository.searchByPrazoDeMultaInBiblioteca(bibliotecaId, value);
+            case "todos" -> vwTabelaPerfilUsuarioRepository.searchByAllInBiblioteca(bibliotecaId, value);
+            default -> new ArrayList<>();
+        };
+    }
+
+    @Transactional(readOnly = true)
+    public PerfilDependenciesDTO getPerfilDependencies(UUID id) {
+        PerfilUsuario perfil = perfilUsuarioRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Perfil não encontrado."));
+
+        return new PerfilDependenciesDTO(
+                perfil.getNome(),
+                perfil.getMultaPadrao(),
+                perfil.getPrazoDevolucaoPadrao(),
+                perfil.getPrazoMultaPadrao()
+        );
     }
 }

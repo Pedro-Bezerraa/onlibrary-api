@@ -1,4 +1,6 @@
-package com.onlibrary.onlibrary_api.dto;
+package com.onlibrary.onlibrary_api.dto.livro;
+
+import com.onlibrary.onlibrary_api.dto.LabelValueDTO;
 
 import java.util.List;
 

@@ -1,5 +1,6 @@
 package com.onlibrary.onlibrary_api.model.views;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -21,6 +22,7 @@ public class VwUsuarioBiblioteca {
     private UUID usuarioBibliotecaId;
 
     @Column(name = "username")
+    @JsonProperty("Username")
     private String username;
 
     @Column(name = "fk_id_usuario")

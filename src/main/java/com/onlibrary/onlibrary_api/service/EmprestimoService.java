@@ -1,5 +1,6 @@
 package com.onlibrary.onlibrary_api.service;
 
+import com.onlibrary.onlibrary_api.dto.emprestimo.EmprestimoDependenciesDTO;
 import com.onlibrary.onlibrary_api.dto.emprestimo.UpdateEmprestimoRequestDTO;
 import com.onlibrary.onlibrary_api.dto.emprestimo.EmprestimoRequestDTO;
 import com.onlibrary.onlibrary_api.dto.emprestimo.EmprestimoResponseDTO;
@@ -7,7 +8,9 @@ import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.*;
 import com.onlibrary.onlibrary_api.model.enums.*;
+import com.onlibrary.onlibrary_api.model.views.VwTableEmprestimo;
 import com.onlibrary.onlibrary_api.repository.entities.*;
+import com.onlibrary.onlibrary_api.repository.views.VwTableEmprestimoRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +32,55 @@ public class EmprestimoService {
     private final UsuarioRepository usuarioRepository;
     private final BibliotecaRepository bibliotecaRepository;
     private final EmprestimoExemplarRepository emprestimoExemplarRepository;
+    private final VwTableEmprestimoRepository vwTableEmprestimoRepository;
+
+    @Transactional(readOnly = true)
+    public List<VwTableEmprestimo> searchEmprestimos(String value, String filter, UUID bibliotecaId) {
+        if (value == null || value.trim().isEmpty()) {
+            return vwTableEmprestimoRepository.findByFkIdBiblioteca(bibliotecaId);
+        }
+
+        return switch (filter.toLowerCase()) {
+            case "username" -> vwTableEmprestimoRepository.searchByUsernameInBiblioteca(bibliotecaId, value);
+            case "todos" -> vwTableEmprestimoRepository.searchByAllInBiblioteca(bibliotecaId, value);
+            default -> new ArrayList<>();
+        };
+    }
+
+    @Transactional(readOnly = true)
+    public EmprestimoDependenciesDTO getEmprestimoDependencies(UUID emprestimoId) {
+        Emprestimo emprestimo = emprestimoRepository.findById(emprestimoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Empréstimo não encontrado."));
+
+        var situacao = new EmprestimoDependenciesDTO.LabelValue<>(
+                emprestimo.getSituacao().toLower(),
+                emprestimo.getSituacao().toLower()
+        );
+
+        var usuarioBiblioteca = new EmprestimoDependenciesDTO.LabelValue<>(
+                emprestimo.getUsuarioBiblioteca().getUsuario().getUsername(),
+                emprestimo.getUsuarioBiblioteca().getId()
+        );
+
+        List<EmprestimoDependenciesDTO.LabelValue<UUID>> exemplaresEmprestados = emprestimo.getExemplares().stream()
+                .map(emprestimoExemplar -> new EmprestimoDependenciesDTO.LabelValue<>(
+                        emprestimoExemplar.getExemplar().getNumeroTombo(),
+                        emprestimoExemplar.getExemplar().getId()
+                ))
+                .collect(Collectors.toList());
+
+        return new EmprestimoDependenciesDTO(
+                situacao,
+                emprestimo.getDataDevolucao(),
+                exemplaresEmprestados,
+                usuarioBiblioteca
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public List<VwTableEmprestimo> getEmprestimosByUsuario(UUID usuarioId) {
+        return vwTableEmprestimoRepository.findByFkIdUsuario(usuarioId);
+    }
 
     @Transactional
     public EmprestimoResponseDTO criarEmprestimo(EmprestimoRequestDTO dto) {

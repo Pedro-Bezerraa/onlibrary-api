@@ -1,6 +1,7 @@
 package com.onlibrary.onlibrary_api.service;
 
 import com.onlibrary.onlibrary_api.dto.usuarioBiblioteca.UpdateUsuarioBibliotecaRequestDTO;
+import com.onlibrary.onlibrary_api.dto.usuarioBiblioteca.UsuarioBibliotecaDependenciesDTO;
 import com.onlibrary.onlibrary_api.dto.usuarioBiblioteca.UsuarioBibliotecaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.usuarioBiblioteca.UsuarioBibliotecaResponseDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
@@ -12,11 +13,14 @@ import com.onlibrary.onlibrary_api.model.entities.UsuarioBiblioteca;
 import com.onlibrary.onlibrary_api.model.enums.ContaSituacao;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoMulta;
 import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
+import com.onlibrary.onlibrary_api.model.views.VwTabelaUsuarioBiblioteca;
 import com.onlibrary.onlibrary_api.repository.entities.*;
+import com.onlibrary.onlibrary_api.repository.views.VwTabelaUsuarioBibliotecaRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,6 +33,64 @@ public class UsuarioBibliotecaService {
     private final PerfilUsuarioRepository perfilUsuarioRepository;
     private final NotificacaoService notificacaoService;
     private final MultaRepository multaRepository;
+    private final VwTabelaUsuarioBibliotecaRepository vwTabelaUsuarioBibliotecaRepository;
+
+    @Transactional(readOnly = true)
+    public List<VwTabelaUsuarioBiblioteca> searchUsuariosInBiblioteca(String value, String filter, UUID bibliotecaId) {
+        if (value == null || value.trim().isEmpty()) {
+            return vwTabelaUsuarioBibliotecaRepository.findByFkIdBiblioteca(bibliotecaId);
+        }
+
+        return switch (filter.toLowerCase()) {
+            case "username" -> vwTabelaUsuarioBibliotecaRepository.searchByUsernameInBiblioteca(bibliotecaId, value);
+            case "nome" -> vwTabelaUsuarioBibliotecaRepository.searchByNomeInBiblioteca(bibliotecaId, value);
+            case "perfil" -> vwTabelaUsuarioBibliotecaRepository.searchByPerfilInBiblioteca(bibliotecaId, value);
+            case "todos" -> vwTabelaUsuarioBibliotecaRepository.searchByAllInBiblioteca(bibliotecaId, value);
+            default -> new ArrayList<>();
+        };
+    }
+
+    @Transactional(readOnly = true)
+    public UsuarioBibliotecaDependenciesDTO getUsuarioBibliotecaDependencies(UUID id) {
+        UsuarioBiblioteca usuarioBiblioteca = usuarioBibliotecaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Relação Usuário-Biblioteca não encontrada."));
+
+        var tipoUsuario = new UsuarioBibliotecaDependenciesDTO.LabelValue<>(
+                usuarioBiblioteca.getTipoUsuario().toLower(),
+                usuarioBiblioteca.getTipoUsuario().toLower()
+        );
+
+        var situacao = new UsuarioBibliotecaDependenciesDTO.LabelValue<>(
+                usuarioBiblioteca.getSituacao().toLower(),
+                usuarioBiblioteca.getSituacao().toLower()
+        );
+
+        var usuario = new UsuarioBibliotecaDependenciesDTO.LabelValue<>(
+                usuarioBiblioteca.getUsuario().getUsername(),
+                "" // Conforme solicitado, o valor para o usuário é vazio
+        );
+
+        var perfilAtual = new UsuarioBibliotecaDependenciesDTO.LabelValue<>(
+                usuarioBiblioteca.getPerfilUsuario().getNome(),
+                usuarioBiblioteca.getPerfilUsuario().getId()
+        );
+
+        List<UsuarioBibliotecaDependenciesDTO.LabelValue<UUID>> todosOsPerfis = perfilUsuarioRepository
+                .findByBibliotecaIdAndDeletadoFalse(usuarioBiblioteca.getBiblioteca().getId())
+                .stream()
+                .map(p -> new UsuarioBibliotecaDependenciesDTO.LabelValue<>(p.getNome(), p.getId()))
+                .toList();
+
+        return new UsuarioBibliotecaDependenciesDTO(
+                usuarioBiblioteca.getNumeroMatricula(),
+                usuarioBiblioteca.getCpf(),
+                tipoUsuario,
+                situacao,
+                usuario,
+                perfilAtual,
+                todosOsPerfis
+        );
+    }
 
     @Transactional
     public UsuarioBibliotecaResponseDTO criarUsuarioBiblioteca(UsuarioBibliotecaRequestDTO dto) {

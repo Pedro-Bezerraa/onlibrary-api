@@ -1,11 +1,15 @@
 package com.onlibrary.onlibrary_api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.onlibrary.onlibrary_api.dto.livro.LivroHomePageSearchDTO;
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
 import com.onlibrary.onlibrary_api.dto.livro.UpdateLivroRequestDTO;
 import com.onlibrary.onlibrary_api.dto.livro.UpdateLivroResponseDTO;
 import com.onlibrary.onlibrary_api.dto.livro.LivroRequestDTO;
 import com.onlibrary.onlibrary_api.dto.livro.LivroResponseDTO;
+import com.onlibrary.onlibrary_api.model.views.VwBibliotecaReservaExemplar;
+import com.onlibrary.onlibrary_api.model.views.VwLivro;
+import com.onlibrary.onlibrary_api.model.views.VwTableBibliotecaLivro;
 import com.onlibrary.onlibrary_api.service.LivroService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -43,5 +48,34 @@ public class LivroController {
         UpdateLivroResponseDTO response = livroService.atualizarLivro(id, dto, imagem);
         return ResponseEntity.ok()
                 .body(new ResponseDTO<>(true, "Livro atualizado com sucesso.", response));
+    }
+
+    @GetMapping("/search/biblioteca")
+    public ResponseEntity<ResponseDTO<List<VwTableBibliotecaLivro>>> searchInBiblioteca(
+            @RequestParam("id_biblioteca") UUID bibliotecaId,
+            @RequestParam(required = false) String value,
+            @RequestParam(defaultValue = "todos") String filter) {
+        List<VwTableBibliotecaLivro> result = livroService.searchLivrosInBiblioteca(value, filter, bibliotecaId);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Pesquisa de livros na biblioteca realizada com sucesso.", result));
+    }
+
+    @GetMapping("/search/home")
+    public ResponseEntity<ResponseDTO<List<LivroHomePageSearchDTO>>> searchInHomePage(
+            @RequestParam(required = false) String value,
+            @RequestParam(defaultValue = "todos") String filter) {
+        List<LivroHomePageSearchDTO> result = livroService.searchLivrosHomePage(value, filter);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Pesquisa de livros realizada com sucesso.", result));
+    }
+
+    @GetMapping("/{livroId}/libraries")
+    public ResponseEntity<ResponseDTO<List<VwBibliotecaReservaExemplar>>> getBibliotecasForLivro(@PathVariable UUID livroId) {
+        List<VwBibliotecaReservaExemplar> result = livroService.getBibliotecasForLivro(livroId);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Bibliotecas para o livro recuperadas com sucesso.", result));
+    }
+
+    @GetMapping("/{livroId}/details")
+    public ResponseEntity<ResponseDTO<VwLivro>> getLivroDetails(@PathVariable UUID livroId) {
+        VwLivro result = livroService.getLivroDetails(livroId);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Detalhes do livro recuperados com sucesso.", result));
     }
 }

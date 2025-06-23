@@ -1,8 +1,9 @@
 package com.onlibrary.onlibrary_api.controller;
 
+import com.onlibrary.onlibrary_api.dto.biblioteca.BibliotecaDependenciesDTO;
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
 import com.onlibrary.onlibrary_api.dto.biblioteca.*;
-import com.onlibrary.onlibrary_api.model.views.VwTableEmprestimo;
+import com.onlibrary.onlibrary_api.model.views.VwTableBiblioteca;
 import com.onlibrary.onlibrary_api.repository.views.VwTableEmprestimoRepository;
 import com.onlibrary.onlibrary_api.service.BibliotecaService;
 import com.onlibrary.onlibrary_api.service.JwtService;
@@ -70,8 +71,17 @@ public class BibliotecaController {
         return ResponseEntity.ok(response);
     }
 
-@GetMapping("/get")
-    public List<VwTableEmprestimo> litarView() {
-        return vwTableEmprestimoRepository.findByDataDevolucaoHoje();
+    @GetMapping("/search")
+    public ResponseEntity<ResponseDTO<List<VwTableBiblioteca>>> searchBibliotecas(
+            @RequestParam(required = false) String value,
+            @RequestParam(defaultValue = "todos") String filter) {
+        List<VwTableBiblioteca> result = bibliotecaService.searchBibliotecas(value, filter);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Pesquisa de bibliotecas realizada com sucesso.", result));
+    }
+
+    @GetMapping("/dependencies/{id}")
+    public ResponseEntity<ResponseDTO<BibliotecaDependenciesDTO>> getBibliotecaDependencies(@PathVariable UUID id) {
+        BibliotecaDependenciesDTO dependencies = bibliotecaService.getBibliotecaDependencies(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Dependências da biblioteca recuperadas com sucesso.", dependencies));
     }
 }

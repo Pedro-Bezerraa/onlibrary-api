@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum SituacaoEmprestimo {
     CONCLUIDO,
     PENDENTE,
+    VENCIDO,
     CANCELADO;
 
     @JsonValue

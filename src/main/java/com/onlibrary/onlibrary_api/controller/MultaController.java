@@ -1,16 +1,19 @@
 package com.onlibrary.onlibrary_api.controller;
 
+import com.onlibrary.onlibrary_api.dto.multa.MultaDependenciesDTO;
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
 import com.onlibrary.onlibrary_api.dto.multa.UpdateMultaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.multa.UpdateMultaResponseDTO;
 import com.onlibrary.onlibrary_api.dto.multa.MultaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.multa.MultaResponseDTO;
+import com.onlibrary.onlibrary_api.model.views.VwTableMulta;
 import com.onlibrary.onlibrary_api.service.MultaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -18,7 +21,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MultaController {
     private final MultaService multaService;
-
 
     @PostMapping("/criar-multa")
     public ResponseEntity<?> criarMulta(
@@ -42,5 +44,26 @@ public class MultaController {
     public ResponseEntity<ResponseDTO<Void>> deletarMulta(@PathVariable UUID id) {
         multaService.deletarMulta(id);
         return ResponseEntity.ok(new ResponseDTO<>(true, "Multa marcada como deletada com sucesso.", null));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ResponseDTO<List<VwTableMulta>>> searchMultas(
+            @RequestParam(required = false) String value,
+            @RequestParam(defaultValue = "todos") String filter,
+            @RequestParam("id_biblioteca") UUID bibliotecaId) {
+        List<VwTableMulta> result = multaService.searchMultas(value, filter, bibliotecaId);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Pesquisa de multas realizada com sucesso.", result));
+    }
+
+    @GetMapping("/dependencies/{id}")
+    public ResponseEntity<ResponseDTO<MultaDependenciesDTO>> getMultaDependencies(@PathVariable UUID id) {
+        MultaDependenciesDTO dependencies = multaService.getMultaDependencies(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Dependências da multa recuperadas com sucesso.", dependencies));
+    }
+
+    @GetMapping("/user/{usuarioId}")
+    public ResponseEntity<ResponseDTO<List<VwTableMulta>>> getMultasByUser(@PathVariable UUID usuarioId) {
+        List<VwTableMulta> multas = multaService.getMultasByUsuario(usuarioId);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Multas do usuário recuperadas com sucesso.", multas));
     }
 }

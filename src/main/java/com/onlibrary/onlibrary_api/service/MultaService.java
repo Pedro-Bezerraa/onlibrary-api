@@ -1,5 +1,6 @@
 package com.onlibrary.onlibrary_api.service;
 
+import com.onlibrary.onlibrary_api.dto.multa.MultaDependenciesDTO;
 import com.onlibrary.onlibrary_api.dto.multa.UpdateMultaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.multa.UpdateMultaResponseDTO;
 import com.onlibrary.onlibrary_api.dto.multa.MultaRequestDTO;
@@ -8,15 +9,19 @@ import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.*;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoMulta;
+import com.onlibrary.onlibrary_api.model.views.VwTableMulta;
 import com.onlibrary.onlibrary_api.repository.entities.BibliotecaRepository;
 import com.onlibrary.onlibrary_api.repository.entities.MultaRepository;
 import com.onlibrary.onlibrary_api.repository.entities.UsuarioBibliotecaRepository;
 import com.onlibrary.onlibrary_api.repository.entities.UsuarioRepository;
+import com.onlibrary.onlibrary_api.repository.views.VwTableMultaRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -27,6 +32,52 @@ public class MultaService {
     private final UsuarioBibliotecaRepository usuarioBibliotecaRepository;
     private final BibliotecaRepository bibliotecaRepository;
     private final NotificacaoService notificacaoService;
+    private final VwTableMultaRepository vwTableMultaRepository;
+
+    @Transactional(readOnly = true)
+    public List<VwTableMulta> searchMultas(String value, String filter, UUID bibliotecaId) {
+        if (value == null || value.trim().isEmpty()) {
+            return vwTableMultaRepository.findByFkIdBiblioteca(bibliotecaId);
+        }
+
+        return switch (filter.toLowerCase()) {
+            case "username" -> vwTableMultaRepository.searchByUsernameInBiblioteca(bibliotecaId, value);
+            case "situação" -> vwTableMultaRepository.searchBySituacaoInBiblioteca(bibliotecaId, value);
+            case "todos" -> vwTableMultaRepository.searchByAllInBiblioteca(bibliotecaId, value);
+            default -> new ArrayList<>();
+        };
+    }
+
+    @Transactional(readOnly = true)
+    public MultaDependenciesDTO getMultaDependencies(UUID id) {
+        Multa multa = multaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Multa não encontrada."));
+
+        Usuario usuario = multa.getUsuario();
+//
+//        var situacao = new MultaDependenciesDTO.LabelValue<>(
+//                multa.getSituacao().toLower(),
+//                multa.getSituacao().toLower()
+//        );
+
+        var usuarioInfo = new MultaDependenciesDTO.LabelValue<>(
+                usuario.getUsername(),
+                usuario.getId()
+        );
+
+        return new MultaDependenciesDTO(
+                multa.getValor(),
+                multa.getMotivo(),
+                multa.getDataVencimento(),
+                multa.getSituacao(),
+                usuarioInfo
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public List<VwTableMulta> getMultasByUsuario(UUID usuarioId) {
+        return vwTableMultaRepository.findByFkIdUsuario(usuarioId);
+    }
 
     public MultaResponseDTO cadastrarMulta(MultaRequestDTO dto) {
         Usuario usuario = usuarioRepository.findById(dto.usuarioId())

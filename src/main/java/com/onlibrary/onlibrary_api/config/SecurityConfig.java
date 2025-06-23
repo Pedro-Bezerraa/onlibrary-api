@@ -54,7 +54,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         req -> req
                                 .requestMatchers("/api/auth/**").permitAll()
-//                                .requestMatchers("/api/bibliotecas/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(

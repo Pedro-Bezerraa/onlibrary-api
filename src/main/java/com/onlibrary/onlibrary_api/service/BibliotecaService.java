@@ -1,5 +1,6 @@
 package com.onlibrary.onlibrary_api.service;
 
+import com.onlibrary.onlibrary_api.dto.biblioteca.BibliotecaDependenciesDTO;
 import com.onlibrary.onlibrary_api.dto.biblioteca.*;
 import com.onlibrary.onlibrary_api.exception.AuthenticationException;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
@@ -12,11 +13,14 @@ import com.onlibrary.onlibrary_api.model.enums.ContaSituacao;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoMulta;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoReserva;
 import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
+import com.onlibrary.onlibrary_api.model.views.VwTableBiblioteca;
 import com.onlibrary.onlibrary_api.repository.entities.*;
+import com.onlibrary.onlibrary_api.repository.views.VwTableBibliotecaRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,6 +38,7 @@ public class BibliotecaService {
     private final ReservaRepository reservaRepository;
     private final EmprestimoRepository emprestimoRepository;
     private final MultaRepository multaRepository;
+    private final VwTableBibliotecaRepository vwTableBibliotecaRepository;
 
     public UUID criarBiblioteca(BibliotecaRequestDTO dto, String token) {
         if (token == null || token.isBlank()) {
@@ -65,6 +70,8 @@ public class BibliotecaService {
 
         Usuario usuario = usuarioRepository.findById(idUsuarioCriador)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        usuario.setTipo(TipoUsuario.ADMIN_MASTER);
 
         UsuarioBiblioteca usuarioBiblioteca = new UsuarioBiblioteca();
         usuarioBiblioteca.setBiblioteca(biblioteca);
@@ -191,5 +198,54 @@ public class BibliotecaService {
                 throw new IllegalArgumentException("Tipo inválido: " + type);
         }
         return new ContagemResponseDTO(quantidade, aviso);
+    }
+
+    @Transactional(readOnly = true)
+    public List<VwTableBiblioteca> searchBibliotecas(String value, String filter) {
+        if (value == null || value.trim().isEmpty()) {
+            return vwTableBibliotecaRepository.findAll();
+        }
+
+        return switch (filter.toLowerCase()) {
+            case "nome" -> vwTableBibliotecaRepository.searchByNome(value);
+            case "telefone" -> vwTableBibliotecaRepository.searchByTelefone(value);
+            case "rua" -> vwTableBibliotecaRepository.searchByRua(value);
+            case "número" -> vwTableBibliotecaRepository.searchByNumero(value);
+            case "cep" -> vwTableBibliotecaRepository.searchByCep(value);
+            case "todos" -> vwTableBibliotecaRepository.searchByAll(value);
+            default -> new ArrayList<>();
+        };
+    }
+
+    @Transactional(readOnly = true)
+    public BibliotecaDependenciesDTO getBibliotecaDependencies(UUID id) {
+        Biblioteca biblioteca = bibliotecaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Biblioteca não encontrada."));
+
+        var aplicacaoMulta = new BibliotecaDependenciesDTO.BooleanLabelValue(
+                biblioteca.getAplicacaoMulta() ? "Habilitar" : "Desabilitar",
+                biblioteca.getAplicacaoMulta()
+        );
+
+        var reservaOnline = new BibliotecaDependenciesDTO.BooleanLabelValue(
+                biblioteca.getReservaOnline() ? "Habilitar" : "Desabilitar",
+                biblioteca.getReservaOnline()
+        );
+
+        var aplicacaoBloqueio = new BibliotecaDependenciesDTO.BooleanLabelValue(
+                biblioteca.getAplicacaoBloqueio() ? "Habilitar" : "Desabilitar",
+                biblioteca.getAplicacaoBloqueio()
+        );
+
+        return new BibliotecaDependenciesDTO(
+                biblioteca.getNome(),
+                biblioteca.getTelefone(),
+                biblioteca.getRua(),
+                biblioteca.getNumero(),
+                biblioteca.getCep(),
+                aplicacaoMulta,
+                reservaOnline,
+                aplicacaoBloqueio
+        );
     }
 }

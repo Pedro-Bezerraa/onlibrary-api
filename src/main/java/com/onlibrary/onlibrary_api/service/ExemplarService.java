@@ -1,5 +1,7 @@
 package com.onlibrary.onlibrary_api.service;
 
+import com.onlibrary.onlibrary_api.dto.LabelValueDTO;
+import com.onlibrary.onlibrary_api.dto.exemplar.ExemplarDependenciesDTO;
 import com.onlibrary.onlibrary_api.dto.exemplar.UpdateExemplarRequestDTO;
 import com.onlibrary.onlibrary_api.dto.exemplar.ExemplarRequestDTO;
 import com.onlibrary.onlibrary_api.dto.exemplar.ExemplarResponseDTO;
@@ -10,14 +12,18 @@ import com.onlibrary.onlibrary_api.model.enums.SituacaoEmprestimo;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoExemplar;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoReserva;
 import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
+import com.onlibrary.onlibrary_api.model.views.VwTableExemplar;
 import com.onlibrary.onlibrary_api.repository.entities.*;
+import com.onlibrary.onlibrary_api.repository.views.VwTableExemplarRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +36,63 @@ public class ExemplarService {
     private final BibliotecaLivroRepository bibliotecaLivroRepository;
     private final NotificacaoService notificacaoService;
     private final EmprestimoRepository emprestimoRepository;
+    private final VwTableExemplarRepository vwTableExemplarRepository; // Adicionar
+
+    @Transactional(readOnly = true)
+    public List<VwTableExemplar> searchExemplares(String value, String filter, UUID bibliotecaId) {
+        if (value == null || value.trim().isEmpty()) {
+            return vwTableExemplarRepository.findByFkIdBiblioteca(bibliotecaId);
+        }
+
+        String normalizedFilter = filter.toLowerCase().replace(" ", "_");
+
+        return switch (normalizedFilter) {
+            case "titulo" -> vwTableExemplarRepository.searchByTituloInBiblioteca(bibliotecaId, value);
+            case "número_tombo" -> vwTableExemplarRepository.searchByNumeroTomboInBiblioteca(bibliotecaId, value);
+            case "situação" -> vwTableExemplarRepository.searchBySituacaoInBiblioteca(bibliotecaId, value);
+            case "todos" -> vwTableExemplarRepository.searchByAllInBiblioteca(bibliotecaId, value);
+            default -> new ArrayList<>();
+        };
+    }
+
+    @Transactional(readOnly = true)
+    public ExemplarDependenciesDTO getExemplarDependencies(UUID exemplarId, UUID bibliotecaId) {
+        Exemplar exemplar = exemplarRepository.findById(exemplarId)
+                .orElseThrow(() -> new ResourceNotFoundException("Exemplar não encontrado."));
+
+        var situacao = new ExemplarDependenciesDTO.LabelValue<>(
+                exemplar.getSituacao().toLower(),
+                exemplar.getSituacao().toLower()
+        );
+
+        var livroAtual = new LabelValueDTO(
+                exemplar.getLivro().getTitulo(),
+                exemplar.getLivro().getId()
+        );
+
+        List<LabelValueDTO> todosOsLivrosDaBiblioteca = bibliotecaLivroRepository.findWithLivroByBibliotecaId(bibliotecaId)
+                .stream()
+                .map(bibliotecaLivro -> new LabelValueDTO(
+                        bibliotecaLivro.getLivro().getTitulo(),
+                        bibliotecaLivro.getLivro().getId()
+                ))
+                .collect(Collectors.toList());
+
+        return new ExemplarDependenciesDTO(
+                exemplar.getNumeroTombo(),
+                situacao,
+                livroAtual,
+                exemplar.getSetor(),
+                exemplar.getPrateleira(),
+                exemplar.getEstante(),
+                todosOsLivrosDaBiblioteca
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public List<SituacaoExemplar> getExemplarSituacoes(UUID bibliotecaId, UUID livroId) {
+        return exemplarRepository.findSituacoesByBibliotecaIdAndLivroId(bibliotecaId, livroId);
+    }
 
     @Transactional
     public ExemplarResponseDTO criarExemplar(ExemplarRequestDTO dto) {

@@ -1,5 +1,6 @@
 package com.onlibrary.onlibrary_api.model.views;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -21,24 +22,31 @@ public class VwTableBibliotecaLivro {
     private UUID id;
 
     @Column(name = "\"Título\"")
+    @JsonProperty("Título")
     private String titulo;
 
     @Column(name = "\"ISBN\"")
+    @JsonProperty("ISBN")
     private String isbn;
 
     @Column(name = "\"Exemplares\"")
+    @JsonProperty("Exemplares")
     private Long exemplares;
 
     @Column(name = "\"Autores\"")
+    @JsonProperty("Autores")
     private String autores;
 
     @Column(name = "\"Categorias\"")
+    @JsonProperty("Categorias")
     private String categorias;
 
     @Column(name = "\"Generos\"")
+    @JsonProperty("Gêneros")
     private String generos;
 
     @Column(name = "\"Editoras\"")
+    @JsonProperty("Editoras")
     private String editoras;
 
     @Column(name = "fk_id_biblioteca")

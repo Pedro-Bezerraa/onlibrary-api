@@ -47,13 +47,21 @@ public class Usuario {
     private List<Notificacao> notificacoes;
 
     @OneToMany(mappedBy = "usuario")
+    @JsonIgnore // Adicionado para evitar loops
     private List<UsuarioBiblioteca> usuarioBibliotecas;
 
     @OneToMany(mappedBy = "usuario")
+    @JsonIgnore // Adicionado para evitar loops
     private List<Reserva> reservas;
 
     @OneToMany(mappedBy = "usuario")
+    @JsonIgnore // Adicionado para evitar loops
     private List<Multa> multas;
+
+    // Relacionamento inverso que faltava
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Contato> contatos;
 
     public Usuario(UUID id, String nome, String email, String senha, String username) {
         this.id = id;

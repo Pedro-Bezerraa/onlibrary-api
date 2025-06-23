@@ -1,9 +1,7 @@
 package com.onlibrary.onlibrary_api.service;
 
-import com.onlibrary.onlibrary_api.dto.reserva.UpdateReservaRequestDTO;
-import com.onlibrary.onlibrary_api.dto.reserva.UpdateReservaResponseDTO;
-import com.onlibrary.onlibrary_api.dto.reserva.ReservaRequestDTO;
-import com.onlibrary.onlibrary_api.dto.reserva.ReservaResponseDTO;
+import com.onlibrary.onlibrary_api.dto.LabelValueDTO;
+import com.onlibrary.onlibrary_api.dto.reserva.*;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.*;
@@ -11,7 +9,9 @@ import com.onlibrary.onlibrary_api.model.enums.ContaSituacao;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoExemplar;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoReserva;
 import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
+import com.onlibrary.onlibrary_api.model.views.VwTableReserva;
 import com.onlibrary.onlibrary_api.repository.entities.*;
+import com.onlibrary.onlibrary_api.repository.views.VwTableReservaRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +34,67 @@ public class ReservaService {
     private final BibliotecaRepository bibliotecaRepository;
     private final UsuarioRepository usuarioRepository;
     private final UsuarioBibliotecaRepository usuarioBibliotecaRepository;
+    private final VwTableReservaRepository vwTableReservaRepository; // Adicionar
+    private final BibliotecaLivroRepository bibliotecaLivroRepository; // Adicionar
+
+    @Transactional(readOnly = true)
+    public List<VwTableReserva> searchReservas(String value, String filter, UUID bibliotecaId) {
+        if (value == null || value.trim().isEmpty()) {
+            return vwTableReservaRepository.findByFkIdBiblioteca(bibliotecaId);
+        }
+
+        return switch (filter.toLowerCase()) {
+            case "username" -> vwTableReservaRepository.searchByUsernameInBiblioteca(bibliotecaId, value);
+            case "todos" -> vwTableReservaRepository.searchByAllInBiblioteca(bibliotecaId, value);
+            default -> new ArrayList<>();
+        };
+    }
+
+    @Transactional(readOnly = true)
+    public ReservaDependenciesDTO getReservaDependencies(UUID reservaId) {
+        Reserva reserva = reservaRepository.findById(reservaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Reserva não encontrada."));
+
+        var situacao = new ReservaDependenciesDTO.LabelValue<>(
+                reserva.getSituacao().toLower(),
+                reserva.getSituacao().toLower()
+        );
+
+        var usuario = new LabelValueDTO(
+                reserva.getUsuario().getUsername(),
+                reserva.getUsuario().getId()
+        );
+
+        var livro = new LabelValueDTO(
+                reserva.getLivro().getTitulo(),
+                reserva.getLivro().getId()
+        );
+
+        List<LabelValueDTO> allUsers = usuarioRepository.findByDeletadoFalse()
+                .stream()
+                .map(u -> new LabelValueDTO(u.getUsername(), u.getId()))
+                .collect(Collectors.toList());
+
+        List<LabelValueDTO> allBooks = bibliotecaLivroRepository.findWithLivroByBibliotecaId(reserva.getBiblioteca().getId())
+                .stream()
+                .map(bl -> new LabelValueDTO(bl.getLivro().getTitulo(), bl.getLivro().getId()))
+                .collect(Collectors.toList());
+
+        return new ReservaDependenciesDTO(
+                reserva.getQuantidadeTotal(),
+                situacao,
+                reserva.getDataRetirada(),
+                usuario,
+                livro,
+                allUsers,
+                allBooks
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public List<VwTableReserva> getReservasByUsuario(UUID usuarioId) {
+        return vwTableReservaRepository.findByFkIdUsuario(usuarioId);
+    }
 
 
     @Transactional

@@ -1,8 +1,8 @@
 package com.onlibrary.onlibrary_api.service;
 
-import com.onlibrary.onlibrary_api.dto.BookDependenciesDTO;
+import com.onlibrary.onlibrary_api.dto.livro.BookDependenciesDTO;
 import com.onlibrary.onlibrary_api.dto.LabelValueDTO;
-import com.onlibrary.onlibrary_api.dto.LibraryUserDependenciesDTO;
+import com.onlibrary.onlibrary_api.dto.biblioteca.LibraryUserDependenciesDTO;
 import com.onlibrary.onlibrary_api.dto.biblioteca.ContagemResponseDTO;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Usuario;
