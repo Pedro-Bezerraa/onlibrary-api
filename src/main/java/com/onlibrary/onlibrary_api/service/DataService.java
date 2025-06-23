@@ -108,9 +108,10 @@ public class DataService {
 
             case "amerce": {
                 if (bibliotecaId == null) throw new IllegalArgumentException("id_biblioteca é obrigatório");
-                return usuarioBibliotecaRepository.findCommonAndActiveUsersByBibliotecaId(bibliotecaId).stream()
+                var usuarios = usuarioBibliotecaRepository.findCommonAndActiveUsersByBibliotecaId(bibliotecaId).stream()
                         .map(ub -> new LabelValueDTO(ub.getUsuario().getUsername(), ub.getUsuario().getId()))
                         .collect(Collectors.toList());
+                return java.util.Map.of("usuarios_biblioteca", usuarios);
             }
 
             default:
