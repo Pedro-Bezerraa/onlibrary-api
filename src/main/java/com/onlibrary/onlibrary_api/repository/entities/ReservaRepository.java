@@ -2,6 +2,7 @@ package com.onlibrary.onlibrary_api.repository.entities;
 
 import com.onlibrary.onlibrary_api.model.entities.*;
 import com.onlibrary.onlibrary_api.model.enums.SituacaoReserva;
+import com.onlibrary.onlibrary_api.model.enums.TipoReserva;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -31,4 +32,12 @@ public interface ReservaRepository extends JpaRepository<Reserva, UUID> {
     boolean hasPendingEmprestimosByReservaId(@Param("reservaId") UUID reservaId);
 
     boolean existsByBibliotecaIdAndSituacao(UUID idBiblioteca, SituacaoReserva situacao);
+
+    long countByBibliotecaIdAndDeletadoIsFalse(UUID bibliotecaId);
+
+    long countByBibliotecaIdAndTipoAndDeletadoIsFalse(UUID bibliotecaId, TipoReserva tipo);
+
+    boolean existsByBibliotecaIdAndSituacaoIn(UUID bibliotecaId, List<SituacaoReserva> situacoes);
+
+    boolean existsByBibliotecaIdAndTipoAndSituacaoIn(UUID bibliotecaId, TipoReserva tipo, List<SituacaoReserva> situacoes);
 }

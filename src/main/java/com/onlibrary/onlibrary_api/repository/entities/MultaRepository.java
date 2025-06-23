@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 public interface MultaRepository extends JpaRepository<Multa, UUID> {
@@ -15,4 +16,7 @@ public interface MultaRepository extends JpaRepository<Multa, UUID> {
     boolean existsByBibliotecaIdAndSituacao(UUID idBiblioteca, SituacaoMulta situacao);
     boolean existsByUsuarioIdAndBibliotecaIdAndSituacao(UUID usuarioId, UUID bibliotecaId, SituacaoMulta situacao);
 
+    long countByBibliotecaIdAndDeletadoFalse(UUID bibliotecaId);
+
+    boolean existsByBibliotecaIdAndSituacaoAndDataVencimentoBefore(UUID bibliotecaId, SituacaoMulta situacao, LocalDate data);
 }

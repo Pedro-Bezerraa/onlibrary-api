@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,4 +32,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
 
     @Query("SELECT COUNT(ub) > 0 FROM UsuarioBiblioteca ub JOIN ub.biblioteca b WHERE ub.usuario.id = :usuarioId AND ub.tipoUsuario = 'ADMIN_MASTER' AND b.deletado = false")
     boolean isAdminMasterOfAnyBiblioteca(@Param("usuarioId") UUID usuarioId);
+
+    @Query("SELECT u FROM Usuario u WHERE u.deletado = false AND u.id NOT IN (SELECT ub.usuario.id FROM UsuarioBiblioteca ub WHERE ub.biblioteca.id = :bibliotecaId)")
+    List<Usuario> findUsersNotInLibrary(@Param("bibliotecaId") UUID bibliotecaId);
+
+    List<Usuario> findByDeletadoFalse();
 }

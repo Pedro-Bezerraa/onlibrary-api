@@ -11,5 +11,6 @@ import java.util.UUID;
 
 public interface ExemplarRepository extends JpaRepository<Exemplar, UUID> {
     List<Exemplar> findByLivroAndBibliotecaAndSituacao(Livro livro, Biblioteca biblioteca, SituacaoExemplar situacao);
-
+    long countByBibliotecaIdAndDeletadoFalse(UUID bibliotecaId);
+    List<Exemplar> findByBibliotecaIdAndSituacaoInAndDeletadoFalse(UUID bibliotecaId, List<SituacaoExemplar> situacoes);
 }

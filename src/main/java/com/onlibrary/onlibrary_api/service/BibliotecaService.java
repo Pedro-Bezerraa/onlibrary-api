@@ -184,7 +184,7 @@ public class BibliotecaService {
 
         switch (type.toLowerCase()) {
             case "livro":
-                quantidade = bibliotecaLivroRepository.countByBibliotecaId(bibliotecaId);
+                quantidade = bibliotecaLivroRepository.countByBibliotecaIdAndDeletadoFalse(bibliotecaId);
                 break;
 
             default:

@@ -51,35 +51,70 @@ public class AuthService {
     }
 
     @Transactional
-    public UpdateUsuarioResponseDTO atualizarUsuario(UUID id, UpdateUsuarioRequestDTO dto) {
-        Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+    public UpdateUsuarioResponseDTO atualizarUsuario(UUID targetUserId, UpdateUsuarioRequestDTO dto) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof UsuarioDetails callerDetails)) {
+            throw new AuthenticationException("Usuário chamador não autenticado.");
+        }
+        Usuario caller = usuarioRepository.findById(callerDetails.getId())
+                .orElseThrow(() -> new AuthenticationException("Usuário chamador não encontrado no banco de dados."));
 
-        if (dto.username() != null && !dto.username().equals(usuario.getUsername())) {
-            if (usuarioRepository.existsByUsernameAndIdNot(dto.username(), id)) {
+        Usuario target = usuarioRepository.findById(targetUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário alvo da atualização não encontrado."));
+
+        boolean isSelfUpdate = caller.getId().equals(target.getId());
+
+        if (dto.tipoUsuario() != null || dto.situacao() != null) {
+            TipoUsuario callerType = caller.getTipo();
+            TipoUsuario targetType = target.getTipo();
+
+            if (callerType == null || callerType == TipoUsuario.COMUM) {
+                throw new BusinessException("Usuário comum não tem permissão para alterar tipo ou situação.");
+            }
+
+            if (callerType == TipoUsuario.ADMIN) {
+                if (targetType == TipoUsuario.ADMIN || targetType == TipoUsuario.ADMIN_MASTER) {
+                    throw new BusinessException("Administradores não podem alterar as permissões de outros administradores.");
+                }
+            }
+        } else {
+            if (!isSelfUpdate) {
+                throw new BusinessException("Você só tem permissão para atualizar o seu próprio perfil.");
+            }
+        }
+
+        if (dto.tipoUsuario() != null) {
+            target.setTipo(dto.tipoUsuario());
+        }
+        if (dto.situacao() != null) {
+            target.setSituacao(dto.situacao());
+        }
+
+        if (dto.username() != null && !dto.username().equals(target.getUsername())) {
+            if (usuarioRepository.existsByUsernameAndIdNot(dto.username(), targetUserId)) {
                 throw new ConflictException("Nome de usuário já em uso.");
             }
-            usuario.setUsername(dto.username());
+            target.setUsername(dto.username());
         }
 
-        if (dto.email() != null && !dto.email().equals(usuario.getEmail())) {
-            if (usuarioRepository.existsByEmailAndIdNot(dto.email(), id)) {
+        if (dto.email() != null && !dto.email().equals(target.getEmail())) {
+            if (usuarioRepository.existsByEmailAndIdNot(dto.email(), targetUserId)) {
                 throw new ConflictException("Email já em uso.");
             }
-            usuario.setEmail(dto.email());
+            target.setEmail(dto.email());
         }
 
-        if (dto.cpf() != null && !dto.cpf().equals(usuario.getCpf())) {
-            if (usuarioRepository.existsByCpfAndIdNot(dto.cpf(), id)) {
+        if (dto.cpf() != null && !dto.cpf().equals(target.getCpf())) {
+            if (usuarioRepository.existsByCpfAndIdNot(dto.cpf(), targetUserId)) {
                 throw new ConflictException("CPF já em uso.");
             }
-            usuario.setCpf(dto.cpf());
+            target.setCpf(dto.cpf());
         }
 
-        if (dto.nome() != null) usuario.setNome(dto.nome());
-        if (dto.sobrenome() != null) usuario.setSobrenome(dto.sobrenome());
+        if (dto.nome() != null) target.setNome(dto.nome());
+        if (dto.sobrenome() != null) target.setSobrenome(dto.sobrenome());
 
-        Usuario atualizado = usuarioRepository.save(usuario);
+        Usuario atualizado = usuarioRepository.save(target);
 
         return new UpdateUsuarioResponseDTO(
                 atualizado.getNome(),

@@ -37,7 +37,10 @@ public class Reserva {
     @JoinColumn(name = "fk_id_bibliotecario", nullable = true)
     private Usuario bibliotecario;
 
+    @Column(name = "data_emissao")
     private LocalDate dataEmissao;
+
+    @Column(name = "data_retirada")
     private LocalDate dataRetirada;
 
     @Enumerated(EnumType.STRING)

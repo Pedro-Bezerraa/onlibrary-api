@@ -2,6 +2,7 @@ package com.onlibrary.onlibrary_api.model.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.onlibrary.onlibrary_api.model.enums.ContaSituacao;
+import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,6 +38,9 @@ public class Usuario {
 
     @Column(unique = true)
     private String username;
+
+    @Enumerated(EnumType.STRING)
+    private TipoUsuario tipo;
 
     @OneToMany(mappedBy = "usuario")
     @JsonIgnore

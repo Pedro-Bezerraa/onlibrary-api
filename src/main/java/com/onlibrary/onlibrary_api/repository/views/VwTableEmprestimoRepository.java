@@ -13,4 +13,6 @@ public interface VwTableEmprestimoRepository extends JpaRepository<VwTableEmpres
 
     @Query(value = "SELECT * FROM \"vw_table_emprestimo\" WHERE \"Data de Devolução\" = TO_CHAR(current_date, 'DD/MM/YYYY')", nativeQuery = true)
     List<VwTableEmprestimo> findByDataDevolucaoHoje();
+
+    List<VwTableEmprestimo> findByFkIdBiblioteca(UUID fkIdBiblioteca);
 }
