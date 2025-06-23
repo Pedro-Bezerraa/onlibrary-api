@@ -22,7 +22,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/biblioteca")
 @RequiredArgsConstructor
-@Slf4j
 public class BibliotecaController {
     private final BibliotecaService bibliotecaService;
     private final JwtService jwtService;

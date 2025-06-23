@@ -13,8 +13,12 @@ import java.util.UUID;
 public class SupabaseStorageService {
 
     private final String bucket = "onlibrarybucket";
-    private final String storageUrl = "https://wtrxmsmkatrnenkhanra.supabase.co";
-    private final String apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0cnhtc21rYXRybmVua2hhbnJhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MTAyNDI2NSwiZXhwIjoyMDU2NjAwMjY1fQ.KiinPauEINJT59M0UzMkpznZOWsFApW-NRfuzrKZ5Jc";
+
+    @Value("${supabase.storage.url}")
+    private String storageUrl;
+
+    @Value("${supabase.storage.apikey}")
+    private String apiKey;
 
     private final WebClient webClient;
 

@@ -313,28 +313,10 @@ public class EmprestimoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Empréstimo não encontrado."));
 
         if (emprestimo.getSituacao() == SituacaoEmprestimo.PENDENTE) {
-//            notificacaoService.notificarUsuario(
-//                    emprestimo.getBibliotecario(),
-//                    "Não foi possível excluir o empréstimo",
-//                    "O empréstimo do livro '" + emprestimo.getExemplares().get(0).getExemplar().getLivro().getTitulo() +
-//                            "' para o usuário '" + emprestimo.getUsuarioBiblioteca().getUsuario().getUsername() +
-//                            "' na biblioteca '" + emprestimo.getBiblioteca().getNome() +
-//                            "' não pode ser excluído pois está com status PENDENTE.",
-//                    TipoUsuario.ADMIN
-//            );
             throw new BusinessException("Não é possível excluir um empréstimo pendente.");
         }
 
         emprestimo.setDeletado(true);
         emprestimoRepository.save(emprestimo);
-
-//        notificacaoService.notificarUsuario(
-//                emprestimo.getUsuarioBiblioteca().getUsuario(),
-//                "Empréstimo arquivado",
-//                "Seu empréstimo do livro '" + emprestimo.getExemplares().get(0).getExemplar().getLivro().getTitulo() +
-//                        "' na biblioteca '" + emprestimo.getBiblioteca().getNome() +
-//                        "' foi arquivado do sistema. Não há mais pendências associadas a ele.",
-//                TipoUsuario.COMUM
-//        );
     }
 }

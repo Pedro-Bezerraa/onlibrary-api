@@ -20,7 +20,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/exemplar")
 @RequiredArgsConstructor
-@Slf4j
 public class ExemplarController {
     private final ExemplarService exemplarService;
 
