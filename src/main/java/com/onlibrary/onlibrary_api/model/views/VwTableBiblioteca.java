@@ -31,7 +31,7 @@ public class VwTableBiblioteca {
     private String rua;
 
     @Column(name = "\"Número\"")
-    private String numero;
+    private Integer numero;
 
     @Column(name = "\"Cep\"")
     private String cep;

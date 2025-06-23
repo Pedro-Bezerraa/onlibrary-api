@@ -8,7 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Immutable;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -37,11 +38,11 @@ public class VwReservaEmprestimoExemplar {
     private String situacao;
 
     @Column(name = "data_emissao")
-    private LocalDateTime dataEmissao;
+    private LocalDate dataEmissao;
 
     @Column(name = "quantidade_total")
-    private Integer quantidadeTotal;
+    private BigDecimal quantidadeTotal;
 
     @Column(name = "quantidade_pendente")
-    private Integer quantidadePendente;
+    private BigDecimal quantidadePendente;
 }

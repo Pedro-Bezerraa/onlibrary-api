@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Immutable;
 
+import java.util.UUID;
+
 @Entity
 @Immutable
 @Table(name = "vw_table_autor")
@@ -16,7 +18,7 @@ import org.hibernate.annotations.Immutable;
 public class VwTableAutor {
     @Id
     @Column(name = "id")
-    private Long id;
+    private UUID id;
 
     @Column(name = "\"Nome\"")
     private String nome;

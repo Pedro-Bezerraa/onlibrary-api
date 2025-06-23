@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Immutable;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -42,10 +43,10 @@ public class VwTableReserva {
     private String tipo;
 
     @Column(name = "\"Quantidade Total\"")
-    private Integer quantidadeTotal;
+    private BigDecimal quantidadeTotal;
 
     @Column(name = "\"Quantidade Pendente\"")
-    private Integer quantidadePendente;
+    private BigDecimal quantidadePendente;
 
     @Column(name = "fk_id_biblioteca")
     private UUID fkIdBiblioteca;
