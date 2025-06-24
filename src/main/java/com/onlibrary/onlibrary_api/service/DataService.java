@@ -137,14 +137,30 @@ public class DataService {
             case "author":
                 quantidade = autorRepository.countByDeletadoFalse();
                 break;
+            case "library_author":
+                if (bibliotecaId == null) throw new IllegalArgumentException("id_biblioteca é obrigatório para o tipo 'library_author'");
+                quantidade = autorRepository.countByBibliotecaId(bibliotecaId);
+                break;
             case "category":
                 quantidade = categoriaRepository.countByDeletadoFalse();
+                break;
+            case "library_category":
+                if (bibliotecaId == null) throw new IllegalArgumentException("id_biblioteca é obrigatório para o tipo 'library_category'");
+                quantidade = categoriaRepository.countByBibliotecaId(bibliotecaId);
                 break;
             case "gender":
                 quantidade = generoRepository.countByDeletadoFalse();
                 break;
+            case "library_gender":
+                if (bibliotecaId == null) throw new IllegalArgumentException("id_biblioteca é obrigatório para o tipo 'library_gender'");
+                quantidade = generoRepository.countByBibliotecaId(bibliotecaId);
+                break;
             case "publisher":
                 quantidade = editoraRepository.countByDeletadoFalse();
+                break;
+            case "library_publisher":
+                if (bibliotecaId == null) throw new IllegalArgumentException("id_biblioteca é obrigatório para o tipo 'library_publisher'");
+                quantidade = editoraRepository.countByBibliotecaId(bibliotecaId);
                 break;
             case "account":
                 quantidade = perfilUsuarioRepository.countByBibliotecaIdAndDeletadoFalse(bibliotecaId);
