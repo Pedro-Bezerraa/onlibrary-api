@@ -7,8 +7,8 @@ import java.util.UUID;
 public record EmprestimoDependenciesDTO(
         LabelValue<String> situacao,
         LocalDate data_devolucao,
-        List<LabelValue<UUID>> exemplares_emprestimo,
-        LabelValue<UUID> usuario_emprestimo
+        List<LabelValue<UUID>> exemplares_biblioteca,
+        LabelValue<UUID> usuarios_biblioteca
 ) {
     public record LabelValue<T>(String label, T value) {}
 }

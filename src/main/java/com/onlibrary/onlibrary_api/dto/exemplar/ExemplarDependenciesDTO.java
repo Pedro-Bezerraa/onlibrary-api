@@ -8,7 +8,7 @@ import java.util.List;
 public record ExemplarDependenciesDTO(
         String numero_tombo,
         LabelValue<String> situacao,
-        LabelValueDTO livro_atual,
+        LabelValueDTO livros_biblioteca,
         String setor,
         String prateleira,
         String estante,

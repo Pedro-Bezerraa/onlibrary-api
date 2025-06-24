@@ -10,9 +10,8 @@ public record UsuarioBibliotecaDependenciesDTO(
         String cpf,
         LabelValue<String> tipo_usuario,
         LabelValue<String> situacao,
-        @JsonProperty("usuarios") LabelValue<String> usuario, // <-- CORREÇÃO: Renomeado para "usuarios"
-        @JsonProperty("perfis_biblioteca") LabelValue<UUID> perfil_atual// <-- CORREÇÃO: Renomeado para "perfis_biblioteca"
-        // O campo 'todos_os_perfis_da_biblioteca' foi removido
+        @JsonProperty("usuarios") LabelValue<String> usuario,
+        @JsonProperty("perfis_biblioteca") LabelValue<UUID> perfil_atual
 ) {
     public record LabelValue<T>(String label, T value) {}
 }
