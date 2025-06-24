@@ -44,7 +44,10 @@ public class UsuarioBibliotecaService {
         return switch (filter.toLowerCase()) {
             case "username" -> vwTabelaUsuarioBibliotecaRepository.searchByUsernameInBiblioteca(bibliotecaId, value);
             case "nome" -> vwTabelaUsuarioBibliotecaRepository.searchByNomeInBiblioteca(bibliotecaId, value);
+            case "email" -> vwTabelaUsuarioBibliotecaRepository.searchByEmailInBiblioteca(bibliotecaId, value);
+            case "cpf" -> vwTabelaUsuarioBibliotecaRepository.searchByCpfInBiblioteca(bibliotecaId, value);
             case "perfil" -> vwTabelaUsuarioBibliotecaRepository.searchByPerfilInBiblioteca(bibliotecaId, value);
+            case "situação" -> vwTabelaUsuarioBibliotecaRepository.searchBySituacaoInBiblioteca(bibliotecaId, value);
             case "todos" -> vwTabelaUsuarioBibliotecaRepository.searchByAllInBiblioteca(bibliotecaId, value);
             default -> new ArrayList<>();
         };

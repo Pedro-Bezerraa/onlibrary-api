@@ -14,7 +14,6 @@ public interface VwTableReservaRepository extends JpaRepository<VwTableReserva, 
 
     List<VwTableReserva> findByFkIdUsuario(UUID fkIdUsuario);
 
-    // Métodos para a rota de busca (Search)
     @Query(value = "SELECT * FROM vw_table_reserva v WHERE v.fk_id_biblioteca = :bibliotecaId AND (" +
             "LOWER(v.\"Username\") ILIKE LOWER(CONCAT('%', :value, '%')) OR " +
             "LOWER(v.\"Livro\") ILIKE LOWER(CONCAT('%', :value, '%')) OR " +
@@ -29,4 +28,16 @@ public interface VwTableReservaRepository extends JpaRepository<VwTableReserva, 
     @Query(value = "SELECT * FROM vw_table_reserva v WHERE v.fk_id_biblioteca = :bibliotecaId AND " +
             "LOWER(v.\"Username\") ILIKE LOWER(CONCAT('%', :value, '%'))", nativeQuery = true)
     List<VwTableReserva> searchByUsernameInBiblioteca(@Param("bibliotecaId") UUID bibliotecaId, @Param("value") String value);
+
+    @Query(value = "SELECT * FROM vw_table_reserva v WHERE v.fk_id_biblioteca = :bibliotecaId AND " +
+            "LOWER(v.\"Livro\") ILIKE LOWER(CONCAT('%', :value, '%'))", nativeQuery = true)
+    List<VwTableReserva> searchByLivroInBiblioteca(@Param("bibliotecaId") UUID bibliotecaId, @Param("value") String value);
+
+    @Query(value = "SELECT * FROM vw_table_reserva v WHERE v.fk_id_biblioteca = :bibliotecaId AND " +
+            "LOWER(v.\"Situação\") ILIKE LOWER(CONCAT('%', :value, '%'))", nativeQuery = true)
+    List<VwTableReserva> searchBySituacaoInBiblioteca(@Param("bibliotecaId") UUID bibliotecaId, @Param("value") String value);
+
+    @Query(value = "SELECT * FROM vw_table_reserva v WHERE v.fk_id_biblioteca = :bibliotecaId AND " +
+            "LOWER(v.tipo) ILIKE LOWER(CONCAT('%', :value, '%'))", nativeQuery = true)
+    List<VwTableReserva> searchByTipoInBiblioteca(@Param("bibliotecaId") UUID bibliotecaId, @Param("value") String value);
 }

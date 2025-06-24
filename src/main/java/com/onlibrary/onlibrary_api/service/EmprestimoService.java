@@ -42,6 +42,11 @@ public class EmprestimoService {
 
         return switch (filter.toLowerCase()) {
             case "username" -> vwTableEmprestimoRepository.searchByUsernameInBiblioteca(bibliotecaId, value);
+            case "livros" -> vwTableEmprestimoRepository.searchByLivrosInBiblioteca(bibliotecaId, value);
+            case "exemplares" -> vwTableEmprestimoRepository.searchByExemplaresInBiblioteca(bibliotecaId, value);
+            case "bibliotecário" -> vwTableEmprestimoRepository.searchByBibliotecarioInBiblioteca(bibliotecaId, value);
+            case "data de devolução" -> vwTableEmprestimoRepository.searchByDataDevolucaoInBiblioteca(bibliotecaId, value);
+            case "situação" -> vwTableEmprestimoRepository.searchBySituacaoInBiblioteca(bibliotecaId, value);
             case "todos" -> vwTableEmprestimoRepository.searchByAllInBiblioteca(bibliotecaId, value);
             default -> new ArrayList<>();
         };

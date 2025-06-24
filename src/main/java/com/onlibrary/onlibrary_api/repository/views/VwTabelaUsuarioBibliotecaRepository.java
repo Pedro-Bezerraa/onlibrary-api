@@ -32,4 +32,16 @@ public interface VwTabelaUsuarioBibliotecaRepository extends JpaRepository<VwTab
     @Query(value = "SELECT * FROM vw_table_usuario_biblioteca v WHERE v.fk_id_biblioteca = :bibliotecaId AND " +
             "LOWER(v.perfil) ILIKE LOWER(CONCAT('%', :value, '%'))", nativeQuery = true)
     List<VwTabelaUsuarioBiblioteca> searchByPerfilInBiblioteca(@Param("bibliotecaId") UUID bibliotecaId, @Param("value") String value);
+
+    @Query(value = "SELECT * FROM vw_table_usuario_biblioteca v WHERE v.fk_id_biblioteca = :bibliotecaId AND " +
+            "LOWER(v.email) ILIKE LOWER(CONCAT('%', :value, '%'))", nativeQuery = true)
+    List<VwTabelaUsuarioBiblioteca> searchByEmailInBiblioteca(@Param("bibliotecaId") UUID bibliotecaId, @Param("value") String value);
+
+    @Query(value = "SELECT * FROM vw_table_usuario_biblioteca v WHERE v.fk_id_biblioteca = :bibliotecaId AND " +
+            "LOWER(v.cpf) ILIKE LOWER(CONCAT('%', :value, '%'))", nativeQuery = true)
+    List<VwTabelaUsuarioBiblioteca> searchByCpfInBiblioteca(@Param("bibliotecaId") UUID bibliotecaId, @Param("value") String value);
+
+    @Query(value = "SELECT * FROM vw_table_usuario_biblioteca v WHERE v.fk_id_biblioteca = :bibliotecaId AND " +
+            "LOWER(v.situacao) ILIKE LOWER(CONCAT('%', :value, '%'))", nativeQuery = true)
+    List<VwTabelaUsuarioBiblioteca> searchBySituacaoInBiblioteca(@Param("bibliotecaId") UUID bibliotecaId, @Param("value") String value);
 }

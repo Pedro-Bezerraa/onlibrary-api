@@ -68,6 +68,11 @@ public class LivroService {
 
         return switch (filter.toLowerCase()) {
             case "título" -> vwLivroRepository.searchByTitulo(value);
+            case "isbn" -> vwLivroRepository.searchByIsbn(value);
+            case "autore" -> vwLivroRepository.searchByAutores(value);
+            case "categoria" -> vwLivroRepository.searchByCategorias(value);
+            case "genero" -> vwLivroRepository.searchByGeneros(value);
+            case "editora" -> vwLivroRepository.searchByEditoras(value);
             case "todos" -> vwLivroRepository.searchByAll(value);
             default -> new ArrayList<>();
         };

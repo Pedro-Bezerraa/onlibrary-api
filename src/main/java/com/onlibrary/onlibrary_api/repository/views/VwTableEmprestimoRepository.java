@@ -34,4 +34,24 @@ public interface VwTableEmprestimoRepository extends JpaRepository<VwTableEmpres
     @Query(value = "SELECT * FROM vw_table_emprestimo v WHERE v.fk_id_biblioteca = :bibliotecaId AND " +
             "LOWER(v.\"Username\") ILIKE LOWER(CONCAT('%', :value, '%'))", nativeQuery = true)
     List<VwTableEmprestimo> searchByUsernameInBiblioteca(@Param("bibliotecaId") UUID bibliotecaId, @Param("value") String value);
+
+    @Query(value = "SELECT * FROM vw_table_emprestimo v WHERE v.fk_id_biblioteca = :bibliotecaId AND " +
+            "LOWER(v.\"Livros\") ILIKE LOWER(CONCAT('%', :value, '%'))", nativeQuery = true)
+    List<VwTableEmprestimo> searchByLivrosInBiblioteca(@Param("bibliotecaId") UUID bibliotecaId, @Param("value") String value);
+
+    @Query(value = "SELECT * FROM vw_table_emprestimo v WHERE v.fk_id_biblioteca = :bibliotecaId AND " +
+            "LOWER(v.\"Exemplares\") ILIKE LOWER(CONCAT('%', :value, '%'))", nativeQuery = true)
+    List<VwTableEmprestimo> searchByExemplaresInBiblioteca(@Param("bibliotecaId") UUID bibliotecaId, @Param("value") String value);
+
+    @Query(value = "SELECT * FROM vw_table_emprestimo v WHERE v.fk_id_biblioteca = :bibliotecaId AND " +
+            "LOWER(v.\"Bibliotecario\") ILIKE LOWER(CONCAT('%', :value, '%'))", nativeQuery = true)
+    List<VwTableEmprestimo> searchByBibliotecarioInBiblioteca(@Param("bibliotecaId") UUID bibliotecaId, @Param("value") String value);
+
+    @Query(value = "SELECT * FROM vw_table_emprestimo v WHERE v.fk_id_biblioteca = :bibliotecaId AND " +
+            "LOWER(v.\"Data de Devolução\") ILIKE LOWER(CONCAT('%', :value, '%'))", nativeQuery = true)
+    List<VwTableEmprestimo> searchByDataDevolucaoInBiblioteca(@Param("bibliotecaId") UUID bibliotecaId, @Param("value") String value);
+
+    @Query(value = "SELECT * FROM vw_table_emprestimo v WHERE v.fk_id_biblioteca = :bibliotecaId AND " +
+            "LOWER(v.\"Situação\") ILIKE LOWER(CONCAT('%', :value, '%'))", nativeQuery = true)
+    List<VwTableEmprestimo> searchBySituacaoInBiblioteca(@Param("bibliotecaId") UUID bibliotecaId, @Param("value") String value);
 }

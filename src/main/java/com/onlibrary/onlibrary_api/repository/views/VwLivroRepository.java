@@ -26,4 +26,24 @@ public interface VwLivroRepository extends JpaRepository<VwLivro, UUID> {
 
     @Query("SELECT new com.onlibrary.onlibrary_api.dto.livro.LivroHomePageSearchDTO(v.id, v.titulo, v.capa) FROM VwLivro v")
     List<LivroHomePageSearchDTO> findAllAsHomePageSearchDTO();
+
+    @Query("SELECT new com.onlibrary.onlibrary_api.dto.livro.LivroHomePageSearchDTO(v.id, v.titulo, v.capa) FROM VwLivro v " +
+            "WHERE LOWER(v.isbn) ILIKE LOWER(CONCAT('%', :value, '%'))")
+    List<LivroHomePageSearchDTO> searchByIsbn(@Param("value") String value);
+
+    @Query("SELECT new com.onlibrary.onlibrary_api.dto.livro.LivroHomePageSearchDTO(v.id, v.titulo, v.capa) FROM VwLivro v " +
+            "WHERE LOWER(v.autores) ILIKE LOWER(CONCAT('%', :value, '%'))")
+    List<LivroHomePageSearchDTO> searchByAutores(@Param("value") String value);
+
+    @Query("SELECT new com.onlibrary.onlibrary_api.dto.livro.LivroHomePageSearchDTO(v.id, v.titulo, v.capa) FROM VwLivro v " +
+            "WHERE LOWER(v.categorias) ILIKE LOWER(CONCAT('%', :value, '%'))")
+    List<LivroHomePageSearchDTO> searchByCategorias(@Param("value") String value);
+
+    @Query("SELECT new com.onlibrary.onlibrary_api.dto.livro.LivroHomePageSearchDTO(v.id, v.titulo, v.capa) FROM VwLivro v " +
+            "WHERE LOWER(v.generos) ILIKE LOWER(CONCAT('%', :value, '%'))")
+    List<LivroHomePageSearchDTO> searchByGeneros(@Param("value") String value);
+
+    @Query("SELECT new com.onlibrary.onlibrary_api.dto.livro.LivroHomePageSearchDTO(v.id, v.titulo, v.capa) FROM VwLivro v " +
+            "WHERE LOWER(v.editoras) ILIKE LOWER(CONCAT('%', :value, '%'))")
+    List<LivroHomePageSearchDTO> searchByEditoras(@Param("value") String value);
 }
