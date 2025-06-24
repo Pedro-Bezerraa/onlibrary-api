@@ -34,6 +34,18 @@ public interface VwTableReservaRepository extends JpaRepository<VwTableReserva, 
     List<VwTableReserva> searchByLivroInBiblioteca(@Param("bibliotecaId") UUID bibliotecaId, @Param("value") String value);
 
     @Query(value = "SELECT * FROM vw_table_reserva v WHERE v.fk_id_biblioteca = :bibliotecaId AND " +
+            "LOWER(v.\"Exemplares\") ILIKE LOWER(CONCAT('%', :value, '%'))", nativeQuery = true)
+    List<VwTableReserva> searchByExemplaresInBiblioteca(@Param("bibliotecaId") UUID bibliotecaId, @Param("value") String value);
+
+    @Query(value = "SELECT * FROM vw_table_reserva v WHERE v.fk_id_biblioteca = :bibliotecaId AND " +
+            "LOWER(v.\"Data de emissão\") ILIKE LOWER(CONCAT('%', :value, '%'))", nativeQuery = true)
+    List<VwTableReserva> searchByDataEmissaoInBiblioteca(@Param("bibliotecaId") UUID bibliotecaId, @Param("value") String value);
+
+    @Query(value = "SELECT * FROM vw_table_reserva v WHERE v.fk_id_biblioteca = :bibliotecaId AND " +
+            "LOWER(v.\"Data de retirada\") ILIKE LOWER(CONCAT('%', :value, '%'))", nativeQuery = true)
+    List<VwTableReserva> searchByDataRetiradaInBiblioteca(@Param("bibliotecaId") UUID bibliotecaId, @Param("value") String value);
+
+    @Query(value = "SELECT * FROM vw_table_reserva v WHERE v.fk_id_biblioteca = :bibliotecaId AND " +
             "LOWER(v.\"Situação\") ILIKE LOWER(CONCAT('%', :value, '%'))", nativeQuery = true)
     List<VwTableReserva> searchBySituacaoInBiblioteca(@Param("bibliotecaId") UUID bibliotecaId, @Param("value") String value);
 

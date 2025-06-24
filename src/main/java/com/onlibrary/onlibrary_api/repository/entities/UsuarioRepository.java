@@ -37,4 +37,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
     List<Usuario> findUsersNotInLibrary(@Param("bibliotecaId") UUID bibliotecaId);
 
     List<Usuario> findByDeletadoFalse();
+
+    long countByDeletadoFalse();
 }

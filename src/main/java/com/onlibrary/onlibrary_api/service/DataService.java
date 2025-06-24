@@ -152,6 +152,9 @@ public class DataService {
             case "exemplary":
                 quantidade = exemplarRepository.countByBibliotecaIdAndDeletadoFalse(bibliotecaId);
                 break;
+            case "user":
+                quantidade = usuarioRepository.countByDeletadoFalse();
+                break;
 
             case "library_user":
                 if (usuarioId == null) throw new IllegalArgumentException("id_usuario é obrigatório para o tipo 'library_user'");

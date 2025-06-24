@@ -53,7 +53,7 @@ public class LivroService {
         }
 
         return switch (filter.toLowerCase()) {
-            case "título" -> vwTableBibliotecaLivroRepository.searchByTituloInBiblioteca(bibliotecaId, value);
+            case "titulo" -> vwTableBibliotecaLivroRepository.searchByTituloInBiblioteca(bibliotecaId, value);
             case "isbn" -> vwTableBibliotecaLivroRepository.searchByIsbnInBiblioteca(bibliotecaId, value);
             case "todos" -> vwTableBibliotecaLivroRepository.searchByAllInBiblioteca(bibliotecaId, value);
             default -> new ArrayList<>();
@@ -67,9 +67,9 @@ public class LivroService {
         }
 
         return switch (filter.toLowerCase()) {
-            case "título" -> vwLivroRepository.searchByTitulo(value);
+            case "titulo" -> vwLivroRepository.searchByTitulo(value);
             case "isbn" -> vwLivroRepository.searchByIsbn(value);
-            case "autore" -> vwLivroRepository.searchByAutores(value);
+            case "autor" -> vwLivroRepository.searchByAutores(value);
             case "categoria" -> vwLivroRepository.searchByCategorias(value);
             case "genero" -> vwLivroRepository.searchByGeneros(value);
             case "editora" -> vwLivroRepository.searchByEditoras(value);

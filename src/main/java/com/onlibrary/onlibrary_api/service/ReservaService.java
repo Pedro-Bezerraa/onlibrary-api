@@ -46,6 +46,9 @@ public class ReservaService {
         return switch (filter.toLowerCase()) {
             case "username" -> vwTableReservaRepository.searchByUsernameInBiblioteca(bibliotecaId, value);
             case "livro" -> vwTableReservaRepository.searchByLivroInBiblioteca(bibliotecaId, value);
+            case "exemplares" -> vwTableReservaRepository.searchByExemplaresInBiblioteca(bibliotecaId, value);
+            case "data de emissão" -> vwTableReservaRepository.searchByDataEmissaoInBiblioteca(bibliotecaId, value);
+            case "data de retirada" -> vwTableReservaRepository.searchByDataRetiradaInBiblioteca(bibliotecaId, value);
             case "situação" -> vwTableReservaRepository.searchBySituacaoInBiblioteca(bibliotecaId, value);
             case "tipo" -> vwTableReservaRepository.searchByTipoInBiblioteca(bibliotecaId, value);
             case "todos" -> vwTableReservaRepository.searchByAllInBiblioteca(bibliotecaId, value);
