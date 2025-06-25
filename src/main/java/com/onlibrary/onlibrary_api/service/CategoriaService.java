@@ -14,13 +14,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CategoriaService {
     private final CategoriaRepository categoriaRepository;
     private final LivroCategoriaRepository livroCategoriaRepository;
+
+    @Transactional(readOnly = true)
+    public List<CategoriaResponseDTO> listarCategorias() {
+        return categoriaRepository.findByDeletadoFalse().stream()
+                .map(categoria -> new CategoriaResponseDTO(categoria.getId(), categoria.getNome()))
+                .collect(Collectors.toList());
+    }
 
     @Transactional
     public CategoriaResponseDTO criarCategoria(CategoriaRequestDTO dto) {
