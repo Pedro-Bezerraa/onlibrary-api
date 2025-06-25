@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import com.onlibrary.onlibrary_api.repository.views.VwLivroRepository.SuggestionProjection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,14 @@ public class LivroService {
     private final VwLivroRepository vwLivroRepository;
     private final VwBibliotecaReservaExemplarRepository vwBibliotecaReservaExemplarRepository;
     private final VwTableBibliotecaLivroRepository vwTableBibliotecaLivroRepository;
+
+    @Transactional(readOnly = true)
+    public List<SuggestionProjection> getSearchSuggestions(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        return vwLivroRepository.getSearchSuggestions(value);
+    }
 
     @Transactional(readOnly = true)
     public List<VwTableBibliotecaLivro> searchLivrosInBiblioteca(String value, String filter, UUID bibliotecaId) {

@@ -17,6 +17,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.onlibrary.onlibrary_api.repository.views.VwLivroRepository.SuggestionProjection;
+
 
 import java.util.List;
 import java.util.UUID;
@@ -65,6 +67,13 @@ public class LivroController {
             @RequestParam(defaultValue = "todos") String filter) {
         List<LivroHomePageSearchDTO> result = livroService.searchLivrosHomePage(value, filter);
         return ResponseEntity.ok(new ResponseDTO<>(true, "Pesquisa de livros realizada com sucesso.", result));
+    }
+
+    @GetMapping("/search/suggestions")
+    public ResponseEntity<ResponseDTO<List<SuggestionProjection>>> getSearchSuggestions(
+            @RequestParam(required = false) String value) {
+        List<SuggestionProjection> result = livroService.getSearchSuggestions(value);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Sugestões de pesquisa recuperadas com sucesso.", result));
     }
 
     @GetMapping("/{livroId}/libraries")
