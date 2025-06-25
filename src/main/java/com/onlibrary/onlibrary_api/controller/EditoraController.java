@@ -33,4 +33,10 @@ public class EditoraController {
         return ResponseEntity.ok()
                 .body(new ResponseDTO<>(true, "Editora criada com sucesso", editoraAtualizada));
     }
+
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity<ResponseDTO<Void>> deletarEditora(@PathVariable UUID id) {
+        editoraService.deletarEditora(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Editora marcada como deletada com sucesso.", null));
+    }
 }

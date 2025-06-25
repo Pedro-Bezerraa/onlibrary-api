@@ -4,10 +4,12 @@ import com.onlibrary.onlibrary_api.dto.categoria.UpdateCategoriaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.categoria.UpdateCategoriaResponseDTO;
 import com.onlibrary.onlibrary_api.dto.categoria.CategoriaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.categoria.CategoriaResponseDTO;
+import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ConflictException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Categoria;
 import com.onlibrary.onlibrary_api.repository.entities.CategoriaRepository;
+import com.onlibrary.onlibrary_api.repository.entities.LivroCategoriaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CategoriaService {
     private final CategoriaRepository categoriaRepository;
+    private final LivroCategoriaRepository livroCategoriaRepository;
 
     @Transactional
     public CategoriaResponseDTO criarCategoria(CategoriaRequestDTO dto) {
@@ -50,5 +53,18 @@ public class CategoriaService {
         categoriaRepository.save(categoria);
 
         return new UpdateCategoriaResponseDTO(categoria.getId(), categoria.getNome());
+    }
+
+    @Transactional
+    public void deletarCategoria(UUID id) {
+        Categoria categoria = categoriaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada."));
+
+        if (livroCategoriaRepository.existsByCategoriaIdAndLivroDeletadoIsFalse(id)) {
+            throw new BusinessException("Não é possível excluir a categoria, pois ela está associada a um ou mais livros.");
+        }
+
+        categoria.setDeletado(true);
+        categoriaRepository.save(categoria);
     }
 }

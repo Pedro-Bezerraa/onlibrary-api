@@ -33,4 +33,10 @@ public class CategoriaController {
         return ResponseEntity.ok()
                 .body(new ResponseDTO<>(true, "Categoria atualizada com sucesso", categoriaAtualizado));
     }
+
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity<ResponseDTO<Void>> deletarCategoria(@PathVariable UUID id) {
+        categoriaService.deletarCategoria(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Categoria marcada como deletada com sucesso.", null));
+    }
 }

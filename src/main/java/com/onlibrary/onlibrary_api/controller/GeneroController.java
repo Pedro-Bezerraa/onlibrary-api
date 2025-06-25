@@ -32,4 +32,9 @@ public class GeneroController {
         return ResponseEntity.ok(new ResponseDTO<>(true, "Gênero atualizado com sucesso!", generoAtualizado));
     }
 
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity<ResponseDTO<Void>> deletarGenero(@PathVariable UUID id) {
+        generoService.deletarGenero(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Gênero marcado como deletado com sucesso.", null));
+    }
 }

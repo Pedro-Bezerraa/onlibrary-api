@@ -4,10 +4,12 @@ import com.onlibrary.onlibrary_api.dto.editora.UpdateEditoraRequestDTO;
 import com.onlibrary.onlibrary_api.dto.editora.UpdateEditoraResponseDTO;
 import com.onlibrary.onlibrary_api.dto.editora.EditoraRequestDTO;
 import com.onlibrary.onlibrary_api.dto.editora.EditoraResponseDTO;
+import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ConflictException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Editora;
 import com.onlibrary.onlibrary_api.repository.entities.EditoraRepository;
+import com.onlibrary.onlibrary_api.repository.entities.LivroEditoraRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class EditoraService {
     private final EditoraRepository editoraRepository;
+    private final LivroEditoraRepository livroEditoraRepository;
+
 
     @Transactional
     public EditoraResponseDTO criarEditora(EditoraRequestDTO dto) {
@@ -50,5 +54,18 @@ public class EditoraService {
         editoraRepository.save(editora);
 
         return new UpdateEditoraResponseDTO(editora.getId(), editora.getNome());
+    }
+
+    @Transactional
+    public void deletarEditora(UUID id) {
+        Editora editora = editoraRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Editora não encontrada."));
+
+        if (livroEditoraRepository.existsByEditoraIdAndLivroDeletadoIsFalse(id)) {
+            throw new BusinessException("Não é possível excluir a editora, pois ela está associada a um ou mais livros ativos.");
+        }
+
+        editora.setDeletado(true);
+        editoraRepository.save(editora);
     }
 }

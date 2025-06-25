@@ -2,10 +2,12 @@ package com.onlibrary.onlibrary_api.service;
 
 import com.onlibrary.onlibrary_api.dto.genero.GeneroRequestDTO;
 import com.onlibrary.onlibrary_api.dto.genero.GeneroResponseDTO;
+import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ConflictException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Genero;
 import com.onlibrary.onlibrary_api.repository.entities.GeneroRepository;
+import com.onlibrary.onlibrary_api.repository.entities.LivroGeneroRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +18,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class GeneroService {
     private final GeneroRepository generoRepository;
+    private final LivroGeneroRepository livroGeneroRepository;
+
 
     @Transactional
     public GeneroResponseDTO criarGenero(GeneroRequestDTO dto) {
@@ -49,4 +53,16 @@ public class GeneroService {
         return new GeneroResponseDTO(genero.getId(), genero.getNome());
     }
 
+    @Transactional
+    public void deletarGenero(UUID id) {
+        Genero genero = generoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Gênero não encontrado."));
+
+        if (livroGeneroRepository.existsByGeneroIdAndLivroDeletadoIsFalse(id)) {
+            throw new BusinessException("Não é possível excluir o gênero, pois ele está associado a um ou mais livros ativos.");
+        }
+
+        genero.setDeletado(true);
+        generoRepository.save(genero);
+    }
 }

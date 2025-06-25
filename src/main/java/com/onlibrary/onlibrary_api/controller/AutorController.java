@@ -34,4 +34,10 @@ public class AutorController {
                 new ResponseDTO<>(true, "Autor atualizado com sucesso!", autorAtualizado)
         );
     }
+
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity<ResponseDTO<Void>> deletarAutor(@PathVariable UUID id) {
+        autorService.deletarAutor(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Autor marcado como deletado com sucesso.", null));
+    }
 }
