@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -18,6 +19,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AutorController {
     private final AutorService autorService;
+
+    @GetMapping
+    public ResponseEntity<ResponseDTO<List<AutorResponseDTO>>> listarAutores() {
+        List<AutorResponseDTO> autores = autorService.listarAutores();
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Autores recuperados com sucesso", autores));
+    }
 
     @PostMapping("/criar-autor")
     public ResponseEntity<?> criarAutor(@RequestBody AutorRequestDTO dto) {

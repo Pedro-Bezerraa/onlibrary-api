@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -18,6 +19,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class GeneroController {
     private final GeneroService generoService;
+
+    @GetMapping
+    public ResponseEntity<ResponseDTO<List<GeneroResponseDTO>>> listarGeneros() {
+        List<GeneroResponseDTO> generos = generoService.listarGeneros();
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Gêneros recuperados com sucesso", generos));
+    }
 
     @PostMapping("/criar-genero")
     public ResponseEntity<?> criarGenero(@RequestBody GeneroRequestDTO dto) {

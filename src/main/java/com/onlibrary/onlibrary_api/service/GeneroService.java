@@ -12,13 +12,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class GeneroService {
     private final GeneroRepository generoRepository;
     private final LivroGeneroRepository livroGeneroRepository;
+
+    @Transactional(readOnly = true)
+    public List<GeneroResponseDTO> listarGeneros() {
+        return generoRepository.findByDeletadoFalse().stream()
+                .map(genero -> new GeneroResponseDTO(genero.getId(), genero.getNome()))
+                .collect(Collectors.toList());
+    }
 
 
     @Transactional

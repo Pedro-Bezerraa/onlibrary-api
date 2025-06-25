@@ -63,7 +63,9 @@ public class SecurityConfig {
                                         "/api/livro/search/suggestions",
                                         "/api/livro/{livroId}/libraries",
                                         "/api/livro/{livroId}/details",
-                                        "/api/data/group").permitAll()
+                                        "/api/data/group",
+                                        "/api/exemplar/situacoes",
+                                        "/api/livro/book-page/{id}").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(

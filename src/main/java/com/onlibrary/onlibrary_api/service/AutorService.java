@@ -12,13 +12,22 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class AutorService {
     private final AutorRepository autorRepository;
     private final LivroAutorRepository livroAutorRepository;
+
+    @Transactional(readOnly = true)
+    public List<AutorResponseDTO> listarAutores() {
+        return autorRepository.findByDeletadoFalse().stream()
+                .map(autor -> new AutorResponseDTO(autor.getId(), autor.getNome()))
+                .collect(Collectors.toList());
+    }
 
 
     @Transactional

@@ -14,7 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +24,12 @@ public class EditoraService {
     private final EditoraRepository editoraRepository;
     private final LivroEditoraRepository livroEditoraRepository;
 
+    @Transactional(readOnly = true)
+    public List<EditoraResponseDTO> listarEditoras() {
+        return editoraRepository.findByDeletadoFalse().stream()
+                .map(editora -> new EditoraResponseDTO(editora.getId(), editora.getNome()))
+                .collect(Collectors.toList());
+    }
 
     @Transactional
     public EditoraResponseDTO criarEditora(EditoraRequestDTO dto) {

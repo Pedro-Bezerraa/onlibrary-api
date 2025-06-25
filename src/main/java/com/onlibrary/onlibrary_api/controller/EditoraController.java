@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -18,6 +19,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class EditoraController {
     private final EditoraService editoraService;
+
+    @GetMapping
+    public ResponseEntity<ResponseDTO<List<EditoraResponseDTO>>> listarEditoras() {
+        List<EditoraResponseDTO> editoras = editoraService.listarEditoras();
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Editoras recuperadas com sucesso", editoras));
+    }
 
     @PostMapping("/criar-editora")
     public ResponseEntity<?> criarEditora(@RequestBody EditoraRequestDTO dto) {
