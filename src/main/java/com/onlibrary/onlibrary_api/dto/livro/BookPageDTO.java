@@ -8,5 +8,10 @@ public record BookPageDTO(
         @JsonProperty("ISBN") String isbn,
         String titulo,
         String descricao,
-        String imagem
+        String imagem,
+        @JsonProperty("ano_lancamento") Integer anoLancamento,
+        String autores,
+        String categorias,
+        String generos,
+        String editoras
 ) {}

@@ -43,7 +43,7 @@ public class LivroService {
 
     @Transactional(readOnly = true)
     public BookPageDTO getBookPageInfo(UUID livroId) {
-        Livro livro = livroRepository.findById(livroId)
+        VwLivro livro = vwLivroRepository.findById(livroId)
                 .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado"));
 
         return new BookPageDTO(
@@ -51,7 +51,12 @@ public class LivroService {
                 livro.getIsbn(),
                 livro.getTitulo(),
                 livro.getDescricao(),
-                livro.getCapa() // Mapeando capa para imagem
+                livro.getCapa(),
+                livro.getAnoLancamento(),
+                livro.getAutores(),
+                livro.getCategorias(),
+                livro.getGeneros(),
+                livro.getEditoras()
         );
     }
 
