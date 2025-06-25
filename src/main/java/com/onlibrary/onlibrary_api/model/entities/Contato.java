@@ -19,7 +19,6 @@ public class Contato {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @CreationTimestamp
     @Column(name = "data_emissao", nullable = false, updatable = false)
     private OffsetDateTime dataEmissao;
 
