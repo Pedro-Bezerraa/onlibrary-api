@@ -5,5 +5,5 @@ import java.util.UUID;
 public record LivroCategoriaResponseDTO(
         UUID id,
         String titulo,
-        String capa
+        String imagem
 ) {}
