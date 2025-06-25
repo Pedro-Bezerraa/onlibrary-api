@@ -1,14 +1,10 @@
 package com.onlibrary.onlibrary_api.service;
 
-import com.onlibrary.onlibrary_api.dto.livro.LivroHomePageSearchDTO;
+import com.onlibrary.onlibrary_api.dto.livro.*;
 import com.onlibrary.onlibrary_api.dto.autor.AutorResponseDTO;
 import com.onlibrary.onlibrary_api.dto.categoria.CategoriaResponseDTO;
 import com.onlibrary.onlibrary_api.dto.editora.EditoraResponseDTO;
 import com.onlibrary.onlibrary_api.dto.genero.GeneroResponseDTO;
-import com.onlibrary.onlibrary_api.dto.livro.UpdateLivroRequestDTO;
-import com.onlibrary.onlibrary_api.dto.livro.UpdateLivroResponseDTO;
-import com.onlibrary.onlibrary_api.dto.livro.LivroRequestDTO;
-import com.onlibrary.onlibrary_api.dto.livro.LivroResponseDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.*;
@@ -44,6 +40,20 @@ public class LivroService {
     private final VwLivroRepository vwLivroRepository;
     private final VwBibliotecaReservaExemplarRepository vwBibliotecaReservaExemplarRepository;
     private final VwTableBibliotecaLivroRepository vwTableBibliotecaLivroRepository;
+
+    @Transactional(readOnly = true)
+    public BookPageDTO getBookPageInfo(UUID livroId) {
+        Livro livro = livroRepository.findById(livroId)
+                .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado"));
+
+        return new BookPageDTO(
+                livro.getId(),
+                livro.getIsbn(),
+                livro.getTitulo(),
+                livro.getDescricao(),
+                livro.getCapa() // Mapeando capa para imagem
+        );
+    }
 
     @Transactional(readOnly = true)
     public Map<String, Object> getLivroDependenciesForUpdate(UUID livroId) {

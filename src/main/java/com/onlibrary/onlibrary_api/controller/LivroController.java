@@ -1,12 +1,8 @@
 package com.onlibrary.onlibrary_api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.onlibrary.onlibrary_api.dto.livro.LivroHomePageSearchDTO;
+import com.onlibrary.onlibrary_api.dto.livro.*;
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
-import com.onlibrary.onlibrary_api.dto.livro.UpdateLivroRequestDTO;
-import com.onlibrary.onlibrary_api.dto.livro.UpdateLivroResponseDTO;
-import com.onlibrary.onlibrary_api.dto.livro.LivroRequestDTO;
-import com.onlibrary.onlibrary_api.dto.livro.LivroResponseDTO;
 import com.onlibrary.onlibrary_api.model.views.VwBibliotecaReservaExemplar;
 import com.onlibrary.onlibrary_api.model.views.VwLivro;
 import com.onlibrary.onlibrary_api.model.views.VwTableBibliotecaLivro;
@@ -93,5 +89,11 @@ public class LivroController {
     public ResponseEntity<ResponseDTO<Map<String, Object>>> getLivroDependenciesForUpdate(@PathVariable UUID id) {
         Map<String, Object> dependencies = livroService.getLivroDependenciesForUpdate(id);
         return ResponseEntity.ok(new ResponseDTO<>(true, "Dependências do livro para atualização recuperadas com sucesso.", dependencies));
+    }
+
+    @GetMapping("/book-page/{id}")
+    public ResponseEntity<ResponseDTO<BookPageDTO>> getBookPageInfo(@PathVariable UUID id) {
+        BookPageDTO bookInfo = livroService.getBookPageInfo(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Informações do livro para a página recuperadas com sucesso.", bookInfo));
     }
 }
