@@ -3,8 +3,10 @@ package com.onlibrary.onlibrary_api.service;
 import com.onlibrary.onlibrary_api.dto.usuario.*;
 import com.onlibrary.onlibrary_api.exception.*;
 import com.onlibrary.onlibrary_api.model.entities.Usuario;
+import com.onlibrary.onlibrary_api.model.entities.UsuarioBiblioteca;
 import com.onlibrary.onlibrary_api.model.enums.ContaSituacao;
 import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
+import com.onlibrary.onlibrary_api.repository.entities.UsuarioBibliotecaRepository;
 import com.onlibrary.onlibrary_api.repository.entities.UsuarioRepository;
 import com.onlibrary.onlibrary_api.security.UsuarioDetails;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -31,6 +34,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final NotificacaoService notificacaoService;
+    private final UsuarioBibliotecaRepository usuarioBibliotecaRepository;
 
     public void logout(HttpServletResponse response) {
         ResponseCookie cookie = ResponseCookie.from("jwt", "")
@@ -125,6 +129,12 @@ public class AuthService {
                 throw new ConflictException("CPF já em uso.");
             }
             target.setCpf(dto.cpf());
+
+            List<UsuarioBiblioteca> usuarioBibliotecas = usuarioBibliotecaRepository.findByUsuarioId(targetUserId);
+            for (UsuarioBiblioteca ub : usuarioBibliotecas) {
+                ub.setCpf(dto.cpf());
+            }
+            usuarioBibliotecaRepository.saveAll(usuarioBibliotecas);
         }
 
         if (dto.nome() != null) target.setNome(dto.nome());

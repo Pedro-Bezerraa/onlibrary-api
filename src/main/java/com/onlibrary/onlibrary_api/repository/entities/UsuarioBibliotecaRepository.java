@@ -35,4 +35,7 @@ public interface UsuarioBibliotecaRepository extends JpaRepository<UsuarioBiblio
 
     @Query("SELECT ub FROM UsuarioBiblioteca ub JOIN FETCH ub.usuario u WHERE ub.biblioteca.id = :bibliotecaId AND ub.tipoUsuario = 'COMUM' AND ub.deletado = false AND ub.situacao = 'ATIVO' AND u.deletado = false AND u.situacao = 'ATIVO'")
     List<UsuarioBiblioteca> findCommonAndActiveUsersByBibliotecaId(@Param("bibliotecaId") UUID bibliotecaId);
+
+    List<UsuarioBiblioteca> findByUsuarioId(UUID usuarioId);
+
 }
