@@ -11,8 +11,8 @@ public record ReservaDependenciesDTO(
         LabelValue<String> situacao,
         LocalDate data_retirada,
         LabelValueDTO usuarios_biblioteca,
-        LabelValueDTO livros_biblioteca
-//        List<LabelValueDTO> todos_os_usuarios,
+        LabelValueDTO livros_biblioteca,
+        List<String> exemplares//        List<LabelValueDTO> todos_os_usuarios,
 //        List<LabelValueDTO> todos_os_livros_da_biblioteca
 ) {
     public record LabelValue<T>(String label, T value) {}

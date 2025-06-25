@@ -12,6 +12,9 @@ public interface VwTableReservaRepository extends JpaRepository<VwTableReserva, 
     List<VwTableReserva> findByFkIdBiblioteca(UUID fkIdBiblioteca);
     List<VwTableReserva> findByFkIdBibliotecaAndTipo(UUID fkIdBiblioteca, String tipo);
 
+    @Query("SELECT v FROM VwTableReserva v WHERE v.id = :reservaId")
+    List<VwTableReserva> findAllById(@Param("reservaId") UUID reservaId);
+
     List<VwTableReserva> findByFkIdUsuario(UUID fkIdUsuario);
 
     @Query(value = "SELECT * FROM vw_table_reserva v WHERE v.fk_id_biblioteca = :bibliotecaId AND (" +
