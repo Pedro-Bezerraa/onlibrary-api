@@ -37,4 +37,10 @@ public class UsuarioController {
         authService.deletarUsuario(id);
         return ResponseEntity.ok(new ResponseDTO<>(true, "Usuário deletado com sucesso.", null));
     }
+
+    @GetMapping("/dependencies/{id}")
+    public ResponseEntity<ResponseDTO<Map<String, Object>>> getUsuarioDependenciesForUpdate(@PathVariable UUID id) {
+        Map<String, Object> dependencies = usuarioService.getUsuarioDependenciesForUpdate(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Dependências do usuário para atualização recuperadas com sucesso.", dependencies));
+    }
 }
