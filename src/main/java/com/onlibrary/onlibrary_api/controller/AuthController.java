@@ -19,8 +19,13 @@ import java.util.UUID;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-
     private final AuthService authService;
+
+    @PostMapping("/logout")
+    public ResponseEntity<ResponseDTO<Void>> logout(HttpServletResponse response) {
+        authService.logout(response);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Logout realizado com sucesso.", null));
+    }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUsuario(@Valid @RequestBody UsuarioRequestDTO requestDTO) {
