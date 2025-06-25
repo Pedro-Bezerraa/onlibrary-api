@@ -34,7 +34,11 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     private Collection<? extends GrantedAuthority> getAuthority(Usuario usuario) {
-        return List.of(new SimpleGrantedAuthority("USER"));
-    }
+        if (usuario.getTipo() == null) {
+            return List.of(new SimpleGrantedAuthority("ROLE_COMUM"));
+        }
 
+        String role = "ROLE_" + usuario.getTipo().name();
+        return List.of(new SimpleGrantedAuthority(role));
+    }
 }
