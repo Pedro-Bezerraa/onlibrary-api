@@ -2,6 +2,7 @@ package com.onlibrary.onlibrary_api.controller;
 
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
 import com.onlibrary.onlibrary_api.dto.biblioteca.ContagemResponseDTO;
+import com.onlibrary.onlibrary_api.dto.graficos.ChartDataResponseDTO;
 import com.onlibrary.onlibrary_api.service.DataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,15 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DataController {
     private final DataService dataService;
+
+    @GetMapping("/graficos")
+    public ResponseEntity<ResponseDTO<ChartDataResponseDTO>> getChartData(
+            @RequestParam("nome_tabela") String nomeTabela,
+            @RequestParam(name = "id_biblioteca", required = false) UUID bibliotecaId) {
+
+        ChartDataResponseDTO chartData = dataService.getChartData(nomeTabela, bibliotecaId);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Dados do gráfico recuperados com sucesso.", chartData));
+    }
 
     @GetMapping("/group")
     public ResponseEntity<ResponseDTO<Object>> getGroupData(

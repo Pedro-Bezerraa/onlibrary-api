@@ -1,5 +1,8 @@
 package com.onlibrary.onlibrary_api.service;
 
+import com.onlibrary.onlibrary_api.dto.graficos.ChartDataResponseDTO;
+import com.onlibrary.onlibrary_api.dto.graficos.ChartLastDataDTO;
+import com.onlibrary.onlibrary_api.dto.graficos.ChartWeekDataDTO;
 import com.onlibrary.onlibrary_api.dto.livro.BookDependenciesDTO;
 import com.onlibrary.onlibrary_api.dto.LabelValueDTO;
 import com.onlibrary.onlibrary_api.dto.biblioteca.LibraryUserDependenciesDTO;
@@ -7,13 +10,16 @@ import com.onlibrary.onlibrary_api.dto.biblioteca.ContagemResponseDTO;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Usuario;
 import com.onlibrary.onlibrary_api.model.enums.*;
+import com.onlibrary.onlibrary_api.repository.custom.ChartRepository;
 import com.onlibrary.onlibrary_api.repository.entities.*;
 import com.onlibrary.onlibrary_api.repository.views.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -52,6 +58,23 @@ public class DataService {
     private final ReservaRepository reservaRepository;
     private final UsuarioRepository usuarioRepository;
     private final BibliotecaRepository bibliotecaRepository;
+    private final ChartRepository chartRepository;
+
+    private static final Set<String> ALLOWED_TABLE_NAMES = Set.of(
+            "tb_emprestimo", "tb_reserva", "tb_multa", "tb_usuario", "tb_biblioteca"
+    );
+
+    @Transactional(readOnly = true)
+    public ChartDataResponseDTO getChartData(String nomeTabela, UUID bibliotecaId) {
+        if (!ALLOWED_TABLE_NAMES.contains(nomeTabela)) {
+            throw new IllegalArgumentException("Nome de tabela inválido: " + nomeTabela);
+        }
+
+        List<ChartWeekDataDTO> weekData = chartRepository.getWeekData(nomeTabela, bibliotecaId);
+        List<ChartLastDataDTO> lastData = chartRepository.getLastData(nomeTabela, bibliotecaId);
+
+        return new ChartDataResponseDTO(weekData, lastData);
+    }
 
     public Object getGroupData(String type, UUID bibliotecaId) {
         switch (type.toLowerCase()) {
