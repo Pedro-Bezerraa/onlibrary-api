@@ -4,6 +4,7 @@ import com.onlibrary.onlibrary_api.security.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -54,6 +55,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         req -> req
                                 .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/categoria", "/api/categoria/livros/{id}", "/api/livro/search/biblioteca", "/api/livro/search/home", "/api/livro/search/suggestions", "/api/livro/{livroId}/libraries", "/api/livro/{livroId}/details").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(
