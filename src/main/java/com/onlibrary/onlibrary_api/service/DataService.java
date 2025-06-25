@@ -66,6 +66,15 @@ public class DataService {
 
     @Transactional(readOnly = true)
     public ChartDataResponseDTO getChartData(String nomeTabela, UUID bibliotecaId) {
+
+        Set<String> tabelasDependentes = Set.of("tb_emprestimo", "tb_reserva", "tb_multa");
+
+        if (bibliotecaId == null && tabelasDependentes.contains(nomeTabela)) {
+            throw new IllegalArgumentException(
+                    "O parâmetro 'id_biblioteca' é obrigatório para a tabela '" + nomeTabela + "'."
+            );
+        }
+
         if (!ALLOWED_TABLE_NAMES.contains(nomeTabela)) {
             throw new IllegalArgumentException("Nome de tabela inválido: " + nomeTabela);
         }
