@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,26 +40,34 @@ public class Usuario {
     @Column(unique = true)
     private String username;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean deletado = false;
+
     @Enumerated(EnumType.STRING)
-    private TipoUsuario tipo;
+    @Builder.Default
+    private TipoUsuario tipo = TipoUsuario.COMUM;
+
+    @Column(name = "data_emissao")
+    @Builder.Default
+    private LocalDate dataEmissao = LocalDate.now();
 
     @OneToMany(mappedBy = "usuario")
     @JsonIgnore
     private List<Notificacao> notificacoes;
 
     @OneToMany(mappedBy = "usuario")
-    @JsonIgnore // Adicionado para evitar loops
+    @JsonIgnore
     private List<UsuarioBiblioteca> usuarioBibliotecas;
 
     @OneToMany(mappedBy = "usuario")
-    @JsonIgnore // Adicionado para evitar loops
+    @JsonIgnore
     private List<Reserva> reservas;
 
     @OneToMany(mappedBy = "usuario")
-    @JsonIgnore // Adicionado para evitar loops
+    @JsonIgnore
     private List<Multa> multas;
 
-    // Relacionamento inverso que faltava
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Contato> contatos;
@@ -70,8 +79,4 @@ public class Usuario {
         this.senha = senha;
         this.username = username;
     }
-
-    @Column(nullable = false)
-    @Builder.Default
-    private Boolean deletado = false;
 }

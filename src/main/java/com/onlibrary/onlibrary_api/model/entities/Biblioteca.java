@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,6 +39,10 @@ public class Biblioteca {
     @Column(nullable = false)
     @Builder.Default
     private Boolean deletado = false;
+
+    @Column(name = "data_emissao")
+    @Builder.Default
+    private LocalDate dataEmissao = LocalDate.now();
 
     @OneToMany(mappedBy = "biblioteca")
     private List<UsuarioBiblioteca> usuarioBibliotecas;
