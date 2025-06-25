@@ -25,9 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import com.onlibrary.onlibrary_api.repository.views.VwLivroRepository.SuggestionProjection;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,6 +44,34 @@ public class LivroService {
     private final VwLivroRepository vwLivroRepository;
     private final VwBibliotecaReservaExemplarRepository vwBibliotecaReservaExemplarRepository;
     private final VwTableBibliotecaLivroRepository vwTableBibliotecaLivroRepository;
+
+    @Transactional(readOnly = true)
+    public Map<String, Object> getLivroDependenciesForUpdate(UUID livroId) {
+        Livro livro = livroRepository.findById(livroId)
+                .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado"));
+
+        Map<String, Object> dependencies = new HashMap<>();
+        dependencies.put("ISBN", livro.getIsbn());
+        dependencies.put("imagem", livro.getCapa());
+        dependencies.put("titulo", livro.getTitulo());
+        dependencies.put("descricao", livro.getDescricao());
+        dependencies.put("ano_lancamento", livro.getAnoLancamento());
+
+        dependencies.put("categorias", livro.getCategorias().stream()
+                .map(livroCategoria -> livroCategoria.getCategoria().getId())
+                .collect(Collectors.toList()));
+        dependencies.put("generos", livro.getGeneros().stream()
+                .map(livroGenero -> livroGenero.getGenero().getId())
+                .collect(Collectors.toList()));
+        dependencies.put("editoras", livro.getEditoras().stream()
+                .map(livroEditora -> livroEditora.getEditora().getId())
+                .collect(Collectors.toList()));
+        dependencies.put("autores", livro.getAutores().stream()
+                .map(livroAutor -> livroAutor.getAutor().getId())
+                .collect(Collectors.toList()));
+
+        return dependencies;
+    }
 
     @Transactional(readOnly = true)
     public List<SuggestionProjection> getSearchSuggestions(String value) {

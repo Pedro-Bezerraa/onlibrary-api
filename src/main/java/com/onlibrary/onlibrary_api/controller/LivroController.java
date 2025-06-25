@@ -21,6 +21,7 @@ import com.onlibrary.onlibrary_api.repository.views.VwLivroRepository.Suggestion
 
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -86,5 +87,11 @@ public class LivroController {
     public ResponseEntity<ResponseDTO<VwLivro>> getLivroDetails(@PathVariable UUID livroId) {
         VwLivro result = livroService.getLivroDetails(livroId);
         return ResponseEntity.ok(new ResponseDTO<>(true, "Detalhes do livro recuperados com sucesso.", result));
+    }
+
+    @GetMapping("/dependencies/{id}")
+    public ResponseEntity<ResponseDTO<Map<String, Object>>> getLivroDependenciesForUpdate(@PathVariable UUID id) {
+        Map<String, Object> dependencies = livroService.getLivroDependenciesForUpdate(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Dependências do livro para atualização recuperadas com sucesso.", dependencies));
     }
 }
