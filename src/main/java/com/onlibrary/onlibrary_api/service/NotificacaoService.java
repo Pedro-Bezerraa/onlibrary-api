@@ -1,5 +1,7 @@
 package com.onlibrary.onlibrary_api.service;
 
+import com.onlibrary.onlibrary_api.dto.contato.SuporteResponseDTO;
+import com.onlibrary.onlibrary_api.dto.notificacao.NotificacaoResponseDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Biblioteca;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +28,7 @@ public class NotificacaoService {
     private final EmailService emailService;
     private final UsuarioRepository usuarioRepository;
     private final BibliotecaRepository bibliotecaRepository;
-    private final ContatoRepository contatoRepository; // Adicionar este repositório
+    private final ContatoRepository contatoRepository;
 
     public void notificarUsuario(Usuario usuario, String titulo, String conteudo, TipoUsuario tipo) {
         Notificacao notificacao = Notificacao.builder()
@@ -50,17 +53,25 @@ public class NotificacaoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
         return switch (tipo.toLowerCase()) {
-            case "comum" -> notificacaoRepository.findByUsuarioOrderByDataEmissaoAsc(usuario);
+            case "comum" -> notificacaoRepository.findByUsuarioAndBibliotecaIsNullOrderByDataEmissaoAsc(usuario)
+                    .stream()
+                    .map(NotificacaoResponseDTO::new)
+                    .collect(Collectors.toList());
             case "biblioteca" -> {
                 if (bibliotecaId == null) {
                     throw new BusinessException("O 'bibliotecaId' é obrigatório para o tipo 'biblioteca'.");
                 }
                 Biblioteca biblioteca = bibliotecaRepository.findById(bibliotecaId)
                         .orElseThrow(() -> new ResourceNotFoundException("Biblioteca não encontrada."));
-                yield notificacaoRepository.findByUsuarioAndBibliotecaOrderByDataEmissaoAsc(usuario, biblioteca);
+                yield notificacaoRepository.findByUsuarioAndBibliotecaOrderByDataEmissaoAsc(usuario, biblioteca)
+                        .stream()
+                        .map(NotificacaoResponseDTO::new)
+                        .collect(Collectors.toList());
             }
-            case "admin" ->
-                    contatoRepository.findAllByOrderByDataEmissaoAsc();
+            case "admin" -> contatoRepository.findAllByOrderByDataEmissaoAsc()
+                    .stream()
+                    .map(SuporteResponseDTO::new)
+                    .collect(Collectors.toList());
             default -> throw new BusinessException("Tipo de notificação inválido: " + tipo);
         };
     }
