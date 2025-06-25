@@ -50,18 +50,17 @@ public class NotificacaoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
         return switch (tipo.toLowerCase()) {
-            case "comum" -> notificacaoRepository.findByUsuarioOrderByDataEmissaoDesc(usuario);
+            case "comum" -> notificacaoRepository.findByUsuarioOrderByDataEmissaoAsc(usuario);
             case "biblioteca" -> {
                 if (bibliotecaId == null) {
                     throw new BusinessException("O 'bibliotecaId' é obrigatório para o tipo 'biblioteca'.");
                 }
                 Biblioteca biblioteca = bibliotecaRepository.findById(bibliotecaId)
                         .orElseThrow(() -> new ResourceNotFoundException("Biblioteca não encontrada."));
-                yield notificacaoRepository.findByUsuarioAndBibliotecaOrderByDataEmissaoDesc(usuario, biblioteca);
+                yield notificacaoRepository.findByUsuarioAndBibliotecaOrderByDataEmissaoAsc(usuario, biblioteca);
             }
             case "admin" ->
-                // Agora, com o repositório, podemos listar todos os contatos.
-                    contatoRepository.findAll();
+                    contatoRepository.findAllByOrderByDataEmissaoAsc();
             default -> throw new BusinessException("Tipo de notificação inválido: " + tipo);
         };
     }

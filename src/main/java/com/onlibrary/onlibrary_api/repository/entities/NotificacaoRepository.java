@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface NotificacaoRepository extends JpaRepository<Notificacao, UUID> {
-    List<Notificacao> findByUsuarioOrderByDataEmissaoDesc(Usuario usuario);
-
-    List<Notificacao> findByUsuarioAndBibliotecaOrderByDataEmissaoDesc(Usuario usuario, Biblioteca biblioteca);
+    List<Notificacao> findByUsuarioOrderByDataEmissaoAsc(Usuario usuario);
+    List<Notificacao> findByUsuarioAndBibliotecaOrderByDataEmissaoAsc(Usuario usuario, Biblioteca biblioteca);
 }
