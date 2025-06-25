@@ -1,12 +1,9 @@
 package com.onlibrary.onlibrary_api.model.entities;
 
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -22,7 +19,7 @@ public class Contato {
     @Column(name = "data_emissao", nullable = false, updatable = false)
     private OffsetDateTime dataEmissao;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "fk_id_usuario", nullable = false)
     private Usuario usuario;
 

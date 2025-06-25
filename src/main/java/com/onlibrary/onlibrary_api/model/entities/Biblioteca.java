@@ -1,5 +1,6 @@
 package com.onlibrary.onlibrary_api.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,26 +46,34 @@ public class Biblioteca {
     private LocalDate dataEmissao = LocalDate.now();
 
     @OneToMany(mappedBy = "biblioteca")
+    @JsonIgnore
     private List<UsuarioBiblioteca> usuarioBibliotecas;
 
     @OneToMany(mappedBy = "biblioteca")
+    @JsonIgnore
     private List<PerfilUsuario> perfisUsuario;
 
     @OneToMany(mappedBy = "biblioteca")
+    @JsonIgnore
     private List<Exemplar> exemplares;
 
     @OneToMany(mappedBy = "biblioteca")
+    @JsonIgnore
     private List<Emprestimo> emprestimos;
 
     @OneToMany(mappedBy = "biblioteca")
+    @JsonIgnore
     private List<Reserva> reservas;
 
     @OneToMany(mappedBy = "biblioteca")
+    @JsonIgnore
     private List<Multa> multas;
 
     @OneToMany(mappedBy = "biblioteca")
+    @JsonIgnore
     private List<Notificacao> notificacoes;
 
     @OneToMany(mappedBy = "biblioteca")
+    @JsonIgnore
     private List<BibliotecaLivro> bibliotecaLivros;
 }
