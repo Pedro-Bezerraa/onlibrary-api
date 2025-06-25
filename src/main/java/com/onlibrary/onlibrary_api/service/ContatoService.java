@@ -21,6 +21,15 @@ public class ContatoService {
     private final UsuarioRepository usuarioRepository;
 
     @Transactional
+    public void marcarComoConcluido(UUID contatoId) {
+        Contato contato = contatoRepository.findById(contatoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Registro de suporte não encontrado."));
+
+        contato.setConcluido(true);
+        contatoRepository.save(contato);
+    }
+
+    @Transactional
     public ContatoResponseDTO criarContato(ContatoRequestDTO dto) {
         Usuario usuario = usuarioRepository.findById(dto.usuarioId())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));

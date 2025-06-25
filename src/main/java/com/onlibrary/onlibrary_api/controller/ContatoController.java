@@ -30,4 +30,10 @@ public class ContatoController {
         contatoService.marcarComoLido(id);
         return ResponseEntity.ok(new ResponseDTO<>(true, "Registro de suporte marcado como lido.", null));
     }
+
+    @PutMapping("/concluido/{id}")
+    public ResponseEntity<ResponseDTO<Void>> marcarComoConcluido(@PathVariable UUID id) {
+        contatoService.marcarComoConcluido(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Registro de suporte marcado como concluído.", null));
+    }
 }
