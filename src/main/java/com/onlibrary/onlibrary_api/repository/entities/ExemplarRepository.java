@@ -1,5 +1,6 @@
 package com.onlibrary.onlibrary_api.repository.entities;
 
+import com.onlibrary.onlibrary_api.dto.exemplar.ExemplarStatusDTO;
 import com.onlibrary.onlibrary_api.model.entities.Biblioteca;
 import com.onlibrary.onlibrary_api.model.entities.Exemplar;
 import com.onlibrary.onlibrary_api.model.entities.Livro;
@@ -16,6 +17,6 @@ public interface ExemplarRepository extends JpaRepository<Exemplar, UUID> {
     long countByBibliotecaIdAndDeletadoFalse(UUID bibliotecaId);
     List<Exemplar> findByBibliotecaIdAndSituacaoInAndDeletadoFalse(UUID bibliotecaId, List<SituacaoExemplar> situacoes);
 
-    @Query("SELECT e.situacao FROM Exemplar e WHERE e.biblioteca.id = :bibliotecaId AND e.livro.id = :livroId AND e.deletado = false")
-    List<SituacaoExemplar> findSituacoesByBibliotecaIdAndLivroId(@Param("bibliotecaId") UUID bibliotecaId, @Param("livroId") UUID livroId);
+    @Query("SELECT new com.onlibrary.onlibrary_api.dto.exemplar.ExemplarStatusDTO(e.id, e.situacao) FROM Exemplar e WHERE e.biblioteca.id = :bibliotecaId AND e.livro.id = :livroId AND e.deletado = false")
+    List<ExemplarStatusDTO> findExemplaresStatusByBibliotecaIdAndLivroId(@Param("bibliotecaId") UUID bibliotecaId, @Param("livroId") UUID livroId);
 }

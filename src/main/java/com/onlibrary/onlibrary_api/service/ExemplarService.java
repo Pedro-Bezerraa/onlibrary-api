@@ -1,10 +1,7 @@
 package com.onlibrary.onlibrary_api.service;
 
 import com.onlibrary.onlibrary_api.dto.LabelValueDTO;
-import com.onlibrary.onlibrary_api.dto.exemplar.ExemplarDependenciesDTO;
-import com.onlibrary.onlibrary_api.dto.exemplar.UpdateExemplarRequestDTO;
-import com.onlibrary.onlibrary_api.dto.exemplar.ExemplarRequestDTO;
-import com.onlibrary.onlibrary_api.dto.exemplar.ExemplarResponseDTO;
+import com.onlibrary.onlibrary_api.dto.exemplar.*;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.*;
@@ -90,8 +87,8 @@ public class ExemplarService {
     }
 
     @Transactional(readOnly = true)
-    public List<SituacaoExemplar> getExemplarSituacoes(UUID bibliotecaId, UUID livroId) {
-        return exemplarRepository.findSituacoesByBibliotecaIdAndLivroId(bibliotecaId, livroId);
+    public List<ExemplarStatusDTO> getExemplaresStatus(UUID bibliotecaId, UUID livroId) {
+        return exemplarRepository.findExemplaresStatusByBibliotecaIdAndLivroId(bibliotecaId, livroId);
     }
 
     @Transactional
