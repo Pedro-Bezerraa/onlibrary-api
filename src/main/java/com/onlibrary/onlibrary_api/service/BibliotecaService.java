@@ -71,8 +71,6 @@ public class BibliotecaService {
         Usuario usuario = usuarioRepository.findById(idUsuarioCriador)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
-        usuario.setTipo(TipoUsuario.ADMIN_MASTER);
-
         UsuarioBiblioteca usuarioBiblioteca = new UsuarioBiblioteca();
         usuarioBiblioteca.setBiblioteca(biblioteca);
         usuarioBiblioteca.setUsuario(usuario);
