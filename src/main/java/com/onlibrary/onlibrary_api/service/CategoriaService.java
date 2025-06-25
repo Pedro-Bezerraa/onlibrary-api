@@ -4,12 +4,14 @@ import com.onlibrary.onlibrary_api.dto.categoria.UpdateCategoriaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.categoria.UpdateCategoriaResponseDTO;
 import com.onlibrary.onlibrary_api.dto.categoria.CategoriaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.categoria.CategoriaResponseDTO;
+import com.onlibrary.onlibrary_api.dto.livro.LivroCategoriaResponseDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ConflictException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Categoria;
 import com.onlibrary.onlibrary_api.repository.entities.CategoriaRepository;
 import com.onlibrary.onlibrary_api.repository.entities.LivroCategoriaRepository;
+import com.onlibrary.onlibrary_api.repository.entities.LivroRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,16 @@ import java.util.stream.Collectors;
 public class CategoriaService {
     private final CategoriaRepository categoriaRepository;
     private final LivroCategoriaRepository livroCategoriaRepository;
+    private final LivroRepository livroRepository;
+
+
+    @Transactional(readOnly = true)
+    public List<LivroCategoriaResponseDTO> listarLivrosPorCategoria(UUID categoriaId) {
+        if (!categoriaRepository.existsById(categoriaId)) {
+            throw new ResourceNotFoundException("Categoria não encontrada.");
+        }
+        return livroRepository.findLivrosByCategoriaId(categoriaId);
+    }
 
     @Transactional(readOnly = true)
     public List<CategoriaResponseDTO> listarCategorias() {

@@ -5,6 +5,7 @@ import com.onlibrary.onlibrary_api.dto.categoria.CategoriaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.categoria.CategoriaResponseDTO;
 import com.onlibrary.onlibrary_api.dto.categoria.UpdateCategoriaRequestDTO;
 import com.onlibrary.onlibrary_api.dto.categoria.UpdateCategoriaResponseDTO;
+import com.onlibrary.onlibrary_api.dto.livro.LivroCategoriaResponseDTO;
 import com.onlibrary.onlibrary_api.service.CategoriaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CategoriaController {
     private final CategoriaService categoriaService;
+
+    @GetMapping("/livros/{id}")
+    public ResponseEntity<ResponseDTO<List<LivroCategoriaResponseDTO>>> listarLivrosPorCategoria(@PathVariable UUID id) {
+        List<LivroCategoriaResponseDTO> livros = categoriaService.listarLivrosPorCategoria(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Livros da categoria recuperados com sucesso", livros));
+    }
 
     @GetMapping
     public ResponseEntity<ResponseDTO<List<CategoriaResponseDTO>>> listarCategorias() {
