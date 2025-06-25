@@ -55,7 +55,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         req -> req
                                 .requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/categoria", "/api/categoria/livros/{id}", "/api/livro/search/biblioteca", "/api/livro/search/home", "/api/livro/search/suggestions", "/api/livro/{livroId}/libraries", "/api/livro/{livroId}/details").permitAll()
+                                .requestMatchers(HttpMethod.GET,
+                                        "/api/categoria",
+                                        "/api/categoria/livros/{id}",
+                                        "/api/livro/search/biblioteca",
+                                        "/api/livro/search/home",
+                                        "/api/livro/search/suggestions",
+                                        "/api/livro/{livroId}/libraries",
+                                        "/api/livro/{livroId}/details",
+                                        "/api/data/group").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(
