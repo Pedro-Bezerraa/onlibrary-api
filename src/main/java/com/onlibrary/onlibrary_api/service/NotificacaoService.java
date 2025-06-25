@@ -65,4 +65,13 @@ public class NotificacaoService {
             default -> throw new BusinessException("Tipo de notificação inválido: " + tipo);
         };
     }
+
+    @Transactional
+    public void marcarComoLida(UUID notificacaoId) {
+        Notificacao notificacao = notificacaoRepository.findById(notificacaoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Notificação não encontrada."));
+
+        notificacao.setMarcadoLido(true);
+        notificacaoRepository.save(notificacao);
+    }
 }
