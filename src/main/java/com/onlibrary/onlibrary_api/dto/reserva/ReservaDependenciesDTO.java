@@ -10,8 +10,10 @@ public record ReservaDependenciesDTO(
         BigDecimal quantidade_total,
         LabelValue<String> situacao,
         LocalDate data_retirada,
-        List<LabelValueDTO> usuarios_biblioteca,
-        List<LabelValueDTO> livros_biblioteca
+        LabelValueDTO usuarios_biblioteca,
+        LabelValueDTO livros_biblioteca
+//        List<LabelValueDTO> todos_os_usuarios,
+//        List<LabelValueDTO> todos_os_livros_da_biblioteca
 ) {
     public record LabelValue<T>(String label, T value) {}
 }

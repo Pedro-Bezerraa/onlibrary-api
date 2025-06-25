@@ -75,25 +75,23 @@ public class ReservaService {
                 reserva.getLivro().getTitulo(),
                 reserva.getLivro().getId()
         );
-
-        List<LabelValueDTO> allUsers = usuarioRepository.findByDeletadoFalse()
-                .stream()
-                .map(u -> new LabelValueDTO(u.getUsername(), u.getId()))
-                .collect(Collectors.toList());
-
-        List<LabelValueDTO> allBooks = bibliotecaLivroRepository.findWithLivroByBibliotecaId(reserva.getBiblioteca().getId())
-                .stream()
-                .map(bl -> new LabelValueDTO(bl.getLivro().getTitulo(), bl.getLivro().getId()))
-                .collect(Collectors.toList());
+//
+//        List<LabelValueDTO> allUsers = usuarioRepository.findByDeletadoFalse()
+//                .stream()
+//                .map(u -> new LabelValueDTO(u.getUsername(), u.getId()))
+//                .collect(Collectors.toList());
+//
+//        List<LabelValueDTO> allBooks = bibliotecaLivroRepository.findWithLivroByBibliotecaId(reserva.getBiblioteca().getId())
+//                .stream()
+//                .map(bl -> new LabelValueDTO(bl.getLivro().getTitulo(), bl.getLivro().getId()))
+//                .collect(Collectors.toList());
 
         return new ReservaDependenciesDTO(
                 reserva.getQuantidadeTotal(),
                 situacao,
                 reserva.getDataRetirada(),
                 usuario,
-                livro,
-                allUsers,
-                allBooks
+                livro
         );
     }
 
