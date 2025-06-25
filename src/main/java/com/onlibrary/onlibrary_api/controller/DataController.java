@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -19,6 +20,14 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DataController {
     private final DataService dataService;
+
+    @GetMapping("/resumo")
+    public ResponseEntity<ResponseDTO<Map<String, List<?>>>> getSummary(
+            @RequestParam(name = "id_biblioteca", required = false) UUID bibliotecaId,
+            @RequestParam("type") String type) {
+        Map<String, List<?>> summary = dataService.getSummary(bibliotecaId, type);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Resumo recuperado com sucesso.", summary));
+    }
 
     @GetMapping("/graficos")
     public ResponseEntity<ResponseDTO<ChartDataResponseDTO>> getChartData(

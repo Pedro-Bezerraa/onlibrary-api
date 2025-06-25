@@ -7,6 +7,7 @@ import com.onlibrary.onlibrary_api.dto.livro.BookDependenciesDTO;
 import com.onlibrary.onlibrary_api.dto.LabelValueDTO;
 import com.onlibrary.onlibrary_api.dto.biblioteca.LibraryUserDependenciesDTO;
 import com.onlibrary.onlibrary_api.dto.biblioteca.ContagemResponseDTO;
+import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Usuario;
 import com.onlibrary.onlibrary_api.model.enums.*;
@@ -18,9 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -63,6 +62,41 @@ public class DataService {
     private static final Set<String> ALLOWED_TABLE_NAMES = Set.of(
             "tb_emprestimo", "tb_reserva", "tb_multa", "tb_usuario", "tb_biblioteca"
     );
+
+    @Transactional(readOnly = true)
+    public Map<String, List<?>> getSummary(UUID bibliotecaId, String type) {
+        Map<String, List<?>> summary = new HashMap<>();
+
+        if ("biblioteca".equalsIgnoreCase(type)) {
+            if (bibliotecaId == null) {
+                throw new BusinessException("O ID da biblioteca é obrigatório para o tipo 'biblioteca'.");
+            }
+            summary.put("livros_da_biblioteca", vwTableBibliotecaLivroRepository.findByFkIdBiblioteca(bibliotecaId));
+            summary.put("autores_da_biblioteca", vwTableBibliotecaAutorRepository.findByFkIdBiblioteca(bibliotecaId));
+            summary.put("generos_da_biblioteca", vwTableBibliotecaGeneroRepository.findByFkIdBiblioteca(bibliotecaId));
+            summary.put("editoras_da_biblioteca", vwTableBibliotecaEditoraRepository.findByFkIdBiblioteca(bibliotecaId));
+            summary.put("categorias_da_biblioteca", vwTableBibliotecaCategoriaRepository.findByFkIdBiblioteca(bibliotecaId));
+            summary.put("exemplares_da_biblioteca", vwTableExemplarRepository.findByFkIdBiblioteca(bibliotecaId));
+            summary.put("usuarios_da_biblioteca", vwTabelaUsuarioBibliotecaRepository.findByFkIdBiblioteca(bibliotecaId));
+            summary.put("perfis_da_biblioteca", vwTabelaPerfilUsuarioRepository.findByFkIdBiblioteca(bibliotecaId));
+            summary.put("emprestimos_da_biblioteca", vwTableEmprestimoRepository.findByFkIdBiblioteca(bibliotecaId));
+            summary.put("multas_da_biblioteca", vwTableMultaRepository.findByFkIdBiblioteca(bibliotecaId));
+            summary.put("reservas_da_biblioteca", vwTableReservaRepository.findByFkIdBiblioteca(bibliotecaId));
+
+        } else if ("admin".equalsIgnoreCase(type)) {
+            summary.put("livros", vwTableLivroRepository.findAll());
+            summary.put("usuarios", vwTableUsuarioRepository.findAll());
+            summary.put("bibliotecas", vwTableBibliotecaRepository.findAll());
+            summary.put("autores", vwTableAutorRepository.findAll());
+            summary.put("categorias", vwTableCategoriaRepository.findAll());
+            summary.put("generos", vwTableGeneroRepository.findAll());
+            summary.put("editoras", vwTableEditoraRepository.findAll());
+        } else {
+            throw new BusinessException("Tipo de resumo inválido: " + type);
+        }
+
+        return summary;
+    }
 
     @Transactional(readOnly = true)
     public ChartDataResponseDTO getChartData(String nomeTabela, UUID bibliotecaId) {
