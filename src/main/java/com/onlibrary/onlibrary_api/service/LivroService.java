@@ -257,95 +257,92 @@ public class LivroService {
             livro.setCapa(novaImagem);
         }
 
-        if (dto.isbn() != null && !dto.isbn().equalsIgnoreCase(livro.getIsbn())) {
-            if (livroRepository.existsByIsbnIgnoreCase(dto.isbn())) {
-                throw new BusinessException("ISBN já cadastrado");
+        if (dto != null) {
+            if (dto.isbn() != null && !dto.isbn().equalsIgnoreCase(livro.getIsbn())) {
+                if (livroRepository.existsByIsbnIgnoreCase(dto.isbn())) {
+                    throw new BusinessException("ISBN já cadastrado");
+                }
+                livro.setIsbn(dto.isbn());
             }
-            livro.setIsbn(dto.isbn());
-        }
 
-        if (dto.titulo() != null && !dto.titulo().equalsIgnoreCase(livro.getTitulo())) {
-            if (livroRepository.existsByTituloIgnoreCase(dto.titulo())) {
-                throw new BusinessException("Título já cadastrado");
+            if (dto.titulo() != null && !dto.titulo().equalsIgnoreCase(livro.getTitulo())) {
+                if (livroRepository.existsByTituloIgnoreCase(dto.titulo())) {
+                    throw new BusinessException("Título já cadastrado");
+                }
+                livro.setTitulo(dto.titulo());
             }
-            livro.setTitulo(dto.titulo());
+
+            if (dto.descricao() != null) {
+                livro.setDescricao(dto.descricao());
+            }
+
+            if (dto.anoLancamento() != null) {
+                livro.setAnoLancamento(dto.anoLancamento());
+            }
+
+            if (dto.autores() != null) {
+                livroAutorRepository.deleteByLivroId(livro.getId());
+                List<LivroAutor> autores = dto.autores().stream()
+                        .map(autorId -> {
+                            Autor autor = autorRepository.findById(autorId)
+                                    .orElseThrow(() -> new ResourceNotFoundException("Autor não encontrado"));
+                            return LivroAutor.builder().livro(livro).autor(autor).build();
+                        }).toList();
+                livroAutorRepository.saveAll(autores);
+            }
+
+            if (dto.categorias() != null) {
+                livroCategoriaRepository.deleteByLivroId(livro.getId());
+                List<LivroCategoria> categorias = dto.categorias().stream()
+                        .map(categoriaId -> {
+                            Categoria categoria = categoriaRepository.findById(categoriaId)
+                                    .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada"));
+                            return LivroCategoria.builder().livro(livro).categoria(categoria).build();
+                        }).toList();
+                livroCategoriaRepository.saveAll(categorias);
+            }
+
+            if (dto.editoras() != null) {
+                livroEditoraRepository.deleteByLivroId(livro.getId());
+                List<LivroEditora> editoras = dto.editoras().stream()
+                        .map(editoraId -> {
+                            Editora editora = editoraRepository.findById(editoraId)
+                                    .orElseThrow(() -> new ResourceNotFoundException("Editora não encontrada"));
+                            return LivroEditora.builder().livro(livro).editora(editora).build();
+                        }).toList();
+                livroEditoraRepository.saveAll(editoras);
+            }
+
+            if (dto.generos() != null) {
+                livroGeneroRepository.deleteByLivroId(livro.getId());
+                List<LivroGenero> generos = dto.generos().stream()
+                        .map(generoId -> {
+                            Genero genero = generoRepository.findById(generoId)
+                                    .orElseThrow(() -> new ResourceNotFoundException("Gênero não encontrado"));
+                            return LivroGenero.builder().livro(livro).genero(genero).build();
+                        }).toList();
+                livroGeneroRepository.saveAll(generos);
+            }
         }
 
-        if (dto.descricao() != null) {
-            livro.setDescricao(dto.descricao());
-        }
-
-        if (dto.anoLancamento() != null) {
-            livro.setAnoLancamento(dto.anoLancamento());
-        }
-
-        livroRepository.save(livro);
-
-        List<LivroAutor> autores = List.of();
-        List<LivroCategoria> categorias = List.of();
-        List<LivroEditora> editoras = List.of();
-        List<LivroGenero> generos = List.of();
-
-        if (dto.autores() != null) {
-            livroAutorRepository.deleteByLivroId(livro.getId());
-            autores = dto.autores().stream()
-                    .map(autorId -> {
-                        Autor autor = autorRepository.findById(autorId)
-                                .orElseThrow(() -> new ResourceNotFoundException("Autor não encontrado"));
-                        return LivroAutor.builder().livro(livro).autor(autor).build();
-                    }).toList();
-            livroAutorRepository.saveAll(autores);
-        }
-
-        if (dto.categorias() != null) {
-            livroCategoriaRepository.deleteByLivroId(livro.getId());
-            categorias = dto.categorias().stream()
-                    .map(categoriaId -> {
-                        Categoria categoria = categoriaRepository.findById(categoriaId)
-                                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada"));
-                        return LivroCategoria.builder().livro(livro).categoria(categoria).build();
-                    }).toList();
-            livroCategoriaRepository.saveAll(categorias);
-        }
-
-        if (dto.editoras() != null) {
-            livroEditoraRepository.deleteByLivroId(livro.getId());
-            editoras = dto.editoras().stream()
-                    .map(editoraId -> {
-                        Editora editora = editoraRepository.findById(editoraId)
-                                .orElseThrow(() -> new ResourceNotFoundException("Editora não encontrada"));
-                        return LivroEditora.builder().livro(livro).editora(editora).build();
-                    }).toList();
-            livroEditoraRepository.saveAll(editoras);
-        }
-
-        if (dto.generos() != null) {
-            livroGeneroRepository.deleteByLivroId(livro.getId());
-            generos = dto.generos().stream()
-                    .map(generoId -> {
-                        Genero genero = generoRepository.findById(generoId)
-                                .orElseThrow(() -> new ResourceNotFoundException("Gênero não encontrado"));
-                        return LivroGenero.builder().livro(livro).genero(genero).build();
-                    }).toList();
-            livroGeneroRepository.saveAll(generos);
-        }
+        Livro livroSalvo = livroRepository.save(livro);
 
         return new UpdateLivroResponseDTO(
-                livro.getId(),
-                livro.getIsbn(),
-                livro.getTitulo(),
-                livro.getDescricao(),
-                livro.getAnoLancamento(),
-                autores.stream()
+                livroSalvo.getId(),
+                livroSalvo.getIsbn(),
+                livroSalvo.getTitulo(),
+                livroSalvo.getDescricao(),
+                livroSalvo.getAnoLancamento(),
+                livroSalvo.getAutores().stream()
                         .map(a -> new AutorResponseDTO(a.getAutor().getId(), a.getAutor().getNome()))
                         .toList(),
-                categorias.stream()
+                livroSalvo.getCategorias().stream()
                         .map(c -> new CategoriaResponseDTO(c.getCategoria().getId(), c.getCategoria().getNome()))
                         .toList(),
-                generos.stream()
+                livroSalvo.getGeneros().stream()
                         .map(g -> new GeneroResponseDTO(g.getGenero().getId(), g.getGenero().getNome()))
                         .toList(),
-                editoras.stream()
+                livroSalvo.getEditoras().stream()
                         .map(e -> new EditoraResponseDTO(e.getEditora().getId(), e.getEditora().getNome()))
                         .toList()
         );
