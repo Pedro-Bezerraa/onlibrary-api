@@ -1,5 +1,6 @@
 package com.onlibrary.onlibrary_api.service;
 
+import com.onlibrary.onlibrary_api.dto.autor.AutorDependenciesDTO;
 import com.onlibrary.onlibrary_api.dto.autor.AutorRequestDTO;
 import com.onlibrary.onlibrary_api.dto.autor.AutorResponseDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
@@ -27,6 +28,13 @@ public class AutorService {
         return autorRepository.findByDeletadoFalse().stream()
                 .map(autor -> new AutorResponseDTO(autor.getId(), autor.getNome()))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public AutorDependenciesDTO getAutorDependencies(UUID id) {
+        Autor autor = autorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Autor não encontrado."));
+        return new AutorDependenciesDTO(autor.getNome());
     }
 
 

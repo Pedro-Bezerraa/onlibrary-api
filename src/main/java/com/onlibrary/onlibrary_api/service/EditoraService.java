@@ -1,9 +1,6 @@
 package com.onlibrary.onlibrary_api.service;
 
-import com.onlibrary.onlibrary_api.dto.editora.UpdateEditoraRequestDTO;
-import com.onlibrary.onlibrary_api.dto.editora.UpdateEditoraResponseDTO;
-import com.onlibrary.onlibrary_api.dto.editora.EditoraRequestDTO;
-import com.onlibrary.onlibrary_api.dto.editora.EditoraResponseDTO;
+import com.onlibrary.onlibrary_api.dto.editora.*;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ConflictException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
@@ -23,6 +20,13 @@ import java.util.stream.Collectors;
 public class EditoraService {
     private final EditoraRepository editoraRepository;
     private final LivroEditoraRepository livroEditoraRepository;
+
+    @Transactional(readOnly = true)
+    public EditoraDependenciesDTO getEditoraDependencies(UUID id) {
+        Editora editora = editoraRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Editora não encontrada."));
+        return new EditoraDependenciesDTO(editora.getNome());
+    }
 
     @Transactional(readOnly = true)
     public List<EditoraResponseDTO> listarEditoras() {

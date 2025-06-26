@@ -1,9 +1,6 @@
 package com.onlibrary.onlibrary_api.service;
 
-import com.onlibrary.onlibrary_api.dto.categoria.UpdateCategoriaRequestDTO;
-import com.onlibrary.onlibrary_api.dto.categoria.UpdateCategoriaResponseDTO;
-import com.onlibrary.onlibrary_api.dto.categoria.CategoriaRequestDTO;
-import com.onlibrary.onlibrary_api.dto.categoria.CategoriaResponseDTO;
+import com.onlibrary.onlibrary_api.dto.categoria.*;
 import com.onlibrary.onlibrary_api.dto.livro.LivroCategoriaResponseDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ConflictException;
@@ -27,6 +24,12 @@ public class CategoriaService {
     private final LivroCategoriaRepository livroCategoriaRepository;
     private final LivroRepository livroRepository;
 
+    @Transactional(readOnly = true)
+    public CategoriaDependenciesDTO getCategoriaDependencies(UUID id) {
+        Categoria categoria = categoriaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada."));
+        return new CategoriaDependenciesDTO(categoria.getNome());
+    }
 
     @Transactional(readOnly = true)
     public List<LivroCategoriaResponseDTO> listarLivrosPorCategoria(UUID categoriaId) {

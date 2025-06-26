@@ -1,6 +1,7 @@
 package com.onlibrary.onlibrary_api.controller;
 
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
+import com.onlibrary.onlibrary_api.dto.genero.GeneroDependenciesDTO;
 import com.onlibrary.onlibrary_api.dto.genero.GeneroRequestDTO;
 import com.onlibrary.onlibrary_api.dto.genero.GeneroResponseDTO;
 import com.onlibrary.onlibrary_api.exception.InvalidCredentialsException;
@@ -43,5 +44,11 @@ public class GeneroController {
     public ResponseEntity<ResponseDTO<Void>> deletarGenero(@PathVariable UUID id) {
         generoService.deletarGenero(id);
         return ResponseEntity.ok(new ResponseDTO<>(true, "Gênero marcado como deletado com sucesso.", null));
+    }
+
+    @GetMapping("/dependencies/{id}")
+    public ResponseEntity<ResponseDTO<GeneroDependenciesDTO>> getGeneroDependencies(@PathVariable UUID id) {
+        GeneroDependenciesDTO dependencies = generoService.getGeneroDependencies(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Dependências do gênero recuperadas com sucesso.", dependencies));
     }
 }

@@ -1,5 +1,6 @@
 package com.onlibrary.onlibrary_api.service;
 
+import com.onlibrary.onlibrary_api.dto.genero.GeneroDependenciesDTO;
 import com.onlibrary.onlibrary_api.dto.genero.GeneroRequestDTO;
 import com.onlibrary.onlibrary_api.dto.genero.GeneroResponseDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
@@ -29,6 +30,12 @@ public class GeneroService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public GeneroDependenciesDTO getGeneroDependencies(UUID id) {
+        Genero genero = generoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Gênero não encontrado."));
+        return new GeneroDependenciesDTO(genero.getNome());
+    }
 
     @Transactional
     public GeneroResponseDTO criarGenero(GeneroRequestDTO dto) {

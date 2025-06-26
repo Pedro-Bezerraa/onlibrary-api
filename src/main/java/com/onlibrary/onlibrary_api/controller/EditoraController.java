@@ -1,10 +1,7 @@
 package com.onlibrary.onlibrary_api.controller;
 
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
-import com.onlibrary.onlibrary_api.dto.editora.UpdateEditoraRequestDTO;
-import com.onlibrary.onlibrary_api.dto.editora.UpdateEditoraResponseDTO;
-import com.onlibrary.onlibrary_api.dto.editora.EditoraRequestDTO;
-import com.onlibrary.onlibrary_api.dto.editora.EditoraResponseDTO;
+import com.onlibrary.onlibrary_api.dto.editora.*;
 import com.onlibrary.onlibrary_api.service.EditoraService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,6 +30,11 @@ public class EditoraController {
                 .body(new ResponseDTO<>(true, "Editora criada com sucesso", editora));
     }
 
+    @GetMapping("/dependencies/{id}")
+    public ResponseEntity<ResponseDTO<EditoraDependenciesDTO>> getEditoraDependencies(@PathVariable UUID id) {
+        EditoraDependenciesDTO dependencies = editoraService.getEditoraDependencies(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Dependências da editora recuperadas com sucesso.", dependencies));
+    }
 
     @PutMapping("/atualizar-editora/{id}")
     public ResponseEntity<?> atualizarEditora(@PathVariable UUID id, @RequestBody UpdateEditoraRequestDTO dto) {

@@ -1,10 +1,7 @@
 package com.onlibrary.onlibrary_api.controller;
 
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
-import com.onlibrary.onlibrary_api.dto.categoria.CategoriaRequestDTO;
-import com.onlibrary.onlibrary_api.dto.categoria.CategoriaResponseDTO;
-import com.onlibrary.onlibrary_api.dto.categoria.UpdateCategoriaRequestDTO;
-import com.onlibrary.onlibrary_api.dto.categoria.UpdateCategoriaResponseDTO;
+import com.onlibrary.onlibrary_api.dto.categoria.*;
 import com.onlibrary.onlibrary_api.dto.livro.LivroCategoriaResponseDTO;
 import com.onlibrary.onlibrary_api.service.CategoriaService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +17,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CategoriaController {
     private final CategoriaService categoriaService;
+
+    @GetMapping("/dependencies/{id}")
+    public ResponseEntity<ResponseDTO<CategoriaDependenciesDTO>> getCategoriaDependencies(@PathVariable UUID id) {
+        CategoriaDependenciesDTO dependencies = categoriaService.getCategoriaDependencies(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Dependências da categoria recuperadas com sucesso.", dependencies));
+    }
 
     @GetMapping("/livros/{id}")
     public ResponseEntity<ResponseDTO<List<LivroCategoriaResponseDTO>>> listarLivrosPorCategoria(@PathVariable UUID id) {

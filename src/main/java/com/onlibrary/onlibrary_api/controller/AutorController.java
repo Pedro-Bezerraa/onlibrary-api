@@ -1,6 +1,7 @@
 package com.onlibrary.onlibrary_api.controller;
 
 import com.onlibrary.onlibrary_api.dto.ResponseDTO;
+import com.onlibrary.onlibrary_api.dto.autor.AutorDependenciesDTO;
 import com.onlibrary.onlibrary_api.dto.autor.AutorRequestDTO;
 import com.onlibrary.onlibrary_api.dto.autor.AutorResponseDTO;
 import com.onlibrary.onlibrary_api.exception.InvalidCredentialsException;
@@ -19,6 +20,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AutorController {
     private final AutorService autorService;
+
+    @GetMapping("/dependencies/{id}")
+    public ResponseEntity<ResponseDTO<AutorDependenciesDTO>> getAutorDependencies(@PathVariable UUID id) {
+        AutorDependenciesDTO dependencies = autorService.getAutorDependencies(id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Dependências do autor recuperadas com sucesso.", dependencies));
+    }
 
     @GetMapping
     public ResponseEntity<ResponseDTO<List<AutorResponseDTO>>> listarAutores() {
