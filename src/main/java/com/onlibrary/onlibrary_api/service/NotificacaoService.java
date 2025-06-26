@@ -54,7 +54,7 @@ public class NotificacaoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
         return switch (tipo.toLowerCase()) {
-            case "comum" -> notificacaoRepository.findByUsuarioAndBibliotecaIsNullOrderByDataEmissaoAscAndDeletadoFalse(usuario)
+            case "comum" -> notificacaoRepository.findByUsuarioAndBibliotecaIsNullAndDeletadoFalseOrderByDataEmissaoAsc(usuario)
                     .stream()
                     .map(NotificacaoResponseDTO::new)
                     .collect(Collectors.toList());
@@ -64,12 +64,12 @@ public class NotificacaoService {
                 }
                 Biblioteca biblioteca = bibliotecaRepository.findById(bibliotecaId)
                         .orElseThrow(() -> new ResourceNotFoundException("Biblioteca não encontrada."));
-                yield notificacaoRepository.findByUsuarioAndBibliotecaOrderByDataEmissaoAscAndDeletadoFalsee(usuario, biblioteca)
+                yield notificacaoRepository.findByUsuarioAndBibliotecaAndDeletadoFalseOrderByDataEmissaoAsc(usuario, biblioteca)
                         .stream()
                         .map(NotificacaoResponseDTO::new)
                         .collect(Collectors.toList());
             }
-            case "admin" -> contatoRepository.findAllByOrderByDataEmissaoAscAndDeletadoFalse()
+            case "admin" -> contatoRepository.findAllByDeletadoFalseOrderByDataEmissaoAsc()
                     .stream()
                     .map(SuporteResponseDTO::new)
                     .collect(Collectors.toList());
