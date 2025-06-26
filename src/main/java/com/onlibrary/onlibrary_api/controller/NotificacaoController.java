@@ -31,4 +31,12 @@ public class NotificacaoController {
         notificacaoService.marcarComoLida(id);
         return ResponseEntity.ok(new ResponseDTO<>(true, "Notificação marcada como lida.", null));
     }
+
+    @DeleteMapping("/deletar")
+    public ResponseEntity<ResponseDTO<Void>> deletarItem(
+            @RequestParam("type") String tipo,
+            @RequestParam("id_biblioteca") UUID id) {
+        notificacaoService.deletarNotificacaoOuContato(tipo, id);
+        return ResponseEntity.ok(new ResponseDTO<>(true, "Item marcado como deletado com sucesso.", null));
+    }
 }

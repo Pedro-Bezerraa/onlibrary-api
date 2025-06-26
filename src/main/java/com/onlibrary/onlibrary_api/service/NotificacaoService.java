@@ -5,6 +5,7 @@ import com.onlibrary.onlibrary_api.dto.notificacao.NotificacaoResponseDTO;
 import com.onlibrary.onlibrary_api.exception.BusinessException;
 import com.onlibrary.onlibrary_api.exception.ResourceNotFoundException;
 import com.onlibrary.onlibrary_api.model.entities.Biblioteca;
+import com.onlibrary.onlibrary_api.model.entities.Contato;
 import com.onlibrary.onlibrary_api.model.entities.Notificacao;
 import com.onlibrary.onlibrary_api.model.entities.Usuario;
 import com.onlibrary.onlibrary_api.model.enums.TipoUsuario;
@@ -53,7 +54,7 @@ public class NotificacaoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
         return switch (tipo.toLowerCase()) {
-            case "comum" -> notificacaoRepository.findByUsuarioAndBibliotecaIsNullOrderByDataEmissaoAsc(usuario)
+            case "comum" -> notificacaoRepository.findByUsuarioAndBibliotecaIsNullOrderByDataEmissaoAscAndDeletadoFalse(usuario)
                     .stream()
                     .map(NotificacaoResponseDTO::new)
                     .collect(Collectors.toList());
@@ -63,12 +64,12 @@ public class NotificacaoService {
                 }
                 Biblioteca biblioteca = bibliotecaRepository.findById(bibliotecaId)
                         .orElseThrow(() -> new ResourceNotFoundException("Biblioteca não encontrada."));
-                yield notificacaoRepository.findByUsuarioAndBibliotecaOrderByDataEmissaoAsc(usuario, biblioteca)
+                yield notificacaoRepository.findByUsuarioAndBibliotecaOrderByDataEmissaoAscAndDeletadoFalsee(usuario, biblioteca)
                         .stream()
                         .map(NotificacaoResponseDTO::new)
                         .collect(Collectors.toList());
             }
-            case "admin" -> contatoRepository.findAllByOrderByDataEmissaoAsc()
+            case "admin" -> contatoRepository.findAllByOrderByDataEmissaoAscAndDeletadoFalse()
                     .stream()
                     .map(SuporteResponseDTO::new)
                     .collect(Collectors.toList());
@@ -83,5 +84,26 @@ public class NotificacaoService {
 
         notificacao.setMarcadoLido(true);
         notificacaoRepository.save(notificacao);
+    }
+
+    @Transactional
+    public void deletarNotificacaoOuContato(String tipo, UUID id) {
+        switch (tipo.toLowerCase()) {
+            case "admin":
+                Contato contato = contatoRepository.findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Registro de suporte (contato) não encontrado."));
+                contato.setDeletado(true);
+                contatoRepository.save(contato);
+                break;
+            case "comum":
+            case "biblioteca":
+                Notificacao notificacao = notificacaoRepository.findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Notificação não encontrada."));
+                notificacao.setDeletado(true);
+                notificacaoRepository.save(notificacao);
+                break;
+            default:
+                throw new BusinessException("Tipo de item para exclusão inválido: " + tipo);
+        }
     }
 }
