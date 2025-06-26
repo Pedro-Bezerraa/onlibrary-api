@@ -8,6 +8,7 @@ import com.onlibrary.onlibrary_api.model.views.VwLivro;
 import com.onlibrary.onlibrary_api.model.views.VwTableBibliotecaLivro;
 import com.onlibrary.onlibrary_api.service.LivroService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/livro")
 @AllArgsConstructor
+@Slf4j
 public class LivroController {
     private final LivroService livroService;
     private final ObjectMapper objectMapper;
@@ -32,6 +34,17 @@ public class LivroController {
             @RequestPart("data") String dataJson,
             @RequestPart(value = "imagem", required = false) MultipartFile imagem
     ) throws Exception {
+        log.info("--- Recebendo dados para criar livro ---");
+        log.info("JSON recebido: {}", dataJson);
+
+        if (imagem != null && !imagem.isEmpty()) {
+            log.info("Arquivo de imagem recebido: Nome='{}', Tamanho='{} bytes', Tipo='{}'",
+                    imagem.getOriginalFilename(), imagem.getSize(), imagem.getContentType());
+        } else {
+            log.warn("Nenhum arquivo de imagem foi enviado.");
+        }
+        log.info("------------------------------------");
+
         LivroRequestDTO dto = objectMapper.readValue(dataJson, LivroRequestDTO.class);
         LivroResponseDTO livroResponseDTO = livroService.criarLivro(dto, imagem);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -44,6 +57,21 @@ public class LivroController {
             @RequestPart(required = false) UpdateLivroRequestDTO dto,
             @RequestPart(required = false) MultipartFile imagem
     ) {
+        log.info("--- Recebendo dados para atualizar livro com ID: {} ---", id);
+        if (dto != null) {
+            log.info("DTO recebido: {}", dto.toString());
+        } else {
+            log.info("Nenhum DTO de atualização foi enviado.");
+        }
+
+        if (imagem != null && !imagem.isEmpty()) {
+            log.info("Arquivo de imagem recebido: Nome='{}', Tamanho='{} bytes', Tipo='{}'",
+                    imagem.getOriginalFilename(), imagem.getSize(), imagem.getContentType());
+        } else {
+            log.warn("Nenhum arquivo de imagem foi enviado para atualização.");
+        }
+        log.info("------------------------------------");
+
         UpdateLivroResponseDTO response = livroService.atualizarLivro(id, dto, imagem);
         return ResponseEntity.ok()
                 .body(new ResponseDTO<>(true, "Livro atualizado com sucesso.", response));
