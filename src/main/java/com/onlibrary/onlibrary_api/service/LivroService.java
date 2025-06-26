@@ -150,72 +150,66 @@ public class LivroService {
             throw new BusinessException("Título já cadastrado.");
         }
 
+        List<Autor> autoresList = new ArrayList<>();
+        for (UUID autorId : dto.autores()) {
+            autoresList.add(autorRepository.findById(autorId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Autor com o ID " + autorId + " não foi encontrado.")));
+        }
+
+        List<Categoria> categoriasList = new ArrayList<>();
+        for (UUID categoriaId : dto.categorias()) {
+            categoriasList.add(categoriaRepository.findById(categoriaId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Categoria com o ID " + categoriaId + " não foi encontrada.")));
+        }
+
+        List<Editora> editorasList = new ArrayList<>();
+        for (UUID editoraId : dto.editoras()) {
+            editorasList.add(editoraRepository.findById(editoraId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Editora com o ID " + editoraId + " não foi encontrada.")));
+        }
+
+        List<Genero> generosList = new ArrayList<>();
+        for (UUID generoId : dto.generos()) {
+            generosList.add(generoRepository.findById(generoId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Gênero com o ID " + generoId + " não foi encontrado.")));
+        }
+
         String urlImagem = null;
         if (capa != null && !capa.isEmpty()) {
-            urlImagem = supabaseStorageService.uploadImagem(capa);
+            try {
+                urlImagem = supabaseStorageService.uploadImagem(capa);
+            } catch (RuntimeException e) {
+                throw new BusinessException("Falha ao fazer upload da imagem da capa: " + e.getMessage(), e);
+            }
         }
 
         Livro livro = new Livro();
-
         livro.setIsbn(dto.isbn());
         livro.setTitulo(dto.titulo());
         livro.setDescricao(dto.descricao());
         livro.setAnoLancamento(dto.anoLancamento());
         livro.setCapa(urlImagem);
-
         livroRepository.save(livro);
 
-
-        List<LivroAutor> autores = dto.autores().stream()
-                .map(autorId -> {
-                    Autor autor = autorRepository.findById(autorId)
-                            .orElseThrow(() -> new ResourceNotFoundException("Autor não encontrado"));
-                    return LivroAutor.builder()
-                            .livro(livro)
-                            .autor(autor)
-                            .build();
-                })
+        final Livro livroFinal = livro;
+        List<LivroAutor> autores = autoresList.stream()
+                .map(autor -> LivroAutor.builder().livro(livroFinal).autor(autor).build())
                 .collect(Collectors.toList());
-
         livroAutorRepository.saveAll(autores);
 
-        List<LivroCategoria> categorias = dto.categorias().stream()
-                .map(categoriaId -> {
-                    Categoria categoria = categoriaRepository.findById(categoriaId)
-                            .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrado"));
-                    return LivroCategoria.builder()
-                            .livro(livro)
-                            .categoria(categoria)
-                            .build();
-                })
+        List<LivroCategoria> categorias = categoriasList.stream()
+                .map(categoria -> LivroCategoria.builder().livro(livroFinal).categoria(categoria).build())
                 .collect(Collectors.toList());
-
         livroCategoriaRepository.saveAll(categorias);
 
-        List<LivroEditora> editoras = dto.editoras().stream()
-                .map(editoraId -> {
-                    Editora editora = editoraRepository.findById(editoraId)
-                            .orElseThrow(() -> new ResourceNotFoundException("Editora não encontrado"));
-                    return LivroEditora.builder()
-                            .livro(livro)
-                            .editora(editora)
-                            .build();
-                })
+        List<LivroEditora> editoras = editorasList.stream()
+                .map(editora -> LivroEditora.builder().livro(livroFinal).editora(editora).build())
                 .collect(Collectors.toList());
-
         livroEditoraRepository.saveAll(editoras);
 
-        List<LivroGenero> generos = dto.generos().stream()
-                .map(generoId -> {
-                    Genero genero = generoRepository.findById(generoId)
-                            .orElseThrow(() -> new ResourceNotFoundException("Genero não encontrado"));
-                    return LivroGenero.builder()
-                            .livro(livro)
-                            .genero(genero)
-                            .build();
-                })
+        List<LivroGenero> generos = generosList.stream()
+                .map(genero -> LivroGenero.builder().livro(livroFinal).genero(genero).build())
                 .collect(Collectors.toList());
-
         livroGeneroRepository.saveAll(generos);
 
         List<AutorResponseDTO> autoresDTO = autores.stream()
