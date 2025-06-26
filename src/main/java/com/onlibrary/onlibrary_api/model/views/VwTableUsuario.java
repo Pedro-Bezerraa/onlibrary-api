@@ -49,5 +49,5 @@ public class VwTableUsuario {
 
     @Column(name = "\"Data de Emissão\"")
     @JsonProperty("Data de emissão")
-    private LocalDate dataEmissao;
+    private String dataEmissao;
 }

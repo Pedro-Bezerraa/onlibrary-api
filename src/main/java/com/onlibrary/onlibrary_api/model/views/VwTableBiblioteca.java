@@ -30,31 +30,35 @@ public class VwTableBiblioteca {
     @JsonProperty("Telefone")
     private String telefone;
 
-    @Column(name = "\"Rua\"")
-    @JsonProperty("Rua")
-    private String rua;
+//    @Column(name = "\"Rua\"")
+//    @JsonProperty("Rua")
+//    private String rua;
 
-    @Column(name = "\"Número\"")
-    @JsonProperty("Número")
-    private Integer numero;
+//    @Column(name = "\"Número\"")
+//    @JsonProperty("Número")
+//    private Integer numero;
+//
+//    @Column(name = "\"Cep\"")
+//    @JsonProperty("CEP")
+//    private String cep;
 
-    @Column(name = "\"Cep\"")
-    @JsonProperty("CEP")
-    private String cep;
+    @Column(name = "\"Endereço\"")
+    @JsonProperty("Endereço")
+    private String endereco;
 
     @Column(name = "\"Aplicação Multa\"")
     @JsonProperty("Aplicação multa")
-    private Boolean aplicacaoMulta;
+    private String aplicacaoMulta;
 
     @Column(name = "\"Reserva Online\"")
     @JsonProperty("Reserva online")
-    private Boolean reservaOnline;
+    private String reservaOnline;
 
     @Column(name = "\"Aplicação Bloqueio\"")
     @JsonProperty("Aplicação bloqueio")
-    private Boolean aplicacaoBloqueio;
+    private String aplicacaoBloqueio;
 
     @Column(name = "\"Data de Emissão\"")
     @JsonProperty("Data de emissão")
-    private LocalDate dataEmissao;
+    private String dataEmissao;
 }

@@ -1,5 +1,6 @@
 package com.onlibrary.onlibrary_api.service;
 
+import com.onlibrary.onlibrary_api.dto.LabelValueDTO;
 import com.onlibrary.onlibrary_api.dto.livro.*;
 import com.onlibrary.onlibrary_api.dto.autor.AutorResponseDTO;
 import com.onlibrary.onlibrary_api.dto.categoria.CategoriaResponseDTO;
@@ -73,16 +74,16 @@ public class LivroService {
         dependencies.put("ano_lancamento", livro.getAnoLancamento());
 
         dependencies.put("categorias", livro.getCategorias().stream()
-                .map(livroCategoria -> livroCategoria.getCategoria().getId())
+                .map(livroCategoria -> new LabelValueDTO(livroCategoria.getCategoria().getNome(), livroCategoria.getCategoria().getId()))
                 .collect(Collectors.toList()));
         dependencies.put("generos", livro.getGeneros().stream()
-                .map(livroGenero -> livroGenero.getGenero().getId())
+                .map(livroGenero -> new LabelValueDTO(livroGenero.getGenero().getNome(), livroGenero.getGenero().getId()))
                 .collect(Collectors.toList()));
         dependencies.put("editoras", livro.getEditoras().stream()
-                .map(livroEditora -> livroEditora.getEditora().getId())
+                .map(livroEditora -> new LabelValueDTO(livroEditora.getEditora().getNome(), livroEditora.getEditora().getId()))
                 .collect(Collectors.toList()));
         dependencies.put("autores", livro.getAutores().stream()
-                .map(livroAutor -> livroAutor.getAutor().getId())
+                .map(livroAutor -> new LabelValueDTO(livroAutor.getAutor().getNome(), livroAutor.getAutor().getId()))
                 .collect(Collectors.toList()));
 
         return dependencies;
