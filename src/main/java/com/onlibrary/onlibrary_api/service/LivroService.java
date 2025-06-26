@@ -141,7 +141,7 @@ public class LivroService {
     }
 
     @Transactional
-    public LivroResponseDTO criarLivro(LivroRequestDTO dto, MultipartFile imagem) {
+    public LivroResponseDTO criarLivro(LivroRequestDTO dto, MultipartFile capa) {
         if (livroRepository.existsByIsbnIgnoreCase(dto.isbn())) {
             throw new BusinessException("ISBN já cadastrado");
         }
@@ -151,8 +151,8 @@ public class LivroService {
         }
 
         String urlImagem = null;
-        if (imagem != null && !imagem.isEmpty()) {
-            urlImagem = supabaseStorageService.uploadImagem(imagem);
+        if (capa != null && !capa.isEmpty()) {
+            urlImagem = supabaseStorageService.uploadImagem(capa);
         }
 
         Livro livro = new Livro();
@@ -248,12 +248,12 @@ public class LivroService {
     }
 
     @Transactional
-    public UpdateLivroResponseDTO atualizarLivro(UUID id, UpdateLivroRequestDTO dto, MultipartFile imagem) {
+    public UpdateLivroResponseDTO atualizarLivro(UUID id, UpdateLivroRequestDTO dto, MultipartFile capa) {
         Livro livro = livroRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado"));
 
-        if (imagem != null && !imagem.isEmpty()) {
-            String novaImagem = supabaseStorageService.uploadImagem(imagem);
+        if (capa != null && !capa.isEmpty()) {
+            String novaImagem = supabaseStorageService.uploadImagem(capa);
             livro.setCapa(novaImagem);
         }
 
